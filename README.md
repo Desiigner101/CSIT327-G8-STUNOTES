@@ -7,7 +7,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [Team](#team)
-- [Timeline](#timeline)
 
 ## Overview
 
