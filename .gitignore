@@ -1,0 +1,62 @@
+# Android/Emulator
+.gradle/
+.idea/
+*.iml
+*.apk
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+.android/
+.vs/
+.vscode/
+
+# Emulator/AVD system images
+*.lock
+*.log
+*.cache
+*.img
+*.qcow2
+*.nvram
+*.keystore
+*.pb
+*.ini
+*.proto
+*.trace
+*.json
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+
+# VS Code
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
