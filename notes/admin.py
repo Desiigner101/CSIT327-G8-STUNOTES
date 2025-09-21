@@ -10,7 +10,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering = ['-created_at']
     
-    # Add custom fields to the user form
+
     fieldsets = BaseUserAdmin.fieldsets + (
         ('StuNotes Profile', {
             'fields': ('bio', 'profile_pic', 'is_admin', 'theme', 'notifications_enabled')
