@@ -5,5 +5,7 @@ from django.test import TestCase
 print("Hello Everyone")
 
 # Create your tests here.
+
+print("idi na hui")
 print("tests.py is working")
 
