@@ -10,18 +10,23 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering = ['-created_at']
     
-
     fieldsets = BaseUserAdmin.fieldsets + (
         ('StuNotes Profile', {
-            'fields': ('bio', 'profile_pic', 'is_admin', 'theme', 'notifications_enabled')
+            'fields': ('bio', 'profile_pic', 'theme', 'notifications_enabled')  # Removed 'is_admin'
         }),
     )
     
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
         ('StuNotes Profile', {
-            'fields': ('bio', 'profile_pic', 'is_admin', 'theme', 'notifications_enabled')
+            'fields': ('bio', 'profile_pic', 'theme', 'notifications_enabled')  # Removed 'is_admin'
         }),
     )
+    
+    class Media:
+        css = {
+            'all': ('admin_assets/css/admin.css',)
+        }
+        js = ('admin_assets/js/admin.js',)
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
@@ -31,7 +36,6 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ['title', 'user__username', 'subject', 'description']
     ordering = ['-created_at']
     
-    
     fieldsets = (
         ('Task Information', {
             'fields': ('user', 'title', 'description', 'subject')
@@ -40,6 +44,12 @@ class TaskAdmin(admin.ModelAdmin):
             'fields': ('due_date', 'priority', 'status')
         }),
     )
+    
+    class Media:
+        css = {
+            'all': ('admin_assets/css/admin.css',)
+        }
+        js = ('admin_assets/js/admin.js',)
 
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
@@ -49,7 +59,6 @@ class NoteAdmin(admin.ModelAdmin):
     search_fields = ['title', 'user__username', 'content', 'subject', 'tags']
     ordering = ['-created_at']
     
-    
     fieldsets = (
         ('Note Information', {
             'fields': ('user', 'title', 'subject')
@@ -58,6 +67,12 @@ class NoteAdmin(admin.ModelAdmin):
             'fields': ('content', 'tags')
         }),
     )
+    
+    class Media:
+        css = {
+            'all': ('admin_assets/css/admin.css',)
+        }
+        js = ('admin_assets/js/admin.js',)
 
 @admin.register(Reminder)
 class ReminderAdmin(admin.ModelAdmin):
@@ -67,25 +82,17 @@ class ReminderAdmin(admin.ModelAdmin):
     search_fields = ['task__title', 'task__user__username']
     ordering = ['remind_time']
     
-    
     fieldsets = (
         ('Reminder Details', {
             'fields': ('task', 'remind_time', 'is_sent')
         }),
     )
     
-# Styling calls for admin
-class Media:
-    css = {
-        'all': ('admin_assets/css/admin.css',)
-    }
-    js = ('admin_assets/js/admin.js',)
-
-# Apply to all admin classes
-UserAdmin.Media = Media
-TaskAdmin.Media = Media
-NoteAdmin.Media = Media
-ReminderAdmin.Media = Media
+    class Media:
+        css = {
+            'all': ('admin_assets/css/admin.css',)
+        }
+        js = ('admin_assets/js/admin.js',)
 
 # Customize admin site
 admin.site.site_header = "StuNotes Administration"
