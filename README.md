@@ -50,7 +50,7 @@
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-username/stunotes.git
+   git clone https://github.com/Desiigner101/STUNOTES-APP.git
    cd stunotes
    ```
 
