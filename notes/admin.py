@@ -30,7 +30,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_filter = ['priority', 'status', 'subject', 'created_at', 'due_date']
     search_fields = ['title', 'user__username', 'subject', 'description']
     ordering = ['-created_at']
-    date_hierarchy = 'created_at'
+    
     
     fieldsets = (
         ('Task Information', {
@@ -48,7 +48,7 @@ class NoteAdmin(admin.ModelAdmin):
     list_filter = ['subject', 'created_at']
     search_fields = ['title', 'user__username', 'content', 'subject', 'tags']
     ordering = ['-created_at']
-    date_hierarchy = 'created_at'
+    
     
     fieldsets = (
         ('Note Information', {
@@ -66,13 +66,26 @@ class ReminderAdmin(admin.ModelAdmin):
     list_filter = ['is_sent', 'remind_time', 'created_at']
     search_fields = ['task__title', 'task__user__username']
     ordering = ['remind_time']
-    date_hierarchy = 'remind_time'
+    
     
     fieldsets = (
         ('Reminder Details', {
             'fields': ('task', 'remind_time', 'is_sent')
         }),
     )
+    
+# Styling calls for admin
+class Media:
+    css = {
+        'all': ('admin_assets/css/admin.css',)
+    }
+    js = ('admin_assets/js/admin.js',)
+
+# Apply to all admin classes
+UserAdmin.Media = Media
+TaskAdmin.Media = Media
+NoteAdmin.Media = Media
+ReminderAdmin.Media = Media
 
 # Customize admin site
 admin.site.site_header = "StuNotes Administration"
