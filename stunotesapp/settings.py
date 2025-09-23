@@ -88,6 +88,7 @@ DATABASES = {
     }
 }
 
+#Configure static files for user interface and for future use ninyo
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
