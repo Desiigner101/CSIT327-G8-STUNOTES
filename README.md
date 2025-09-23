@@ -119,4 +119,4 @@ For questions or issues:
 
 ---
 
-**Developed by IT317-G3 Team**
+**Developed by CSIT-327 Team**
