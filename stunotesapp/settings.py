@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'stunotes',
     'notes',
+
 ]
 
 MIDDLEWARE = [
@@ -56,7 +57,7 @@ ROOT_URLCONF = 'stunotesapp.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # 👈 global templates folder
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -91,11 +92,14 @@ DATABASES = {
 #Configure static files for user interface and for future use ninyo
 STATIC_URL = '/static/'
 
+# App-level static + global static folder
 STATICFILES_DIRS = [
-    BASE_DIR / 'notes' / 'static',
+    BASE_DIR / "stunotes" / "static",   # your app static (style.css etc.)
+    BASE_DIR / "staticfiles",           # your global folder (admin overrides, extra css/js)
 ]
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Where collected static files will go after running `collectstatic`
+STATIC_ROOT = BASE_DIR / "static_cdn"
 
 AUTH_USER_MODEL = 'notes.User'
 MEDIA_URL = '/media/'
