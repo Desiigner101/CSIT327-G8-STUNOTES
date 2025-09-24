@@ -40,6 +40,13 @@ body {
   margin-top: 20%
 }
 
+/*create now colored coded*/
+.create-now{
+  color: #5EAA65;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 /* Labels */
 .form-box label {
   margin-left: 20%;
