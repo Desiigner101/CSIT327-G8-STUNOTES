@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Home - Dashboard</title>
-  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'notes/css/style.css' %}">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -69,7 +69,7 @@
 <body>
 
   <!-- Logout link -->
-  <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+  <a href="{% url 'notes:logout' %}" class="logout-link">Logout</a>
 
   <!-- Main Content -->
   <div class="container">

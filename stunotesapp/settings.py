@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'stunotes',
     'notes',
 
 ]
@@ -94,7 +93,7 @@ STATIC_URL = '/static/'
 
 # App-level static + global static folder
 STATICFILES_DIRS = [
-    BASE_DIR / "stunotes" / "static",   # your app static (style.css etc.)
+    BASE_DIR / "notes" / "static",   # your app static (style.css etc.)
     BASE_DIR / "staticfiles",           # your global folder (admin overrides, extra css/js)
 ]
 
