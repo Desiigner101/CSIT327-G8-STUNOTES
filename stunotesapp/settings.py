@@ -93,8 +93,7 @@ STATIC_URL = '/static/'
 
 # App-level static + global static folder
 STATICFILES_DIRS = [
-    BASE_DIR / "notes" / "static",   # your app static (style.css etc.)
-    BASE_DIR / "staticfiles",           # your global folder (admin overrides, extra css/js)
+    BASE_DIR / "notes" / "static",   # your app static (style.css etc.)          # your global folder (admin overrides, extra css/js)
 ]
 
 # Where collected static files will go after running `collectstatic`
