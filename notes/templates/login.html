@@ -11,6 +11,7 @@
 <body>
   <div class="container">
 
+    <!-- ✅ Messages -->
     {% if messages %} 
       <div class="messages">
         {% for message in messages %}
@@ -20,6 +21,7 @@
         {% endfor %}
       </div>
     {% endif %}
+    <!-- ✅ End messages -->
 
     <form method="POST" class="form-box">
       {% csrf_token %}
@@ -30,13 +32,8 @@
         <a href="{% url 'notes:register' %}" class="create-now">create now</a>
       </div>
 
-      {% if user_model.USERNAME_FIELD == 'email' %}
-        <label for="login_input">Email</label>
-        <input type="email" id="login_input" name="username" placeholder="Enter your email" required>
-      {% else %}
-        <label for="login_input">Username</label>
-        <input type="text" id="login_input" name="username" placeholder="Enter your username" required>
-      {% endif %}
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
       <label for="password">Password</label>
       <input type="password" id="password" name="password" placeholder="Enter your password" required>
@@ -46,6 +43,7 @@
   </div>
   
   <script>
+    // Auto dismiss messages after 3 seconds
     setTimeout(function() {
       let alerts = document.querySelectorAll('.alert');
       alerts.forEach(alert => {
