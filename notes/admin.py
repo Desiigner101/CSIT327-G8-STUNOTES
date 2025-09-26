@@ -4,33 +4,55 @@ from .models import User, Task, Note, Reminder
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    """Admin configuration for User model"""
-    list_display = ['username', 'email', 'first_name', 'last_name', 'is_admin', 'created_at', 'is_superuser', 'is_staff']
+    """
+    Admin configuration for the User model.
+
+    Customizes how User instances appear in the Django admin interface.
+    Includes additional StuNotes-specific fields such as bio, profile_pic, theme, and notifications.
+    """
+    # Columns displayed in the list view
+    list_display = [
+        'username', 'email', 'first_name', 'last_name', 
+        'is_admin', 'created_at', 'is_superuser', 'is_staff'
+    ]
+    # Filters available in the right sidebar
     list_filter = ['is_superuser', 'is_staff', 'theme', 'notifications_enabled', 'created_at']
+    # Fields that can be searched
     search_fields = ['username', 'email', 'first_name', 'last_name']
+    # Default ordering in list view
     ordering = ['-created_at']
     
+    # Fieldsets for editing existing users
     fieldsets = BaseUserAdmin.fieldsets + (
         ('StuNotes Profile', {
-            'fields': ('bio', 'profile_pic', 'theme', 'notifications_enabled')  # Removed 'is_admin'
+            'fields': ('bio', 'profile_pic', 'theme', 'notifications_enabled')  # StuNotes-specific fields
         }),
     )
     
+    # Fieldsets for adding a new user
     add_fieldsets = BaseUserAdmin.add_fieldsets + (
         ('StuNotes Profile', {
-            'fields': ('bio', 'profile_pic', 'theme', 'notifications_enabled')  # Removed 'is_admin'
+            'fields': ('bio', 'profile_pic', 'theme', 'notifications_enabled')
         }),
     )
     
     class Media:
+        """
+        Include custom CSS and JS for admin customization.
+        """
         css = {
             'all': ('admin_assets/css/admin.css',)
         }
         js = ('admin_assets/js/admin.js',)
 
+
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    """Admin configuration for Task model"""
+    """
+    Admin configuration for the Task model.
+
+    Customizes the list view, filters, search, and field organization for Task instances.
+    """
     list_display = ['title', 'user', 'subject', 'priority', 'status', 'due_date', 'created_at']
     list_filter = ['priority', 'status', 'subject', 'created_at', 'due_date']
     search_fields = ['title', 'user__username', 'subject', 'description']
@@ -46,14 +68,17 @@ class TaskAdmin(admin.ModelAdmin):
     )
     
     class Media:
-        css = {
-            'all': ('admin_assets/css/admin.css',)
-        }
+        css = {'all': ('admin_assets/css/admin.css',)}
         js = ('admin_assets/js/admin.js',)
+
 
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
-    """Admin configuration for Note model"""
+    """
+    Admin configuration for the Note model.
+
+    Customizes how notes are displayed, searchable fields, and organization in the admin.
+    """
     list_display = ['title', 'user', 'subject', 'created_at']
     list_filter = ['subject', 'created_at']
     search_fields = ['title', 'user__username', 'content', 'subject', 'tags']
@@ -69,14 +94,17 @@ class NoteAdmin(admin.ModelAdmin):
     )
     
     class Media:
-        css = {
-            'all': ('admin_assets/css/admin.css',)
-        }
+        css = {'all': ('admin_assets/css/admin.css',)}
         js = ('admin_assets/js/admin.js',)
+
 
 @admin.register(Reminder)
 class ReminderAdmin(admin.ModelAdmin):
-    """Admin configuration for Reminder model"""
+    """
+    Admin configuration for the Reminder model.
+
+    Controls display, filtering, search, and field organization in the admin.
+    """
     list_display = ['task', 'remind_time', 'is_sent', 'created_at']
     list_filter = ['is_sent', 'remind_time', 'created_at']
     search_fields = ['task__title', 'task__user__username']
@@ -89,12 +117,11 @@ class ReminderAdmin(admin.ModelAdmin):
     )
     
     class Media:
-        css = {
-            'all': ('admin_assets/css/admin.css',)
-        }
+        css = {'all': ('admin_assets/css/admin.css',)}
         js = ('admin_assets/js/admin.js',)
 
-# Customize admin site
-admin.site.site_header = "StuNotes Administration"
-admin.site.site_title = "StuNotes Admin Portal"
-admin.site.index_title = "Welcome to StuNotes Administration"
+
+# Customize the admin site headers and titles
+admin.site.site_header = "StuNotes Administration"  # Top header of admin
+admin.site.site_title = "StuNotes Admin Portal"     # Browser tab title
+admin.site.index_title = "Welcome to StuNotes Administration"  # Index page title
