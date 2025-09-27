@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="{% static 'notes/css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'notes/css/Login.css' %}">
 </head>
 <body>
   <div class="container">
@@ -27,8 +27,8 @@
       {% csrf_token %}
       <h2 class="form-box-title">Sign in</h2>
 
-      <div class="switch-link">
-        Don't have an account? 
+      <div class="switch-link"><a class="no-account_text">
+       Don't have an account?</a> 
       <a href="{% url 'notes:register' %}" class="create-now">create now</a>
       </div>
 
@@ -38,7 +38,7 @@
       <label for="password">Password</label>
       <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
-      <button type="submit">Login</button>
+      <button type="submit">Sign in</button>
 
     </form>
   </div>
