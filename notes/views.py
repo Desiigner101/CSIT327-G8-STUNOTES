@@ -1,6 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,  get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, authenticate, logout
+from .models import Task, Note
+from .forms import TaskForm, UserProfileForm
+
+
 
 # Get the custom User model
 User = get_user_model()
@@ -82,14 +86,45 @@ def login_view(request):
     # Render login form for GET requests
     return render(request, "login.html")
 
-
 def home(request):
     """
-    Render the home page.
-
+    Render the home page with tasks and task form.
     Accessible only to logged-in users.
     """
-    return render(request, 'home.html')
+    tasks = Task.objects.filter(user=request.user).order_by('-created_at')
+
+    # detect if editing
+    edit_task_id = request.GET.get("edit")
+    task_to_edit = None
+    edit_form = None
+
+    if edit_task_id:
+        task_to_edit = get_object_or_404(Task, id=edit_task_id, user=request.user)
+        edit_form = TaskForm(instance=task_to_edit)
+
+    if request.method == "POST":
+        if "edit_task_id" in request.POST:  # ✅ Editing
+            task_to_edit = get_object_or_404(Task, id=request.POST["edit_task_id"], user=request.user)
+            form = TaskForm(request.POST, instance=task_to_edit)
+            if form.is_valid():
+                form.save()
+                return redirect("notes:home")
+        else:  # ✅ Adding new
+            form = TaskForm(request.POST)
+            if form.is_valid():
+                task = form.save(commit=False)
+                task.user = request.user
+                task.save()
+                return redirect("notes:home")
+    else:
+        form = TaskForm()
+
+    return render(request, "home.html", {
+        "tasks": tasks,
+        "form": form,
+        "edit_form": edit_form,
+        "task_to_edit": task_to_edit,
+    })
 
 
 def logout_view(request):
@@ -104,3 +139,70 @@ def logout_view(request):
     logout(request)
     messages.success(request, "You have logged out!")
     return redirect("notes:login")
+
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+    if request.method == "POST":
+        task.delete()
+        return redirect('notes:home')
+    return redirect('notes:home')
+
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, id=task_id, user=request.user)
+
+    if request.method == "POST":
+        form = TaskForm(request.POST, instance=task)
+        if form.is_valid():
+            form.save()
+            return redirect('notes:home')
+    else:
+        form = TaskForm(instance=task)
+
+    return render(request, "edit_task.html", {"form": form, "task": task})
+
+ # Added security decorator
+def profile_view(request):
+    """
+    Renders the user's profile page and calculates user statistics.
+    """
+    user = request.user
+    
+    # 1. Calculate Task Statistics
+    total_tasks = Task.objects.filter(user=user).count()
+    completed_tasks = Task.objects.filter(user=user, status='completed').count()
+    
+    # 2. Calculate Note Statistics
+    total_notes = Note.objects.filter(user=user).count() # <--- CRITICAL FIX 2: Changed 'notes' to 'Note'
+    
+    context = {
+        'user': user,
+        'total_notes_created': total_notes,
+        'total_tasks_created': total_tasks, # Display total tasks created
+        'tasks_completed': completed_tasks, # Display tasks completed
+    }
+    return render(request, 'profile_view.html', context)
+
+def edit_profile(request):
+    """
+    Handles displaying and processing the User Profile edit form, including file upload.
+    """
+    user = request.user
+    
+    if request.method == "POST":
+        # CRITICAL: Pass request.FILES to the form for file handling
+        form = UserProfileForm(request.POST, request.FILES, instance=user) 
+        
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile and picture have been updated successfully!")
+            return redirect("notes:profile_view")
+        else:
+            messages.error(request, "Please correct the errors below.")
+            
+    else:
+        form = UserProfileForm(instance=user)
+        
+    return render(request, 'edit_profile.html', {
+        "form": form,
+        "user": user
+    })

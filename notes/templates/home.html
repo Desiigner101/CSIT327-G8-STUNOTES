@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>Dashboard - Home</title>
   <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
+  
 </head>
 <body>
   <!-- Sidebar -->
@@ -27,78 +28,210 @@
   <!-- Main Content -->
   <main class="main">
     <header class="topbar">
-      <h2>Welcome, {{ user.username }} 👋</h2>
-      <p>Today is <strong>October 02, 2025</strong></p>
-    </header>
-
-  <div class="container">
-    <h1>Welcome, {{ user.full_name }} 👋</h1>
-    <p>This is your personal dashboard. You can manage your notes and explore features here.</p>
+  <div class="topbar-left">
+    <h2>Welcome, {{ user.username }} 👋</h2>
+    <p class="user-email-display">Welcome, xaviersabornido2004@gmail.com 👋</p> 
   </div>
 
-
-    <div class="grid">
-      <!-- Notes -->
-      <section class="card notes">
-        <div class="card-header">
-          <h3>Notes</h3>
-          <button class="btn">+ Add Note</button>
-        </div>
-        <div class="note">
-          <h4>Sample Note</h4>
-          <p>By the time he returned home, the young man was no longer the same...</p>
-          <span class="date">24 Aug 2022</span>
-        </div>
-        <div class="note">
-          <h4>Another Note</h4>
-          <p>Conflict often brings about change, and this capricious, incalculable...</p>
-          <span class="date">24 Aug 2022</span>
-        </div>
-      </section>
-
-      <!-- To Do List -->
-      <section class="card todo">
-        <div class="card-header">
-          <h3>To Do List</h3>
-          <button class="btn">+ Add Task</button>
-        </div>
-        <ul>
-          <li><input type="checkbox" checked> Study - 8:00 AM</li>
-          <li><input type="checkbox"> Task - 9:00 AM</li>
-          <li><input type="checkbox"> Task - 10:00 AM</li>
-        </ul>
-      </section>
-
-      <!-- Calendar -->
-      <section class="card calendar">
-        <div class="card-header">
-          <h3>October</h3>
-        </div>
-        <div class="calendar-box">
-          <!-- Static placeholder calendar -->
-          <table>
-            <tr>
-              <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
-            </tr>
-            <tr>
-              <td></td><td></td><td>1</td><td class="today">2</td><td>3</td><td>4</td><td>5</td>
-            </tr>
-            <tr>
-              <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
-            </tr>
-            <!-- etc -->
-          </table>
-        </div>
-        <div class="todos-today">
-          <h4>To-dos Today:</h4>
-          <ul>
-            <li>Daily Standup - 09:00</li>
-            <li>Budget Review - 10:00</li>
-            <li>School Joy 13 - 11:00</li>
-          </ul>
-        </div>
-      </section>
+  <div class="topbar-right">
+    <p>Today is <strong>October 02, 2025</strong></p>
+    
+    <a href="{% url 'notes:profile_view' %}" class="profile-link">
+      <img src="{% static 'notes/images/profile_pic.png' %}" 
+           alt="Profile" 
+           class="profile-icon">
+    </a>
     </div>
+</header>
+
+    <!-- GRID CONTAINER -->
+<div class="grid">
+  <!-- Notes -->
+  <section class="card notes">
+    <div class="card-header">
+      <h3>Notes</h3>
+      <button class="btn">+ Add Note</button>
+    </div>
+    <div class="note">
+      <h4>Sample Note</h4>
+      <p>By the time he returned home, the young man was no longer the same...</p>
+      <span class="date">24 Aug 2022</span>
+    </div>
+    <div class="note">
+      <h4>Another Note</h4>
+      <p>Conflict often brings about change, and this capricious, incalculable...</p>
+      <span class="date">24 Aug 2022</span>
+    </div>
+  </section>
+
+  <!-- To Do List -->
+  <section class="card todo">
+    <div class="card-header">
+      <h3>To Do List</h3>
+      <!-- Toggle Button -->
+      <button class="btn btn-primary" id="toggleTaskForm">+ Add Task</button>
+    </div>
+
+    <!-- Hidden Task Form -->
+    <div class="task-form" id="taskForm" style="display: none; margin-top: 10px;">
+      <form method="post" class="form-container">
+        {% csrf_token %}
+
+        <div class="form-group">
+          {{ form.title.label_tag }}
+          {{ form.title }}
+        </div>
+
+        <div class="form-group">
+          {{ form.description.label_tag }}
+          {{ form.description }}
+        </div>
+
+        <div class="form-group">
+          {{ form.subject.label_tag }}
+          {{ form.subject }}
+        </div>
+
+        <div class="form-group">
+          {{ form.due_date.label_tag }}
+          {{ form.due_date }}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            {{ form.priority.label_tag }}
+            {{ form.priority }}
+          </div>
+          <div class="form-group">
+            {{ form.status.label_tag }}
+            {{ form.status }}
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Task</button>
+      </form>
+    </div>
+
+    <!-- Task List -->
+    <ul class="task-list">
+  {% for task in tasks %}
+    <li class="{% if task.is_overdue %}overdue{% endif %}">
+      <input type="checkbox" {% if task.status == "completed" %}checked{% endif %}>
+      <strong>{{ task.title }}</strong> ({{ task.priority|title }})<br>
+      <small>Due: {{ task.due_date|date:"M d, Y H:i" }} | Status: {{ task.get_status_display }}</small>
+
+      <!-- Buttons -->
+      <div style="margin-top: 8px;">
+        <!-- Edit Button (reload page with ?edit=task_id) -->
+        <a href="?edit={{ task.id }}" class="btn btn-primary">✏ Edit</a>
+
+        <!-- Delete -->
+        <form method="post" action="{% url 'notes:delete_task' task.id %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" class="btn-danger"
+                  onclick="return confirm('Are you sure you want to delete this task?');">
+            🗑 Delete
+          </button>
+        </form>
+      </div>
+
+      <!-- Inline Edit Form -->
+      {% if task_to_edit and task_to_edit.id == task.id %}
+        <div class="task-form" style="margin-top: 10px;">
+          <form method="post" class="form-container">
+            {% csrf_token %}
+            <input type="hidden" name="edit_task_id" value="{{ task.id }}">
+            
+            <div class="form-group">
+              {{ edit_form.title.label_tag }}
+              {{ edit_form.title }}
+            </div>
+
+            <div class="form-group">
+              {{ edit_form.description.label_tag }}
+              {{ edit_form.description }}
+            </div>
+
+            <div class="form-group">
+              {{ edit_form.subject.label_tag }}
+              {{ edit_form.subject }}
+            </div>
+
+            <div class="form-group">
+              {{ edit_form.due_date.label_tag }}
+              {{ edit_form.due_date }}
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                {{ edit_form.priority.label_tag }}
+                {{ edit_form.priority }}
+              </div>
+              <div class="form-group">
+                {{ edit_form.status.label_tag }}
+                {{ edit_form.status }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success">💾 Save</button>
+            <a href="{% url 'notes:home' %}" class="btn btn-danger">✖ Cancel</a>
+          </form>
+        </div>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No tasks yet.</li>
+  {% endfor %}
+</ul>
+
+  </section>
+
+  <!-- Calendar -->
+  <section class="card calendar">
+    <div class="card-header">
+      <h3>October</h3>
+    </div>
+    <div class="calendar-box">
+      <!-- Static placeholder calendar -->
+      <table>
+        <tr>
+          <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
+        </tr>
+        <tr>
+          <td></td><td></td><td>1</td><td class="today">2</td><td>3</td><td>4</td><td>5</td>
+        </tr>
+        <tr>
+          <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
+        </tr>
+      </table>
+    </div>
+    <div class="todos-today">
+      <h4>To-dos Today:</h4>
+      <ul>
+        <li>Daily Standup - 09:00</li>
+        <li>Budget Review - 10:00</li>
+        <li>School Joy 13 - 11:00</li>
+      </ul>
+    </div>
+  </section>
+</div>
   </main>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const toggleBtn = document.getElementById("toggleTaskForm");
+    const taskForm = document.getElementById("taskForm");
+
+    toggleBtn.addEventListener("click", function() {
+      if (taskForm.style.display === "none") {
+        taskForm.style.display = "block";
+        toggleBtn.textContent = "✖ Close Form";
+      } else {
+        taskForm.style.display = "none";
+        toggleBtn.textContent = "+ Add Task";
+      }
+    });
+  });
+  </script>
 </body>
 </html>

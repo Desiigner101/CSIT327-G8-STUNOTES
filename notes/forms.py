@@ -22,15 +22,17 @@ class CustomUserChangeForm(UserChangeForm):
 # Task Form
 # ----------------------------
 class TaskForm(forms.ModelForm):
-    """Form for creating and updating tasks"""
-    due_date = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        required=False
-    )
-    
     class Meta:
         model = Task
-        fields = ['user', 'title', 'description', 'subject', 'due_date', 'priority', 'status']
+        fields = ['title', 'description', 'subject', 'due_date', 'priority', 'status']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter task title'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Add details'}),
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
+            'due_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+        }
 
 
 # ----------------------------
@@ -60,3 +62,50 @@ class ReminderForm(forms.ModelForm):
     class Meta:
         model = Reminder
         fields = ['task', 'remind_time', 'is_sent']
+
+class UserProfileForm(forms.ModelForm):
+    """
+    Form for editing user's profile information, including bio and profile picture.
+    """
+    
+    # Custom fields based on your model: full_name is CharField, bio is TextField
+    # Theme is a ChoiceField on the model, so we can render it naturally.
+
+    class Meta:
+        model = User
+        # Fields that will be managed by the ModelForm
+        fields = ['full_name', 'email', 'bio', 'profile_pic', 'theme'] 
+        
+        # We can explicitly define the widget for 'bio' to make it a textarea
+        widgets = {
+            'bio': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Tell us a little bit about yourself...'}),
+        }
+    
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        # Fields to apply general text input styling
+        text_input_fields = ['full_name', 'email']
+        for field_name in text_input_fields:
+            if field_name in self.fields:
+                self.fields[field_name].widget.attrs.update({
+                    'class': 'form-input', 
+                    'placeholder': self.fields[field_name].label
+                })
+        
+        # Apply select styling to the theme field
+        if 'theme' in self.fields:
+            self.fields['theme'].widget.attrs.update({
+                'class': 'form-select',
+            })
+            
+        # Apply styling and placeholder to bio field
+        if 'bio' in self.fields:
+            self.fields['bio'].widget.attrs.update({
+                'class': 'form-textarea',
+            })
+        
+        # Customize the profile picture field's label
+        if 'profile_pic' in self.fields:
+             self.fields['profile_pic'].label = "Change Profile Picture"

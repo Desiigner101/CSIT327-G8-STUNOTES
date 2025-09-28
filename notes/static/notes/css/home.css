@@ -12,6 +12,51 @@ body {
   background: #f5f7fa;
   color: #333;
 }
+/* -------------------- Topbar Styles -------------------- */
+
+/* Make the topbar a flex container to push left and right content apart */
+.topbar {
+    display: flex;
+    justify-content: space-between; /* Pushes the left and right sides to the edges */
+    align-items: center; /* Vertically aligns items in the center */
+    padding: 20px 30px; /* Adjust padding as needed */
+    background: #fff; /* Match your background if needed */
+    border-bottom: 1px solid #eee; /* Add a subtle separator if desired */
+}
+
+/* Style for the container holding the date and icon */
+.topbar-right {
+    display: flex;
+    align-items: center; /* Vertically align the date text and icon */
+    gap: 15px; /* Space between the date and the icon */
+}
+
+/* Style for the profile icon image */
+.profile-icon {
+    width: 38px; /* Set the size of the icon */
+    height: 38px;
+    border-radius: 50%; /* Makes the image circular */
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid #388e3c; /* Optional: adds a green ring around the icon */
+    transition: transform 0.2s;
+}
+
+.profile-icon:hover {
+    transform: scale(1.05); /* Slight zoom effect on hover */
+}
+
+/* Ensure the date text is aligned nicely */
+.topbar-right p {
+    margin: 0; /* Remove default margin on the paragraph */
+    font-size: 14px;
+    color: #555;
+}
+
+.topbar-right strong {
+    font-weight: 600;
+    color: #333;
+}
 
 /* Sidebar */
 .sidebar {
@@ -43,11 +88,15 @@ body {
   color: #fff;
   font-weight: 500;
   transition: 0.3s;
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: block;
 }
 
 .sidebar nav ul li a:hover,
 .sidebar nav ul li a.active {
   color: #ffe082;
+  background: rgba(0, 0, 0, 0.15);
 }
 
 .sidebar .stats {
@@ -63,20 +112,51 @@ body {
 
 .topbar {
   margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
+/* ✅ Fix Grid Layout so Notes, Tasks, and Calendar align horizontally */
 .grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1.2fr 1.5fr 1fr; /* Notes | Tasks | Calendar */
   gap: 20px;
+  align-items: start;
+  width: 100%;
 }
 
-/* Cards */
+/* Make sure all cards have equal height feel */
 .card {
   background: #fff;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Notes section wider */
+.notes {
+  grid-column: 1; /* stays first */
+}
+
+/* To Do List centered */
+.todo {
+  grid-column: 2;
+}
+
+/* Calendar smaller and compact */
+.calendar {
+  grid-column: 3;
+  max-width: 300px; /* keeps calendar card slim */
+}
+
+/* Prevent Calendar from stretching */
+.calendar-box {
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .card-header {
@@ -90,6 +170,7 @@ body {
   font-size: 18px;
 }
 
+/* Buttons */
 .btn {
   background: #4caf50;
   color: #fff;
@@ -98,10 +179,40 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
+  transition: 0.3s;
 }
 
 .btn:hover {
   background: #43a047;
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-success:hover {
+  background: #218838;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: 0.3s;
+}
+
+.btn-danger:hover {
+  background: #b02a37;
 }
 
 /* Notes */
@@ -119,12 +230,27 @@ body {
 }
 
 /* Todo List */
-.todo ul {
+.task-list {
   list-style: none;
+  padding-left: 0;
+  margin-top: 15px;
+  flex-grow: 1;
+  overflow-y: auto; /* scroll if too many tasks */
+  max-height: 200px;
 }
 
-.todo li {
+.task-list li {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
   margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.task-list li.overdue {
+  border-left: 5px solid #dc3545;
+  background: #ffe5e5;
 }
 
 /* Calendar */
@@ -134,7 +260,8 @@ body {
   margin-bottom: 15px;
 }
 
-.calendar-box th, .calendar-box td {
+.calendar-box th,
+.calendar-box td {
   text-align: center;
   padding: 5px;
 }
@@ -148,4 +275,44 @@ body {
 .todos-today ul {
   list-style: none;
   font-size: 14px;
+  padding-left: 0;
+}
+
+/* Task Form */
+.task-form {
+  background: #f9fafc;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+/* ✅ Responsive adjustments */
+@media (max-width: 992px) {
+  .grid {
+    grid-template-columns: 1fr 1fr; /* 2 columns on tablets */
+  }
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr; /* 1 column on mobile */
+  }
 }
