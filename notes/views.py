@@ -89,20 +89,31 @@ def login_view(request):
 def home(request):
     """
     Render the home page with tasks and task form.
-    Accessible only to logged-in users.
+    Now handles both authenticated and anonymous users.
     """
-    tasks = Task.objects.filter(user=request.user).order_by('-created_at')
+    # Check if user is authenticated before filtering tasks
+    if request.user.is_authenticated:
+        tasks = Task.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        tasks = []  # Empty list for anonymous users
+        # You might want to redirect to login instead:
+        # return redirect("notes:login")
 
-    # detect if editing
+    # detect if editing (only for authenticated users)
     edit_task_id = request.GET.get("edit")
     task_to_edit = None
     edit_form = None
 
-    if edit_task_id:
+    if edit_task_id and request.user.is_authenticated:
         task_to_edit = get_object_or_404(Task, id=edit_task_id, user=request.user)
         edit_form = TaskForm(instance=task_to_edit)
 
     if request.method == "POST":
+        # Only allow POST operations for authenticated users
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to perform this action.")
+            return redirect("notes:login")
+            
         if "edit_task_id" in request.POST:  # ✅ Editing
             task_to_edit = get_object_or_404(Task, id=request.POST["edit_task_id"], user=request.user)
             form = TaskForm(request.POST, instance=task_to_edit)
@@ -125,7 +136,6 @@ def home(request):
         "edit_form": edit_form,
         "task_to_edit": task_to_edit,
     })
-
 
 def logout_view(request):
     """
