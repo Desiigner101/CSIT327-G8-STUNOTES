@@ -18,7 +18,7 @@ body {
 /* Container for form */
 .container {
   background: white;
-  padding: 1rem 2.5rem;
+  padding: 12rem 3rem;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
   width: 100%;
   height: 100%;
@@ -31,37 +31,37 @@ body {
   margin-left: 20%;
   text-align: left;
   font-size: 4rem;
-  margin-bottom: 0.1rem;
+  margin-bottom: 1rem;
   color: #111827;
 }
 
-/*Form box login title (Sign in)*/
+/*Form box Register title (Sign up)*/
 .form-box-title{
   margin-top: 20%
 }
 
-/* No account text font size */
-.no-account_text{
-  font-size: 1.1rem;
+/*already have account text font size */
+.already-have-account{
+  font-size: 20px;
   color: #374151;
 }
 
-/*create now text colored coded*/
+/*create now colored coded*/
 .create-now{
   color: #5EAA65;
   font-weight: 700;
-  text-decoration: none;
-  font-size: 1.1rem;
+  font-size: 20px;
+  text-decoration: none;;
 }
 
 /* Labels */
 .form-box label {
   margin-left: 20%;
   display: block;
+  margin-bottom: 0.54rem;
   font-weight: 700;
-  font-size: 17px;
-  margin-bottom: 0.5rem;
   color: #374151;
+  font-size: 15px;
 }
 
 /* Input fields */
@@ -70,11 +70,11 @@ body {
   margin-left: 20%;
   padding: 0.95rem;
   margin-bottom: 2rem;
-  font-size: 1rem;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   outline: none;
   transition: border 0.3s;
+  font-size: 15px;
 }
 
 .form-box input:focus {
@@ -85,14 +85,14 @@ body {
 /* Buttons */
 .form-box button {
   width: 60%;
-  padding: 1.1rem;
+  padding: 1rem;
   margin-left: 20%;
   background: #5EAA65;
+  margin-top: 1%;
   border: none;
-  margin-bottom: 3%;
   border-radius: 20px;
   color: #fff;
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
@@ -102,7 +102,7 @@ body {
   background: #35c644;
 }
 
-/*Switch link for login*/
+/*Switch link for Sign Up*/
 .switch-link{
   text-align: left;
   margin-left: 20%;
@@ -115,7 +115,7 @@ body {
 .form-box .extra {
   text-align: center;
   margin-top: 1rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #5EAA65;
 }
 

@@ -1,0 +1,151 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f7fa;
+  color: #333;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background: #4caf50;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.sidebar .logo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.sidebar nav ul {
+  list-style: none;
+}
+
+.sidebar nav ul li {
+  margin: 15px 0;
+}
+
+.sidebar nav ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.sidebar nav ul li a:hover,
+.sidebar nav ul li a.active {
+  color: #ffe082;
+}
+
+.sidebar .stats {
+  margin-top: 30px;
+  font-size: 14px;
+}
+
+/* Main Content */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+.topbar {
+  margin-bottom: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 20px;
+}
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card h3 {
+  font-size: 18px;
+}
+
+.btn {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn:hover {
+  background: #43a047;
+}
+
+/* Notes */
+.note {
+  background: #f9f9f9;
+  border-left: 4px solid #4caf50;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.note .date {
+  font-size: 12px;
+  color: #777;
+}
+
+/* Todo List */
+.todo ul {
+  list-style: none;
+}
+
+.todo li {
+  margin-bottom: 10px;
+}
+
+/* Calendar */
+.calendar-box table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 15px;
+}
+
+.calendar-box th, .calendar-box td {
+  text-align: center;
+  padding: 5px;
+}
+
+.calendar-box .today {
+  background: #4caf50;
+  color: #fff;
+  border-radius: 50%;
+}
+
+.todos-today ul {
+  list-style: none;
+  font-size: 14px;
+}

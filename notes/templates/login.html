@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="{% static 'notes/css/login.css' %}">
+  <link rel="stylesheet" href="{% static 'notes/css/Login.css' %}">
 </head>
 <body>
   <div class="container">
@@ -29,7 +29,7 @@
 
       <div class="switch-link">
         Don't have an account? 
-        <a href="{% url 'notes:register' %}" class="create-now">create now</a>
+      <a href="{% url 'notes:register' %}" class="create-now">create now</a>
       </div>
 
       <label for="email">Email</label>
@@ -39,6 +39,7 @@
       <input type="password" id="password" name="password" placeholder="Enter your password" required>
 
       <button type="submit">Login</button>
+
     </form>
   </div>
   

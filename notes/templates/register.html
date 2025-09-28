@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register</title>
-  <link rel="stylesheet" href="{% static 'notes/css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'notes/css/Register.css' %}">
 </head>
 <body>
   <div class="container">
@@ -27,6 +27,15 @@
       {% csrf_token %}
       <h2>Sign Up</h2>
 
+
+      <div class="switch-link"><a class="already-have-account">
+       Already have an account?</a> 
+      <a href="{% url 'notes:login' %}" class="create-now">Sign in</a>
+      </div>
+
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Choose a username" required>
+
       <label for="full_name">Full Name</label>
       <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
 
@@ -41,9 +50,6 @@
 
       <button type="submit">Register</button>
 
-      <p class="switch-link">
-        Already have an account? <a href="{% url 'notes:login' %}">Sign in</a>
-      </p>
     </form>
   </div>
   

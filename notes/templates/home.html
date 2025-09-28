@@ -3,106 +3,102 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Home - Dashboard</title>
-  <link rel="stylesheet" href="{% static 'notes/css/style.css' %}">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f6f9;
-      color: #333;
-      position: relative;
-    }
-
-    /* Logout link at top right */
-    .logout-link {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      text-decoration: none;
-      color: #2c3e50;
-      font-weight: bold;
-      font-size: 16px;
-      transition: 0.3s;
-    }
-    .logout-link:hover { color: #f1c40f; }
-
-    /* Container */
-    .container {
-      max-width: 900px;
-      margin: 80px auto 40px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-    }
-
-    h1 { text-align: center; margin-bottom: 20px; font-size: 28px; color: #2c3e50; }
-    p { text-align: center; font-size: 18px; margin-bottom: 20px; }
-
-    /* Top notification popup */
-    .top-alert {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 15px 25px;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      z-index: 9999;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      opacity: 0;
-      animation: slideDown 0.5s forwards;
-    }
-    .top-alert.success { background-color: #d4edda; color: #155724; }
-    .top-alert.error   { background-color: #f8d7da; color: #721c24; }
-    .top-alert.info    { background-color: #cce5ff; color: #004085; }
-
-    @keyframes slideDown {
-      from { opacity: 0; transform: translate(-50%, -20px); }
-      to   { opacity: 1; transform: translate(-50%, 0); }
-    }
-  </style>
+  <title>Dashboard - Home</title>
+  <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
 </head>
 <body>
-
-  <!-- Logout link -->
-  <a href="{% url 'notes:logout' %}" class="logout-link">Logout</a>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo">StuNotes</div>
+    <nav>
+      <ul>
+        <li><a href="#" class="active">🏠 Home</a></li>
+        <li><a href="#">📅 Calendar</a></li>
+        <li><a href="#">⚙ Settings</a></li>
+        <li><a href="{% url 'notes:logout' %}">🚪 Logout</a></li>
+      </ul>
+    </nav>
+    <div class="stats">
+      <p>Tasks: <span>21</span></p>
+      <p>Notes: <span>12</span></p>
+    </div>
+  </aside>
 
   <!-- Main Content -->
+  <main class="main">
+    <header class="topbar">
+      <h2>Welcome, {{ user.username }} 👋</h2>
+      <p>Today is <strong>October 02, 2025</strong></p>
+    </header>
+
   <div class="container">
     <h1>Welcome, {{ user.full_name }} 👋</h1>
     <p>This is your personal dashboard. You can manage your notes and explore features here.</p>
   </div>
 
-  <!-- Top popup messages -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="top-alert {{ message.tags }}">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
 
-  <!-- Script: auto-dismiss and redirect -->
-  <script>
-    // Auto-dismiss after 3 seconds
-    setTimeout(() => {
-      const alerts = document.querySelectorAll('.top-alert');
-      alerts.forEach(alert => {
-        alert.style.transition = "opacity 0.5s ease, transform 0.5s ease";
-        alert.style.opacity = "0";
-        alert.style.transform = "translate(-50%, -20px)";
-        setTimeout(() => alert.remove(), 500);
-      });
-    }, 3000);
+    <div class="grid">
+      <!-- Notes -->
+      <section class="card notes">
+        <div class="card-header">
+          <h3>Notes</h3>
+          <button class="btn">+ Add Note</button>
+        </div>
+        <div class="note">
+          <h4>Sample Note</h4>
+          <p>By the time he returned home, the young man was no longer the same...</p>
+          <span class="date">24 Aug 2022</span>
+        </div>
+        <div class="note">
+          <h4>Another Note</h4>
+          <p>Conflict often brings about change, and this capricious, incalculable...</p>
+          <span class="date">24 Aug 2022</span>
+        </div>
+      </section>
 
-    // Optional: redirect after 3.5 seconds
-    setTimeout(() => {
-      window.location.href = "{% url 'home' %}";  // Replace 'home' with your home URL name
-    }, 3500);
-  </script>
+      <!-- To Do List -->
+      <section class="card todo">
+        <div class="card-header">
+          <h3>To Do List</h3>
+          <button class="btn">+ Add Task</button>
+        </div>
+        <ul>
+          <li><input type="checkbox" checked> Study - 8:00 AM</li>
+          <li><input type="checkbox"> Task - 9:00 AM</li>
+          <li><input type="checkbox"> Task - 10:00 AM</li>
+        </ul>
+      </section>
+
+      <!-- Calendar -->
+      <section class="card calendar">
+        <div class="card-header">
+          <h3>October</h3>
+        </div>
+        <div class="calendar-box">
+          <!-- Static placeholder calendar -->
+          <table>
+            <tr>
+              <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
+            </tr>
+            <tr>
+              <td></td><td></td><td>1</td><td class="today">2</td><td>3</td><td>4</td><td>5</td>
+            </tr>
+            <tr>
+              <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
+            </tr>
+            <!-- etc -->
+          </table>
+        </div>
+        <div class="todos-today">
+          <h4>To-dos Today:</h4>
+          <ul>
+            <li>Daily Standup - 09:00</li>
+            <li>Budget Review - 10:00</li>
+            <li>School Joy 13 - 11:00</li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </main>
 </body>
 </html>
