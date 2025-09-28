@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Task</title>
+  <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
+</head>
+<body>
+  <main class="main">
+    <h2>Edit Task: {{ task.title }}</h2>
+
+    <form method="post" class="form-container">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-success">💾 Save Changes</button>
+      <a href="{% url 'notes:home' %}" class="btn btn-danger">Cancel</a>
+    </form>
+  </main>
+</body>
+</html>

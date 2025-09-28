@@ -1,0 +1,192 @@
+/* This CSS file defines the styles for the profile.html page 
+    to match the user's requested design.
+*/
+
+.profile-page-content {
+    /* Ensures the content centers and respects the sidebar padding */
+    padding: 20px 30px; 
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* --- Main Profile Card (Header) --- */
+.profile-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+/* The cover banner area */
+.profile-cover {
+    height: 150px;
+    background-color: #5596e6; /* A solid blue/grey color for the banner */
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+/* Container for user image, details, and edit button */
+.profile-header {
+    display: flex;
+    align-items: flex-end; /* Align items to the bottom of the container */
+    padding: 0 30px 20px 30px;
+    margin-top: -60px; /* Pulls the content up over the cover image */
+    position: relative;
+}
+
+/* Profile Picture Styling */
+.profile-pic {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #fff; /* White border around the picture */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-right: 20px;
+    background-color: #f0f0f0; /* Fallback background for placeholder */
+}
+
+.user-details {
+    flex-grow: 1; /* Allows details to take up remaining space */
+    padding-bottom: 10px; /* Aligns vertically with the Edit button */
+}
+
+.user-details h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin: 0 0 5px 0;
+}
+
+.email-display {
+    font-size: 16px;
+    color: #666;
+    margin: 0;
+}
+
+/* Edit Button Styling (Matches the green button in the image) */
+.btn-edit {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 20px;
+    background-color: #4CAF50; /* Green color */
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #45a049;
+    transform: translateY(-1px);
+}
+
+/* --- Stats and About Grid --- */
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* 1 column for About, 2 for Stats */
+    gap: 20px;
+}
+
+/* About Card */
+.about-card {
+    padding: 25px;
+}
+
+.about-card h3 {
+    color: #4CAF50; /* Green title for 'About' */
+    margin-bottom: 15px;
+}
+
+.about-list {
+    list-style: none;
+    padding: 0;
+}
+
+.about-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: #444;
+}
+
+.about-list .icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.hint {
+    font-size: 13px;
+    color: #999;
+    margin-top: 20px;
+    border-top: 1px dashed #eee;
+    padding-top: 10px;
+}
+.hint a {
+    color: #5596e6;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+
+/* Stats Cards Container */
+.stats-cards-container {
+    display: flex;
+    flex-direction: column; /* Stacks the stat cards vertically */
+    gap: 20px;
+}
+
+/* Individual Stat Card */
+.stat-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fff; /* White number text */
+    background-color: #4CAF50; /* Green block for the number */
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-right: 20px;
+    min-width: 60px; /* Ensures consistent size */
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding-top: 20px;
+    }
+    
+    .profile-pic {
+        margin: 0 0 15px 0;
+    }
+
+    .btn-edit {
+        position: static; /* Move button from absolute to flow */
+        margin-top: 20px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .profile-grid {
+        grid-template-columns: 1fr; /* Stack all elements on small screens */
+    }
+}

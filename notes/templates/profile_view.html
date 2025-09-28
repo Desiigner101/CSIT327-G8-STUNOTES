@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.username }}'s Profile</title>
+    <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
+    <link rel="stylesheet" href="{% static 'notes/css/profile.css' %}">
+</head>
+<body>
+    <!-- Sidebar - Use the same sidebar as your home.html for consistent navigation -->
+    <aside class="sidebar">
+        <div class="logo">StuNotes</div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'notes:home' %}">🏠 Home</a></li>
+                <li><a href="#" class="active">👤 Profile</a></li>
+                <li><a href="#">📅 Calendar</a></li>
+                <li><a href="#">⚙ Settings</a></li>
+                <li><a href="{% url 'notes:logout' %}">🚪 Logout</a></li>
+            </ul>
+        </nav>
+        <!-- Retain the stats area -->
+        <div class="stats">
+            <p>Tasks: <span>{{ total_tasks_created }}</span></p>
+            <p>Notes: <span>{{ total_notes_created }}</span></p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main profile-page-content">
+        <div class="profile-card">
+            <!-- Header/Cover Section (Blue area in image) -->
+            <div class="profile-cover"></div>
+
+            <!-- User Info and Edit Button -->
+            <div class="profile-header">
+                <!-- 🌟 FIX APPLIED HERE 🌟 -->
+                <!-- Display the uploaded picture, falling back to the default image -->
+                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                     alt="{{ user.username }}" 
+                     class="profile-pic">
+                
+                <div class="user-details">
+                    <!-- Display Full Name (using default filter for safety) -->
+                    <h2>{{ user.full_name|default:user.username }}</h2> 
+                    
+                    <!-- Display Email Address -->
+                    <p class="email-display">{{ user.email }}</p>
+                </div>
+
+                <!-- Edit Button -->
+                <a href=" {% url 'notes:edit_profile' %} " class="btn-edit">
+                    ✏️ Edit
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats and About Grid -->
+        <div class="profile-grid">
+            
+            <!-- About Card (Left) -->
+            <section class="card about-card">
+                <h3>About</h3>
+                <p class="bio-text">{{ user.bio|default:"No bio yet. Tell us a little bit about yourself!" }}</p>
+                
+                <ul class="about-list">
+                    
+                    <li><span class="icon">📧</span> {{ user.email }}</li>
+                    <li><span class="icon">🔔</span> Notifications: </li>
+                </ul>
+               
+            </section>
+
+            <!-- Stats Cards (Right) -->
+            <div class="stats-cards-container">
+                
+                <!-- Notes Created -->
+                <div class="card stat-card notes-stat">
+                    <span class="stat-number">{{ total_notes_created }}</span>
+                    <span class="stat-label">Notes Created</span>
+                </div>
+
+                <!-- Tasks Completed -->
+                <div class="card stat-card tasks-stat">
+                    <span class="stat-number">{{ tasks_completed }}</span>
+                    <span class="stat-label">Tasks Completed</span>
+                </div>
+                
+                <!-- Total Tasks Created -->
+                <div class="card stat-card total-tasks-stat">
+                    <span class="stat-number">{{ total_tasks_created }}</span>
+                    <span class="stat-label">Total Tasks Created</span>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+</body>
+</html>
