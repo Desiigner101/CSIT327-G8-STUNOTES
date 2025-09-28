@@ -11,7 +11,7 @@
 <body>
   <div class="container">
 
-    <!-- ✅ Messages go here -->
+    <!-- ✅ Messages -->
     {% if messages %} 
       <div class="messages">
         {% for message in messages %}
@@ -27,6 +27,7 @@
       {% csrf_token %}
       <h2>Sign Up</h2>
 
+
       <div class="switch-link"><a class="already-have-account">
        Already have an account?</a> 
       <a href="{% url 'notes:login' %}" class="create-now">Sign in</a>
@@ -34,6 +35,9 @@
 
       <label for="username">Username</label>
       <input type="text" id="username" name="username" placeholder="Choose a username" required>
+
+      <label for="full_name">Full Name</label>
+      <input type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
 
       <label for="email">Email</label>
       <input type="email" id="email" name="email" placeholder="Enter your email" required>
