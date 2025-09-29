@@ -28,16 +28,46 @@ body {
   padding: 3rem;
   position: relative;
   text-align: left;
+  overflow: hidden;
+}
+
+/* Decorative Gradient Circles */
+.left-side::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  top: -200px;
+  right: -150px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.left-side::after {
+  content: '';
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 70%);
+  bottom: -100px;
+  left: -80px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .left-content {
   max-width: 600px;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-title {
-  font-size: clamp(2rem, 5vw, 5rem); /* Responsive font size */
-  font-weight: 700;
+  font-size: clamp(1rem, 4vw, 4rem); /* Responsive font size */
+  font-weight: 750;
   color: white;
   line-height: 1.2;
   margin-bottom: 1rem;
@@ -45,15 +75,71 @@ body {
   text-align: left; /* or center if you want it centered */
   white-space: normal; /* allows wrapping */
   word-wrap: break-word; /* breaks long words */
+  position: relative;
 }
 
+/* Additional subtle circles */
+.hero-title::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.13) 0%, transparent 120%);
+  top: 20%;
+  left: 15%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-title::after {
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 150%);
+  top: 50%;
+  right: 10%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: -1;
+}
 
 .hero-subtitle {
-  font-size: clamp(2rem, 3.5vw, 2.5rem);
+  font-size: clamp(1rem, 3vw, 2rem);
   color: rgba(255, 255, 255, 0.95);
   margin-bottom: 2rem;
   line-height: 1.6;
   width: 100%;
+  position: relative;
+}
+
+/* More circles using subtitle element */
+.hero-subtitle::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.11) 0%, transparent 120%);
+  bottom: -300%;
+  right: 110%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-subtitle::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, transparent 100%);
+  top: -30%;
+  left: 50%;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .illustration {
@@ -61,7 +147,24 @@ body {
   justify-content: center;
   align-items: center;
   margin-top: 2rem;
+  position: relative;
+  z-index: 1;
 }
+
+.illustration::after{
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, transparent 90%);
+  top: 70%;
+  left: 90%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+
 
 .student-img {
   width: 100%;
@@ -86,6 +189,7 @@ body {
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 3rem;
+  justify-content: flex-start;
 }
 
 .logo {
@@ -96,7 +200,7 @@ body {
 }
 
 .logo-text {
-  font-size: 1.5rem;
+  font-size: 1.75rem; /* Was 1.5rem */
   font-weight: 700;
   color: #5EAA65;
 }
@@ -107,10 +211,10 @@ body {
 }
 
 .alert {
-  padding: 12px 16px;
+  padding: 14px 18px; /* Was 12px 16px */
   margin-bottom: 10px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 1rem; /* Was 14px */
 }
 
 .alert.success {
@@ -139,14 +243,14 @@ body {
 }
 
 .form-title {
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-size: clamp(2rem, 3vw, 2.75rem); /* Was 1.8rem-2.5rem */
   font-weight: 700;
   color: #111827;
   margin-bottom: 0.5rem;
 }
 
 .switch-link {
-  font-size: 0.95rem;
+  font-size: 1.05rem; /* Was 0.95rem */
   color: #6b7280;
   margin-bottom: 2rem;
 }
@@ -171,15 +275,15 @@ body {
 .form-group label {
   display: block;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 1.05rem; /* Was 0.95rem */
   color: #374151;
   margin-bottom: 0.5rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.875rem 1rem;
-  font-size: 1rem;
+  padding: 1rem 1.125rem; /* Increased padding */
+  font-size: 1.05rem; /* Was 1rem */
   border: 1px solid #d1d5db;
   border-radius: 8px;
   outline: none;
@@ -195,13 +299,12 @@ body {
   box-shadow: 0 0 0 3px rgba(94, 170, 101, 0.1);
 }
 
-/* Form Footer */
 .form-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  font-size: 1rem; /* Was 0.9rem */
   flex-wrap: wrap;
   gap: 0.5rem;
 }
@@ -218,6 +321,7 @@ body {
   width: 16px;
   height: 16px;
   cursor: pointer;
+  accent-color: #5EAA65;
 }
 
 .forgot-password {
@@ -235,12 +339,12 @@ body {
 /* Submit Button */
 .submit-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 1.125rem; /* Was 1rem */
   background: #5EAA65;
   border: none;
   border-radius: 8px;
   color: white;
-  font-size: 1rem;
+  font-size: 1.1rem; /* Was 1rem */
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
@@ -248,6 +352,11 @@ body {
 
 .submit-btn:hover {
   background: #4a9452;
+}
+
+.submit-btn:focus {
+  outline: 2px solid #5EAA65;
+  outline-offset: 2px;
 }
 
 /* Responsive Design */
@@ -264,10 +373,12 @@ body {
 
   .hero-title {
     margin: 0 auto 1rem;
+    text-align: center;
   }
 
   .hero-subtitle {
     margin: 0 auto 2rem;
+    text-align: center;
   }
 
   .illustration {

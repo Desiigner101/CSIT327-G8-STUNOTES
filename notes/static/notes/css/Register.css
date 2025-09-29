@@ -1,142 +1,177 @@
-/* Reset some defaults */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Background */
 body {
   height: 100vh;
   display: flex;
+  overflow: hidden;
+}
+
+/* Left Panel - Green Background */
+.left-panel {
+  flex: 2;
+  background: linear-gradient(135deg, #5EAA65 0%, #4a9452 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: center;
-  align-items: center;
-  background: linear-gradient(100deg, #5EAA65);
+  padding: 4rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Container for form */
-.container {
-  background: white;
-  padding: 50rem 3rem;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+/* Decorative Gradient Circles */
+.left-panel::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  top: -200px;
+  right: -150px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.left-panel::after {
+  content: '';
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
+  bottom: -100px;
+  left: -80px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.left-panel h1 {
+  font-size: clamp(2rem, 5vw, 5rem);
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
   width: 100%;
-  height: 100%;
-  max-width: 1000px;
-  margin-left: auto;
-}
-
-/* Form box */
-.form-box h2 {
-  margin-left: 20%;
   text-align: left;
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  color: #111827;
+  white-space: normal;
+  word-wrap: break-word;
+  position: relative;
+  z-index: 1;
 }
 
-/*Form box Register title (Sign up)*/
-.form-box-title{
-  margin-top: 20%
+/* Additional subtle circles */
+.left-panel h1::before {
+  content: '';
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.13) 0%, transparent 100%);
+  top: 20%;
+  left: 15%;
+  pointer-events: none;
+  z-index: -1;
 }
 
-/*already have account text font size */
-.already-have-account{
-  font-size: 20px;
-  color: #374151;
+.left-panel h1::after {
+  content: '';
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+  top: 50%;
+  right: 10%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
-/*create now colored coded*/
-.create-now{
-  color: #5EAA65;
+.left-panel p {
+  font-size: clamp(1.2rem, 3.5vw, 2.5rem);
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.6;
+  max-width: 500px;
+  position: relative;
+  z-index: 1;
+}
+
+/* More circles using paragraph element */
+.left-panel p::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.11) 0%, transparent 100%);
+  bottom: -50%;
+  right: -20%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.left-panel p::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.14) 0%, transparent 100%);
+  top: -30%;
+  left: 50%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Right Panel - White Background with Form */
+.right-panel {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 4rem;
+  overflow-y: auto;
+}
+
+/* Logo Container */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+  justify-content: flex-start;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-size: 1.75rem;
   font-weight: 700;
-  font-size: 20px;
-  text-decoration: none;;
-}
-
-/* Labels */
-.form-box label {
-  margin-left: 20%;
-  display: block;
-  margin-bottom: 0.54rem;
-  font-weight: 700;
-  color: #374151;
-  font-size: 15px;
-}
-
-/* Input fields */
-.form-box input {
-  width: 60%;
-  margin-left: 20%;
-  padding: 0.95rem;
-  margin-bottom: 2rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  outline: none;
-  transition: border 0.3s;
-  font-size: 15px;
-}
-
-.form-box input:focus {
-  border-color: #5EAA65;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-/* Buttons */
-.form-box button {
-  width: 60%;
-  padding: 1rem;
-  margin-left: 20%;
-  background: #5EAA65;
-  margin-top: 1%;
-  border: none;
-  border-radius: 20px;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.form-box button:hover {
-  background: #35c644;
-}
-
-/*Switch link for Sign Up*/
-.switch-link{
-  text-align: left;
-  margin-left: 20%;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  font-size: 0.9rem;
-}
-
-/* Extra link */
-.form-box .extra {
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 0.9rem;
   color: #5EAA65;
 }
 
-.form-box .extra a {
-  color: #3b82f6;
-  text-decoration: none;
-}
-
-.form-box .extra a:hover {
-  text-decoration: underline;
-}
-
+/* Messages */
 .messages {
-  margin: 15px 0;
+  margin-bottom: 1.5rem;
 }
 
 .alert {
-  padding: 12px;
+  padding: 14px 18px;
   margin-bottom: 10px;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 .alert.success {
@@ -155,4 +190,172 @@ body {
   background: #fff3cd;
   color: #856404;
   border: 1px solid #ffeeba;
+}
+
+/* Form Container */
+.form-container {
+  max-width: 450px;
+  width: 100%;
+  align-self: center;
+}
+
+.form-container h2 {
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.switch-link {
+  font-size: 1.05rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.already-have-account {
+  color: #6b7280;
+}
+
+.create-now {
+  color: #5EAA65;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+  margin-left: 0.25rem;
+}
+
+.create-now:hover {
+  color: #4a9452;
+  text-decoration: underline;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 1rem 1.125rem;
+  font-size: 1.05rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.form-group input:focus {
+  border-color: #5EAA65;
+  box-shadow: 0 0 0 3px rgba(94, 170, 101, 0.1);
+}
+
+/* Password Toggle Button */
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #6b7280;
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  color: #374151;
+}
+
+.toggle-password svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 1.125rem;
+  background: #5EAA65;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.submit-btn:hover {
+  background: #4a9452;
+}
+
+.submit-btn:focus {
+  outline: 2px solid #5EAA65;
+  outline-offset: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  body {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left-panel {
+    padding: 2rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  .left-panel h1 {
+    text-align: center;
+  }
+
+  .left-panel p {
+    text-align: center;
+  }
+
+  .right-panel {
+    padding: 2rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .left-panel {
+    display: none;
+  }
+
+  .right-panel {
+    padding: 1.5rem;
+    width: 100%;
+  }
+
+  .logo-container {
+    justify-content: center;
+  }
+
+  .form-container {
+    max-width: 100%;
+  }
 }

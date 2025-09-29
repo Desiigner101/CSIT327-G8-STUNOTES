@@ -6,7 +6,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - StuNotes</title>
-  <link rel="stylesheet" href="{% static 'notes/css/Login.css' %}">
+  <link rel="stylesheet" href="{% static 'notes/css/login.css' %}">
 </head>
 <body>
   <div class="main-container">
@@ -75,17 +75,6 @@
       </form>
     </div>
   </div>
-  
-  <script>
-    // Auto dismiss messages after 3 seconds
-    setTimeout(function() {
-      let alerts = document.querySelectorAll('.alert');
-      alerts.forEach(alert => {
-        alert.style.transition = "opacity 0.5s ease";
-        alert.style.opacity = "0";
-        setTimeout(() => alert.remove(), 500);
-      });
-    }, 3000);
-  </script>
+  <script src="{% static 'notes/js/login.js' %}"></script>
 </body>
 </html>
