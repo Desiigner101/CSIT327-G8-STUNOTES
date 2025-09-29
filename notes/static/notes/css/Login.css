@@ -1,141 +1,115 @@
-/* Reset some defaults */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Background */
 body {
   height: 100vh;
+  overflow: hidden;
+}
+
+/* Main Container - Split Screen */
+.main-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Left Side - Green Background with Illustration */
+.left-side {
+  flex: 2;
+  background: linear-gradient(135deg, #5EAA65 0%, #4a9452 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  position: relative;
+  text-align: left;
+}
+
+.left-content {
+  max-width: 600px;
+  width: 100%;
+}
+
+.hero-title {
+  font-size: clamp(2rem, 5vw, 5rem); /* Responsive font size */
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  width: 100%;
+  text-align: left; /* or center if you want it centered */
+  white-space: normal; /* allows wrapping */
+  word-wrap: break-word; /* breaks long words */
+}
+
+
+.hero-subtitle {
+  font-size: clamp(2rem, 3.5vw, 2.5rem);
+  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  width: 100%;
+}
+
+.illustration {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(100deg, #5EAA65);
+  margin-top: 2rem;
 }
 
-/* Container for form */
-.container {
-  background: white;
-  padding: 1rem 2.5rem;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+.student-img {
   width: 100%;
-  height: 100%;
   max-width: 1000px;
-  margin-left: auto;
+  height: auto;
+  object-fit: contain;
 }
 
-/* Form box */
-.form-box h2 {
-  margin-left: 20%;
-  text-align: left;
-  font-size: 4rem;
-  margin-bottom: 0.1rem;
-  color: #111827;
+/* Right Side - White Background with Form */
+.right-side {
+  flex: 1;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  padding: 3rem 4rem;
+  overflow-y: auto;
 }
 
-/*Form box login title (Sign in)*/
-.form-box-title{
-  margin-top: 20%
+/* Logo */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
 }
 
-/* No account text font size */
-.no-account_text{
-  font-size: 1.1rem;
-  color: #374151;
+.logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  justify-content: center;
 }
 
-/*create now text colored coded*/
-.create-now{
-  color: #5EAA65;
+.logo-text {
+  font-size: 1.5rem;
   font-weight: 700;
-  text-decoration: none;
-  font-size: 1.1rem;
-}
-
-/* Labels */
-.form-box label {
-  margin-left: 20%;
-  display: block;
-  font-weight: 700;
-  font-size: 17px;
-  margin-bottom: 0.5rem;
-  color: #374151;
-}
-
-/* Input fields */
-.form-box input {
-  width: 60%;
-  margin-left: 20%;
-  padding: 0.95rem;
-  margin-bottom: 2rem;
-  font-size: 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  outline: none;
-  transition: border 0.3s;
-}
-
-.form-box input:focus {
-  border-color: #5EAA65;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-/* Buttons */
-.form-box button {
-  width: 60%;
-  padding: 1.1rem;
-  margin-left: 20%;
-  background: #5EAA65;
-  border: none;
-  margin-bottom: 3%;
-  border-radius: 20px;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.form-box button:hover {
-  background: #35c644;
-}
-
-/*Switch link for login*/
-.switch-link{
-  text-align: left;
-  margin-left: 20%;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-  font-size: 0.9rem;
-}
-
-/* Extra link */
-.form-box .extra {
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 1rem;
   color: #5EAA65;
 }
 
-.form-box .extra a {
-  color: #3b82f6;
-  text-decoration: none;
-}
-
-.form-box .extra a:hover {
-  text-decoration: underline;
-}
-
+/* Messages */
 .messages {
-  margin: 15px 0;
+  margin-bottom: 1.5rem;
 }
 
 .alert {
-  padding: 12px;
+  padding: 12px 16px;
   margin-bottom: 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 14px;
 }
 
@@ -155,4 +129,176 @@ body {
   background: #fff3cd;
   color: #856404;
   border: 1px solid #ffeeba;
+}
+
+/* Form */
+.form-box {
+  max-width: 450px;
+  width: 100%;
+  align-self: center;
+}
+
+.form-title {
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.switch-link {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.create-now {
+  color: #5EAA65;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.create-now:hover {
+  color: #4a9452;
+  text-decoration: underline;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.form-group input:focus {
+  border-color: #5EAA65;
+  box-shadow: 0 0 0 3px rgba(94, 170, 101, 0.1);
+}
+
+/* Form Footer */
+.form-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.forgot-password {
+  color: #5EAA65;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.forgot-password:hover {
+  color: #4a9452;
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #5EAA65;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.submit-btn:hover {
+  background: #4a9452;
+}
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .main-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .left-side {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .hero-title {
+    margin: 0 auto 1rem;
+  }
+
+  .hero-subtitle {
+    margin: 0 auto 2rem;
+  }
+
+  .illustration {
+    margin-top: 1.5rem;
+  }
+
+  .student-img {
+    max-width: 300px;
+  }
+
+  .right-side {
+    padding: 2rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .left-side {
+    display: none;
+  }
+
+  .right-side {
+    padding: 1.5rem;
+    width: 100%;
+  }
+
+  .logo-container {
+    justify-content: center;
+  }
+
+  .form-box {
+    max-width: 100%;
+  }
 }
