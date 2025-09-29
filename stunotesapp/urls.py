@@ -6,7 +6,7 @@ from notes import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.register_view, name='register'),
+    path('', views.home, name='home'),
     path('', include('notes.urls')),
     #path('test/', include('stunotes.urls')),  
     
