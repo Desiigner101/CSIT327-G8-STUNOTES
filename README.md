@@ -66,13 +66,17 @@
    ```
 
 4. **Setup database**
+   First, create the database:
+   ```sql
+   CREATE DATABASE stunotes_db;
+   ```
+   Then run in terminal:
    ```bash
-   python manage.py makemigrations
    python manage.py migrate
    python manage.py createsuperuser
    ```
 
-5. **Run the application**
+6. **Run the application**
    ```bash
    python manage.py runserver
    ```
