@@ -80,11 +80,11 @@ DATABASES = {
     "default": dj_database_url.config(
         default="sqlite:///db.sqlite3",
         conn_max_age=600,
-        ssl_require=False
+        ssl_require=True
     )
 }
 
-ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 DEBUG = False
 
 #Configure static files for user interface and for future use ninyo
