@@ -28,9 +28,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-bw0*1#$qn-^&l!4$*ke$j2q_de1k23^02%7kpr174-_m@xf+o0'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -83,7 +80,7 @@ DATABASES = {
     "default": dj_database_url.config(
         default="sqlite:///db.sqlite3",
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=False
     )
 }
 
