@@ -84,7 +84,7 @@ DATABASES = {
     )
 }
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
 DEBUG = False
 
 #Configure static files for user interface and for future use ninyo
