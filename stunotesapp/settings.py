@@ -87,6 +87,9 @@ DATABASES = {
     )
 }
 
+ALLOWED_HOSTS = ['*']
+DEBUG = False
+
 #Configure static files for user interface and for future use ninyo
 STATIC_URL = '/static/'
 
