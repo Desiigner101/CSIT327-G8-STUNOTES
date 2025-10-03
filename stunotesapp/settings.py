@@ -8,8 +8,8 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
-"""
 
+"""
 import os
 from pathlib import Path
 import dj_database_url
@@ -27,6 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-bw0*1#$qn-^&l!4$*ke$j2q_de1k23^02%7kpr174-_m@xf+o0'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -76,6 +79,7 @@ WSGI_APPLICATION = 'stunotesapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
 DATABASES = {
     "default": dj_database_url.config(
         default="sqlite:///db.sqlite3",
@@ -83,9 +87,6 @@ DATABASES = {
         ssl_require=True
     )
 }
-
-ALLOWED_HOSTS = ['*']
-DEBUG = False
 
 #Configure static files for user interface and for future use ninyo
 STATIC_URL = '/static/'
