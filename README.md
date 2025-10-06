@@ -119,14 +119,14 @@
 ### IT317-G3 Development Team
 
 #### Project Leadership
-- Tupas, Niña Isabelle Capilitan - Product Owner
-- Unabia, Brent Jelson Dejos - Business Analyst
-- Ybañez, Liezel Alvarado - Scrum Master
+- Tupas, Niña Isabelle Capilitan - Product Owner (ninaisabelle.tupas@cit.edu)
+- Unabia, Brent Jelson Dejos - Business Analyst (brentjelson.unabia@cit.edu)
+- Ybañez, Liezel Alvarado - Scrum Master (liezel.ybanez@cit.edu)
 
 #### Developers
-- Kervin Gino M. Sarsonas - Lead Developer
-- Kirby Klent G. Sala - Developer
-- Xavier John A. Sabornido - Developer
+- Kervin Gino M. Sarsonas - Lead Developer (kervingino.sarsonas@cit.edu)
+- Kirby Klent G. Sala - Developer (kirbyklent.sala@cit.edu)
+- Xavier John A. Sabornido - Developer (xavierjohn.sabornido@cit.edu)
 
 #### Academic Supervisors
 - Joemarie Amparo - IT317 Instructor
