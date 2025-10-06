@@ -139,4 +139,4 @@ For questions or issues:
 - Email the project team
 
 ---
-**Developed by CSIT-327 Team**
+**Developed by CSIT-327 G8 Team**
