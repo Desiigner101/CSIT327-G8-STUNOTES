@@ -124,9 +124,9 @@
 - Ybañez, Liezel Alvarado - Scrum Master (liezel.ybanez@cit.edu)
 
 #### Developers
-- Kervin Gino M. Sarsonas - Lead Developer (kervingino.sarsonas@cit.edu)
-- Kirby Klent G. Sala - Developer (kirbyklent.sala@cit.edu)
-- Xavier John A. Sabornido - Developer (xavierjohn.sabornido@cit.edu)
+- Kervin Gino M. Sarsonas - Lead Fullstack Developer (kervingino.sarsonas@cit.edu)
+- Kirby Klent G. Sala - Frontend Developer (kirbyklent.sala@cit.edu)
+- Xavier John A. Sabornido - Fullstack Developer (xavierjohn.sabornido@cit.edu)
 
 #### Academic Supervisors
 - Joemarie Amparo - IT317 Instructor
