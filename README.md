@@ -9,7 +9,6 @@
 - [Team](#team)
 
 ## Overview
-
 **StuNotes** is a web application designed to help students manage their academic tasks, deadlines, and notes in one centralized platform. It provides an easy way for students to stay organized and improve their academic productivity.
 
 **Problem:** Students struggle with managing multiple subjects, assignments, and exam schedules across different platforms, leading to missed deadlines and poor organization.
@@ -33,9 +32,8 @@
 - Admin panel for user management
 
 ## Technology Stack
-
 - **Backend**: Django (Python)
-- **Database**: MySQL
+- **Database**: Supabase
 - **Frontend**: HTML, CSS, JavaScript
 - **Version Control**: Git & GitHub
 
@@ -43,44 +41,64 @@
 
 ### Requirements
 - Python 3.8 or higher
-- MySQL Server
 - Git
 
 ### Setup Steps
 
 1. **Clone the repository**
+   
+   If you want to contribute, fork the repository first, then clone your forked repo:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/STUNOTES-APP.git
+   cd stunotes
+   ```
+   
+   Otherwise, clone directly:
    ```bash
    git clone https://github.com/Desiigner101/STUNOTES-APP.git
    cd stunotes
    ```
 
-2. **Create virtual environment**
+2. **Create and activate virtual environment**
    ```bash
    python -m venv venv
-   source venv/bin/activate
    ```
+   
+   Activate venv:
+   - **Windows:**
+     ```bash
+     venv\Scripts\activate
+     ```
+   - **Mac/Linux:**
+     ```bash
+     source venv/bin/activate
+     ```
 
 3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. **Setup database**
-   First, create the database:
-   ```sql
-   CREATE DATABASE stunotes_db;
+4. **Setup environment variables**
+   
+   Create a `.env` file in the root directory and add your credentials:
+   ```env
+   SECRET_KEY=your-secret-key-here
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_KEY=your-supabase-key
    ```
-   Then run in terminal:
-   ```bash
-   python manage.py migrate
-   python manage.py createsuperuser
-   ```
+   
+   **Note:** Contact the author or maintainer for the secret key credentials.
 
-6. **Run the application**
+5. **Run the application**
    ```bash
    python manage.py runserver
    ```
+
+6. **Access the application**
    
+   Open your browser and navigate to: `http://127.0.0.1:8000/`
+
 ## Usage
 
 ### For Students
@@ -115,12 +133,10 @@
 - Frederick Revilleza - CSIT327 Instructor
 
 ## Support
-
 For questions or issues:
 - Create an issue on GitHub
 - Contact the development team
 - Email the project team
 
 ---
-
 **Developed by CSIT-327 Team**
