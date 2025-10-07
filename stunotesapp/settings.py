@@ -88,12 +88,17 @@ DATABASES = {
     )
 }
 
+# Redirect to login page if user is not authenticated
+LOGIN_URL = 'notes:login'
+
+
+
 #Configure static files for user interface and for future use ninyo
 STATIC_URL = '/static/'
 
-# App-level static + global static folder
+# This should match your actual directory structure
 STATICFILES_DIRS = [
-    BASE_DIR / "notes" / "static",   # your app static (style.css etc.)          # your global folder (admin overrides, extra css/js)
+    BASE_DIR / "notes" / "static" / "notes",  # Point to the inner 'notes' folder
 ]
 
 # Where collected static files will go after running `collectstatic`
