@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
+from decouple import config
 
 # Load environment variables
 load_dotenv()
@@ -79,13 +80,20 @@ WSGI_APPLICATION = 'stunotesapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-
+#for security purposes, we will hide the database credentials using environment variables
 DATABASES = {
-    "default": dj_database_url.config(
-        default="sqlite:///db.sqlite3",
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': config('DB_ENGINE'),
+        'HOST': config('DB_HOST'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'PORT': config('DB_PORT', cast=int),
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+        'CONN_MAX_AGE': 0,
+    }
 }
 
 # Redirect to login page if user is not authenticated
@@ -98,7 +106,7 @@ STATIC_URL = '/static/'
 
 # This should match your actual directory structure
 STATICFILES_DIRS = [
-    BASE_DIR / "notes" / "static" / "notes",  # Point to the inner 'notes' folder
+    BASE_DIR / "notes" / "static"  # Point to the inner 'notes' folder
 ]
 
 # Where collected static files will go after running `collectstatic`
@@ -140,9 +148,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
-
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
