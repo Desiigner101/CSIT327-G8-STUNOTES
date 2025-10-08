@@ -6,6 +6,10 @@ app_name = 'notes'
 urlpatterns = [
     #Home
     path('', views.home, name='home'),
+    # Note creation
+    path('add_note/', views.add_note, name='add_note'),
+    path('note/edit/<int:note_id>/', views.edit_note, name='edit_note'),
+    path('note/delete/<int:note_id>/', views.delete_note, name='delete_note'),
 
     #Login and Register URLs
     path('login/', views.login_view, name='login'),
