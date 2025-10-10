@@ -744,10 +744,10 @@ body {
 
 .modal-content {
   background: #fff;
-  margin: 5% auto;
+  margin: 3% auto;
   padding: 0;
-  width: 90%;
-  max-width: 800px;
+  width: 95%;
+  max-width: 1200px;
   border-radius: 20px;
   box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
   animation: slideUp 0.3s ease;
@@ -755,6 +755,8 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+
 
 .modal-header {
   padding: 25px 30px;
@@ -765,6 +767,42 @@ body {
   background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
   color: white;
   border-radius: 20px 20px 0 0;
+}
+
+/* All Notes header specific layout */
+.all-notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.all-notes-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.all-notes-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.all-notes-search {
+  width: 420px;
+  max-width: 50vw;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 14px;
+}
+
+.all-notes-search::placeholder {
+  color: rgba(255,255,255,0.9);
+  opacity: 0.9;
 }
 
 .modal-header h2 {
@@ -1007,6 +1045,114 @@ body {
   gap: 20px;
 }
 
+/* ==================== ADD NOTE LAYOUT (REFERENCE UI) ==================== */
+.add-note-form {
+  position: relative;
+}
+
+.add-note-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.add-note-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.add-note-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-label {
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.add-note-title {
+  padding: 18px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+.add-note-title:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 6px 20px rgba(76,175,80,0.08);
+}
+
+.add-note-content {
+  margin-top: 6px;
+  padding: 22px;
+  min-height: 300px;
+  resize: vertical;
+  font-size: 15px;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+  line-height: 1.6;
+}
+
+.add-note-content:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 6px 20px rgba(76,175,80,0.06);
+}
+
+.add-note-tags, .add-note-subject {
+  padding: 14px 12px;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+}
+
+.add-note-help .muted {
+  color: #7f8c8d;
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+/* Floating circular submit button */
+.floating-submit {
+  position: absolute;
+  right: 36px; /* inside modal-content padding */
+  bottom: 36px; /* inside modal-content padding */
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: white;
+  border: none;
+  font-size: 28px;
+  box-shadow: 0 12px 30px rgba(76,175,80,0.28);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+}
+
+.floating-submit:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(76,175,80,0.36);
+}
+
+@media (max-width: 900px) {
+  .add-note-grid {
+    grid-template-columns: 1fr;
+  }
+  .add-note-content {
+    min-height: 260px;
+  }
+  .all-notes-search {
+    width: 200px;
+  }
+}
+
 .note-card {
   background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
   border-radius: 12px;
@@ -1073,6 +1219,31 @@ body {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+/* Floating add button for All Notes modal */
+.floating-add-btn {
+  position: absolute;
+  right: 36px; /* inside modal-content padding */
+  bottom: 36px; /* inside modal-content padding */
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4caf50, #66bb6a);
+  color: white;
+  border: none;
+  font-size: 28px;
+  box-shadow: 0 8px 24px rgba(76,175,80,0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+}
+
+.floating-add-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(76,175,80,0.4);
 }
 
 /* Make all stat cards clickable */

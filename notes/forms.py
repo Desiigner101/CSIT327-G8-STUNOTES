@@ -43,7 +43,8 @@ class NoteForm(forms.ModelForm):
     
     class Meta:
         model = Note
-        fields = ['user', 'title', 'content', 'subject', 'tags']
+        # user will be set from request.user in the view, don't expose it on the form
+        fields = ['title', 'content', 'subject', 'tags']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 5}),
             'tags': forms.TextInput(attrs={'placeholder': 'Comma-separated tags'}),

@@ -1,10 +1,51 @@
+from .forms import NoteForm
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.urls import reverse
+
+
+@login_required
+@require_POST
+def add_note(request):
+    """
+    Handles creation of a new note from the dashboard modal.
+    """
+    form = NoteForm(request.POST)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if form.is_valid():
+        note = form.save(commit=False)
+        note.user = request.user
+        note.save()
+        messages.success(request, "Note created successfully!")
+
+        if is_ajax:
+            note_data = {
+                'id': note.id,
+                'title': note.title,
+                'content': note.content,
+                'subject': note.subject or '',
+                'tags': note.tags or '',
+                'created_at': note.created_at.strftime('%b %d, %Y'),
+                'edit_url': reverse('notes:edit_note', args=[note.id]),
+                'delete_url': reverse('notes:delete_note', args=[note.id]),
+            }
+            total_notes = Note.objects.filter(user=request.user).count()
+            return JsonResponse({'status': 'ok', 'note': note_data, 'total_notes': total_notes})
+    else:
+        # collect form errors to show in messages
+        messages.error(request, "Failed to create note. Please check the form.")
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+
+    return redirect('notes:home')
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Task, Note
-from .forms import TaskForm, UserProfileForm
+from .forms import TaskForm, UserProfileForm, NoteForm
 
 # Get the custom User model
 User = get_user_model()
@@ -281,3 +322,34 @@ def edit_profile(request):
         "form": form,
         "user": user
     })
+
+
+@login_required
+def edit_note(request, note_id):
+    """Edit an existing note for the logged-in user."""
+    note = get_object_or_404(Note, id=note_id, user=request.user)
+
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Note updated successfully!')
+            return redirect('notes:home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = NoteForm(instance=note)
+
+    return render(request, 'edit_note.html', {'form': form, 'note': note})
+
+
+@login_required
+def delete_note(request, note_id):
+    """Delete a note belonging to the logged-in user."""
+    note = get_object_or_404(Note, id=note_id, user=request.user)
+    if request.method == 'POST':
+        note.delete()
+        messages.success(request, 'Note deleted successfully!')
+        return redirect('notes:home')
+    # If not POST, redirect back
+    return redirect('notes:home')

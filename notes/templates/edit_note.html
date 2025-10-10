@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Note</title>
+  <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
+</head>
+<body>
+  <main class="main" style="padding: 2rem;">
+    <h2>Edit Note</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        {{ form.title.label_tag }}
+        {{ form.title }}
+      </div>
+      <div class="form-group">
+        {{ form.content.label_tag }}
+        {{ form.content }}
+      </div>
+      <div class="form-group">
+        {{ form.subject.label_tag }}
+        {{ form.subject }}
+      </div>
+      <div class="form-group">
+        {{ form.tags.label_tag }}
+        {{ form.tags }}
+      </div>
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'notes:home' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+  </main>
+</body>
+</html>

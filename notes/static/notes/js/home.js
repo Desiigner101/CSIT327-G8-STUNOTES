@@ -1,3 +1,14 @@
+// ==================== Modal Functions ====================
+function openModal(modalId) {
+    document.getElementById(modalId).style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+window.openModal = openModal;
+window.closeModal = closeModal;
 // home.js - Enhanced Dashboard JavaScript
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -257,6 +268,192 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function openAllNotesModal() {
         openModal('allNotesModal');
+    }
+
+    // ==================== Global Edit Note Modal Helper ====================
+    window.openEditModal = function(buttonElement) {
+        if (!buttonElement) return;
+        const id = buttonElement.dataset.id;
+        const title = buttonElement.dataset.title || '';
+        const content = buttonElement.dataset.content || '';
+        const subject = buttonElement.dataset.subject || '';
+        const tags = buttonElement.dataset.tags || '';
+        const url = buttonElement.dataset.url || '';
+
+        // Populate form fields
+        const form = document.getElementById('globalEditForm');
+        if (!form) return;
+        form.action = url;
+        document.getElementById('global_edit_title').value = title;
+        document.getElementById('global_edit_content').value = content;
+        document.getElementById('global_edit_subject').value = subject;
+        document.getElementById('global_edit_tags').value = tags;
+
+        openModal('globalEditNoteModal');
+    };
+
+    // ==================== All Notes Search Filter ====================
+    const allNotesSearch = document.getElementById('allNotesSearch');
+    const allNotesCount = document.getElementById('all-notes-count');
+    if (allNotesSearch) {
+        allNotesSearch.addEventListener('input', function(e) {
+            const q = (e.target.value || '').trim().toLowerCase();
+            const cards = document.querySelectorAll('#allNotesModal .note-card');
+            let visible = 0;
+            cards.forEach(card => {
+                const title = (card.dataset.title || '').toLowerCase();
+                const content = (card.dataset.content || '').toLowerCase();
+                const tags = (card.dataset.tags || '').toLowerCase();
+                const match = q === '' || title.includes(q) || content.includes(q) || tags.includes(q);
+                card.style.display = match ? '' : 'none';
+                if (match) visible += 1;
+            });
+            if (allNotesCount) {
+                // update count display in header
+                const totalText = `(${visible})`;
+                allNotesCount.textContent = totalText;
+            }
+        });
+    }
+
+    // ==================== AJAX Add Note Submission ====================
+    const addNoteForm = document.getElementById('addNoteForm');
+    if (addNoteForm) {
+        addNoteForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(addNoteForm);
+            const fetchOptions = {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            };
+
+            fetch(addNoteForm.action, fetchOptions)
+                .then(resp => {
+                    if (!resp.ok) throw resp;
+                    return resp.json();
+                })
+                .then(data => {
+                    if (data.status === 'ok') {
+                        // close modal
+                        closeModal('addNoteModal');
+
+                        // insert into compact notes list (top)
+                        try {
+                            const notesSection = document.querySelector('.card.notes');
+                            if (notesSection) {
+                                const container = notesSection.querySelector('.card-header').nextElementSibling;
+                                // create new compact note element
+                                const noteElem = createCompactNoteElement(data.note);
+                                if (container) {
+                                    container.parentNode.insertBefore(noteElem, container);
+                                } else {
+                                    // fallback: append to notes section
+                                    notesSection.insertBefore(noteElem, notesSection.querySelector('.card-header').nextSibling);
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('Could not insert compact note element', err);
+                        }
+
+                        // insert into All Notes grid
+                        const allNotesGrid = document.querySelector('#allNotesModal .notes-grid');
+                        if (allNotesGrid) {
+                            const card = document.createElement('div');
+                            card.className = 'note-card';
+                            card.setAttribute('data-title', (data.note.title || '').toLowerCase());
+                            card.setAttribute('data-content', (data.note.content || '').toLowerCase());
+                            card.setAttribute('data-tags', (data.note.tags || '').toLowerCase());
+                            card.innerHTML = `
+                                <div class="note-card-header" style="position:relative;">
+                                  <h4>${escapeHtml(data.note.title)}</h4>
+                                  <span class="note-date">${escapeHtml(data.note.created_at)}</span>
+                                </div>
+                                <div class="note-card-body">
+                                  <p>${escapeHtml(truncateWords(data.note.content, 30))}</p>
+                                </div>
+                                <div class="note-card-footer">
+                                  ${data.note.subject ? `<span class="note-subject">${escapeHtml(data.note.subject)}</span>` : ''}
+                                </div>
+                            `;
+                            allNotesGrid.prepend(card);
+                        }
+
+                        // update counts
+                        const totalNode = document.querySelector('.stat-card .stat-number');
+                        const totalNotesEls = document.querySelectorAll('#all-notes-count, #sidebar-notes-count');
+                        if (data.total_notes) {
+                            totalNotesEls.forEach(el => el.textContent = `(${data.total_notes})`);
+                            // update overview card number (Total Notes stat-card)
+                            const statCards = document.querySelectorAll('.stat-card');
+                            statCards.forEach(card => {
+                                const h4 = card.querySelector('h4');
+                                if (h4 && h4.textContent.trim() === 'Total Notes') {
+                                    const statNum = card.querySelector('.stat-number');
+                                    if (statNum) statNum.textContent = data.total_notes;
+                                }
+                            });
+                        }
+
+                        showNotification('Note created', 'success');
+
+                        // reset form
+                        addNoteForm.reset();
+                    }
+                })
+                .catch(err => {
+                    console.error('Add note failed', err);
+                    showNotification('Failed to create note', 'error');
+                });
+        });
+    }
+
+    // Helper: create compact note DOM element (small card used in main dashboard list)
+    function createCompactNoteElement(note) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'note';
+        wrapper.innerHTML = `
+            <div style="position:relative;">
+              <h4>${escapeHtml(note.title)}</h4>
+            </div>
+            <p>${escapeHtml(truncateWords(note.content, 15))}</p>
+            <span class="date">${escapeHtml(note.created_at)}</span>
+            <div class="note-actions" style="margin-top:8px;">
+              <button type="button" class="btn btn-sm" style="margin-right:6px;"
+                      onclick="openEditModal(this)"
+                      data-id="${note.id}"
+                      data-title="${escapeHtml(note.title)}"
+                      data-content="${escapeHtml(note.content)}"
+                      data-subject="${escapeHtml(note.subject)}"
+                      data-tags="${escapeHtml(note.tags)}"
+                      data-url="${note.edit_url}">✏️ Edit</button>
+              <form method="post" action="${note.delete_url}" style="display:inline;">
+                <input type="hidden" name="csrfmiddlewaretoken" value="">
+                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this note?');">🗑️ Delete</button>
+              </form>
+            </div>
+        `;
+        return wrapper;
+    }
+
+    function truncateWords(text, num) {
+        if (!text) return '';
+        const words = text.split(/\s+/);
+        if (words.length <= num) return text;
+        return words.slice(0, num).join(' ') + '...';
+    }
+
+    function escapeHtml(unsafe) {
+        if (unsafe === null || unsafe === undefined) return '';
+        return String(unsafe)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
     }
 
     function openModal(modalId) {
