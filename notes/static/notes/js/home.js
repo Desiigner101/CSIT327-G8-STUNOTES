@@ -530,4 +530,24 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log('💡 Keyboard shortcuts:');
     console.log('   - Ctrl/Cmd + N: Add new task');
     console.log('   - ESC: Close task form');
+
+    // Notification modal
+const bell = document.getElementById("notificationBell");
+const modal = document.getElementById("notificationModal");
+const closeModalBtn = document.getElementById("closeNotificationModal");
+
+bell.addEventListener("click", () => {
+  modal.style.display = "block";
+});
+
+closeModalBtn.addEventListener("click", () => {
+  modal.style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === modal) {
+    modal.style.display = "none";
+  }
+});
+
 });
