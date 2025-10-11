@@ -530,4 +530,34 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log('💡 Keyboard shortcuts:');
     console.log('   - Ctrl/Cmd + N: Add new task');
     console.log('   - ESC: Close task form');
+
+
+ // =======================
+// 🔔 Notification Modal Logic
+// =======================
+const bell = document.getElementById("notificationBell");
+const notifModal = document.getElementById("notificationModal");
+const closeNotificationModal = document.getElementById("closeNotificationModal");
+
+if (bell && notifModal && closeNotificationModal) {
+    // ✅ Open modal when bell is clicked
+    bell.addEventListener("click", () => {
+        notifModal.style.display = "flex";
+    });
+
+    // ✅ Close modal when X is clicked
+    closeNotificationModal.addEventListener("click", () => {
+        notifModal.style.display = "none";
+    });
+
+    // ✅ Close modal when clicking outside the content
+    window.addEventListener("click", (event) => {
+        if (event.target === notifModal) {
+            notifModal.style.display = "none";
+        }
+    });
+} else {
+    console.warn("⚠️ Notification modal elements not found in DOM.");
+}
+
 });

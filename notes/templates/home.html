@@ -24,6 +24,7 @@
       <p>Notes: <span id="sidebar-notes-count">{{ total_notes_sidebar }}</span></p>
     </div>
   </aside>
+    
 
   <!-- Main Content -->
   <main class="main">
@@ -34,13 +35,24 @@
         <p class="user-email-display">{{ user.email }} 👋</p> 
       </div>
 
-      <div class="topbar-right">
+        <div class="topbar-right">
         <p>Today is <strong>October 02, 2025</strong></p>
-        
+
+        <!-- 🔔 Notification Bell -->
+        <div class="notification-wrapper">
+          <button id="notificationBell" class="notification-bell" title="View Upcoming Deadlines">
+            🔔
+            {% if upcoming_tasks|length > 0 %}
+            <span class="notification-count">{{ upcoming_tasks|length }}</span>
+            {% endif %}
+          </button>
+        </div>
+
+        <!-- Profile Picture -->
         <a href="{% url 'notes:profile_view' %}" class="profile-link">
           <img src="{% static 'notes/images/profile_pic.png' %}" 
-               alt="Profile" 
-               class="profile-icon">
+              alt="Profile" 
+              class="profile-icon">
         </a>
       </div>
     </header>
@@ -496,6 +508,27 @@
       </div>
     </div>
   </div>
+ <!-- 🔔 Notification Modal -->
+<div id="notificationModal" class="notification-modal">
+  <div class="notification-modal-content">
+    <span id="closeNotificationModal" class="close-modal">&times;</span>
+    <h3>Upcoming Deadlines</h3>
+    <ul>
+      {% if upcoming_tasks %}
+        {% for task in upcoming_tasks %}
+          <li>
+            <strong>{{ task.title }}</strong>
+            <span>Due {{ task.due_date|date:"M d, Y H:i" }}</span>
+          </li>
+        {% endfor %}
+      {% else %}
+        <li>No tasks due in the next 24 hours 🎉</li>
+      {% endif %}
+    </ul>
+  </div>
+</div>
+
+
 
   <script src="{% static 'notes/js/home.js' %}"></script>
 </body>
