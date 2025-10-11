@@ -108,57 +108,50 @@ def login_view(request):
 @login_required
 def home(request):
     """
-    Render the home page with tasks, notes, statistics, and deadline notifications.
+    Render the home page with tasks, notes, and statistics.
     Handles task creation and editing.
     """
     user = request.user
-
+    
     # Get all user tasks and notes
     tasks = Task.objects.filter(user=user).order_by('-created_at')
     notes = Note.objects.filter(user=user).order_by('-created_at')[:5]  # Latest 5 notes
-
+    
     # ✅ Calculate task statistics
     total_tasks = tasks.count()
     completed_tasks_count = tasks.filter(status='completed').count()
     pending_tasks_count = tasks.filter(status='pending').count()
     in_progress_tasks = tasks.filter(status='in_progress').count()
-
+    
     # ✅ Calculate overdue tasks
     now = timezone.now()
     overdue_tasks_count = tasks.filter(
-        due_date__lt=now,
+        due_date__lt=now, 
         status__in=['pending', 'in_progress']
     ).count()
-
+    
     # ✅ Get today's tasks
     today = now.date()
     today_tasks = tasks.filter(due_date__date=today).order_by('due_date')
-
+    
     # ✅ Total notes count
     total_notes = Note.objects.filter(user=user).count()
-
+    
     # ✅ Get completed tasks history
     completed_tasks_list = tasks.filter(status='completed').order_by('-updated_at')
-
-    # ✅ Get pending tasks list
+    
+    # ✅ NEW: Get pending tasks list
     pending_tasks_list = tasks.filter(status='pending').order_by('due_date')
-
-    # ✅ Get overdue tasks list
+    
+    # ✅ NEW: Get overdue tasks list
     overdue_tasks_list = tasks.filter(
         due_date__lt=now,
         status__in=['pending', 'in_progress']
     ).order_by('due_date')
-
-    # ✅ Get all notes list
+    
+    # ✅ NEW: Get all notes list
     all_notes_list = Note.objects.filter(user=user).order_by('-created_at')
-
-    # ✅ Deadline notifications: tasks due within next 24 hours
-    deadline_notifications = tasks.filter(
-        due_date__gte=now,
-        due_date__lte=now + timezone.timedelta(days=1),
-        status__in=['pending', 'in_progress']
-    ).order_by('due_date')
-
+    
     # Detect if editing
     edit_task_id = request.GET.get("edit")
     task_to_edit = None
@@ -188,14 +181,15 @@ def home(request):
     else:
         form = TaskForm()
 
-    # ✅ Context with all stats and notifications
+    # ✅ Context with all stats data
     context = {
+        # Show only active tasks (not completed) in the main task list
         'tasks': tasks.exclude(status='completed')[:10],
         'notes': notes,
         'form': form,
         'edit_form': edit_form,
         'task_to_edit': task_to_edit,
-
+        
         # Stats for overview cards
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks_count,
@@ -203,26 +197,22 @@ def home(request):
         'in_progress_tasks': in_progress_tasks,
         'overdue_tasks': overdue_tasks_count,
         'total_notes': total_notes,
-
+        
         # Today's tasks for calendar
         'today_tasks': today_tasks,
-
+        
         # Lists for modals
         'completed_tasks_list': completed_tasks_list,
-        'pending_tasks_list': pending_tasks_list,
-        'overdue_tasks_list': overdue_tasks_list,
-        'all_notes_list': all_notes_list,
-
-        # Deadline notifications
-        'deadline_notifications': deadline_notifications,
-
+        'pending_tasks_list': pending_tasks_list,       # ✅ NEW
+        'overdue_tasks_list': overdue_tasks_list,       # ✅ NEW
+        'all_notes_list': all_notes_list,               # ✅ NEW
+        
         # Dynamic sidebar counters
         'total_tasks_count': total_tasks,
         'total_notes_sidebar': total_notes,
     }
 
     return render(request, "home.html", context)
-
 
 
 def logout_view(request):
