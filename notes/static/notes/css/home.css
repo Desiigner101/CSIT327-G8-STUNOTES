@@ -1263,3 +1263,234 @@ body {
     grid-template-columns: 1fr;
   }
 }
+/* ====================== HIGHLIGHT OVERDUE TASK ====================== */
+.task-list li.highlight-overdue {
+  background-color: #ffe6e6 !important;
+  border-left: 5px solid #ff4d4d;
+  animation: pulseOverdue 1s infinite alternate;
+}
+
+@keyframes pulseOverdue {
+  from {
+    background-color: #ffe6e6;
+  }
+  to {
+    background-color: #ffcccc;
+  }
+}
+
+/* ====================== DEADLINE NOTIFICATION STYLE ====================== */
+.deadline-notification {
+  position: fixed;
+  top: 20px;
+  right: -400px;
+  background-color: #222;
+  color: #fff;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
+  font-size: 14px;
+  line-height: 1.4;
+  z-index: 9999;
+  transition: right 0.8s ease;
+  max-width: 300px;
+}
+
+.deadline-notification.show {
+  right: 20px;
+}
+
+.deadline-notification strong {
+  color: #ffd700;
+  font-size: 15px;
+}
+
+/* ===========================
+   🔔 Notification Modal (Professional Compact Style)
+   =========================== */
+.notification-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(3px);
+  animation: fadeInOverlay 0.25s ease;
+}
+
+/* The modal card */
+.notification-modal-content {
+  background: #fdfdfd;
+  border: 1px solid #e2e8f0;
+  border-top: 4px solid #007bff; /* Blue accent bar */
+  border-radius: 12px;
+  padding: 1.5rem 1.8rem;
+  width: 380px;
+  max-width: 90%;
+  color: #2d2d2d;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: slideUp 0.3s ease;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Modal Header */
+.notification-modal-content h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  text-align: center;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+/* Close Button */
+.close-modal {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.25s ease;
+}
+
+.close-modal:hover {
+  color: #ef4444;
+}
+
+/* Task List */
+.notification-modal-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.notification-modal-content li {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  margin: 6px 0;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.notification-modal-content li:hover {
+  background: #eaf4ff;
+  transform: translateX(3px);
+}
+
+.notification-modal-content li strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.notification-modal-content li span {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+/* Animations */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar Styling */
+.notification-modal-content ul::-webkit-scrollbar {
+  width: 6px;
+}
+.notification-modal-content ul::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+
+/* ========== Animations ========== */
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.notification-bell {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.notification-bell:hover {
+  background: #f5f7fa;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.notification-count {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: #e74c3c;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 50%;
+  padding: 2px 5px;
+}
+/* ===============================
+   🔔 Notification Bell with Badge
+   =============================== */
+.notification-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: #333;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.notification-bell:hover {
+  transform: scale(1.1);
+  color: #1d4ed8; /* nice blue hover effect */
+}
+
+.notification-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: #ef4444; /* red circle */
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
