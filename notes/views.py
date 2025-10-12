@@ -1,49 +1,11 @@
-from .forms import NoteForm
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.urls import reverse
-
-
-@login_required
-@require_POST
-def add_note(request):
-    """
-    Handles creation of a new note from the dashboard modal.
-    """
-    form = NoteForm(request.POST)
-    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
-    if form.is_valid():
-        note = form.save(commit=False)
-        note.user = request.user
-        note.save()
-        messages.success(request, "Note created successfully!")
-
-        if is_ajax:
-            note_data = {
-                'id': note.id,
-                'title': note.title,
-                'content': note.content,
-                'subject': note.subject or '',
-                'tags': note.tags or '',
-                'created_at': note.created_at.strftime('%b %d, %Y'),
-                'edit_url': reverse('notes:edit_note', args=[note.id]),
-                'delete_url': reverse('notes:delete_note', args=[note.id]),
-            }
-            total_notes = Note.objects.filter(user=request.user).count()
-            return JsonResponse({'status': 'ok', 'note': note_data, 'total_notes': total_notes})
-    else:
-        # collect form errors to show in messages
-        messages.error(request, "Failed to create note. Please check the form.")
-        if is_ajax:
-            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
-
-    return redirect('notes:home')
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from django.urls import reverse
 from .models import Task, Note
 from .forms import TaskForm, UserProfileForm, NoteForm
 
@@ -140,19 +102,27 @@ def home(request):
     # ✅ Get completed tasks history
     completed_tasks_list = tasks.filter(status='completed').order_by('-updated_at')
     
-    # ✅ NEW: Get pending tasks list
+    # ✅ Get pending tasks list
     pending_tasks_list = tasks.filter(status='pending').order_by('due_date')
     
-    # ✅ NEW: Get overdue tasks list
+    # ✅ Get overdue tasks list
     overdue_tasks_list = tasks.filter(
         due_date__lt=now,
         status__in=['pending', 'in_progress']
     ).order_by('due_date')
     
-    # ✅ NEW: Get all notes list
+    # ✅ Get all notes list
     all_notes_list = Note.objects.filter(user=user).order_by('-created_at')
+    
+    # ✅ NEW: Get unique subjects for filter dropdown
+    unique_subjects = Note.objects.filter(
+        user=user, 
+        subject__isnull=False
+    ).exclude(
+        subject=''
+    ).values_list('subject', flat=True).distinct().order_by('subject')
 
-    # ✅ NEW: Get upcoming tasks due within 24 hours
+    # ✅ Get upcoming tasks due within 24 hours
     from datetime import timedelta
     next_24h = now + timedelta(hours=24)
     upcoming_tasks = tasks.filter(
@@ -212,10 +182,13 @@ def home(request):
         
         # Lists for modals
         'completed_tasks_list': completed_tasks_list,
-        'pending_tasks_list': pending_tasks_list,       # ✅ NEW
-        'overdue_tasks_list': overdue_tasks_list,       # ✅ NEW
-        'all_notes_list': all_notes_list,               # ✅ NEW
-        'upcoming_tasks': upcoming_tasks,               # ✅ ADDED
+        'pending_tasks_list': pending_tasks_list,
+        'overdue_tasks_list': overdue_tasks_list,
+        'all_notes_list': all_notes_list,
+        'upcoming_tasks': upcoming_tasks,
+        
+        # NEW: Unique subjects for filter
+        'unique_subjects': unique_subjects,
         
         # Dynamic sidebar counters
         'total_tasks_count': total_tasks,
@@ -332,6 +305,42 @@ def edit_profile(request):
         "form": form,
         "user": user
     })
+
+
+@login_required
+@require_POST
+def add_note(request):
+    """
+    Handles creation of a new note from the dashboard modal.
+    """
+    form = NoteForm(request.POST)
+    is_ajax = request.headers.get('x-requested-with') == 'XMLHttpRequest'
+    if form.is_valid():
+        note = form.save(commit=False)
+        note.user = request.user
+        note.save()
+        messages.success(request, "Note created successfully!")
+
+        if is_ajax:
+            note_data = {
+                'id': note.id,
+                'title': note.title,
+                'content': note.content,
+                'subject': note.subject or '',
+                'tags': note.tags or '',
+                'created_at': note.created_at.strftime('%b %d, %Y'),
+                'edit_url': reverse('notes:edit_note', args=[note.id]),
+                'delete_url': reverse('notes:delete_note', args=[note.id]),
+            }
+            total_notes = Note.objects.filter(user=request.user).count()
+            return JsonResponse({'status': 'ok', 'note': note_data, 'total_notes': total_notes})
+    else:
+        # collect form errors to show in messages
+        messages.error(request, "Failed to create note. Please check the form.")
+        if is_ajax:
+            return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
+
+    return redirect('notes:home')
 
 
 @login_required

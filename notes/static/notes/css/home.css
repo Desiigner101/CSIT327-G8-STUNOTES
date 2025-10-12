@@ -1,4 +1,4 @@
-/* home.css - Complete Enhanced Version */
+/* home.css - Complete Enhanced Version with Filters */
 
 /* Reset */
 * {
@@ -175,6 +175,40 @@ body {
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
 }
 
+/* ==================== NOTIFICATION BELL ==================== */
+.notification-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-bell {
+  background: none;
+  border: none;
+  font-size: 26px;
+  cursor: pointer;
+  color: #333;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.notification-bell:hover {
+  transform: scale(1.1);
+  color: #1d4ed8;
+}
+
+.notification-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 3px 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
 /* ==================== STATS OVERVIEW CARDS ==================== */
 .stats-overview {
   display: grid;
@@ -224,6 +258,7 @@ body {
 .stat-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  cursor: pointer;
 }
 
 .stat-card h4 {
@@ -271,11 +306,6 @@ body {
 
 .stat-card.overdue .stat-number {
   color: #f44336;
-}
-
-.stat-card.completed:hover {
-  cursor: pointer;
-  transform: translateY(-10px) scale(1.02);
 }
 
 /* ==================== GRID LAYOUT ==================== */
@@ -360,6 +390,15 @@ body {
   box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
 }
 
+.btn-secondary {
+  background: linear-gradient(135deg, #9e9e9e, #bdbdbd);
+  box-shadow: 0 4px 12px rgba(158, 158, 158, 0.3);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 6px 20px rgba(158, 158, 158, 0.4);
+}
+
 .btn-success {
   background: linear-gradient(135deg, #4caf50, #66bb6a);
   padding: 12px 24px;
@@ -382,6 +421,11 @@ body {
 .btn-danger:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
 }
 
 /* ==================== NOTES SECTION ==================== */
@@ -719,6 +763,22 @@ body {
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
+.form-control {
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
 .form-row {
   display: flex;
   gap: 15px;
@@ -756,8 +816,6 @@ body {
   flex-direction: column;
 }
 
-
-
 .modal-header {
   padding: 25px 30px;
   border-bottom: 2px solid #f0f0f0;
@@ -767,6 +825,34 @@ body {
   background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
   color: white;
   border-radius: 20px 20px 0 0;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.modal-count {
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.modal-header-pending {
+  background: linear-gradient(135deg, #ff9800 0%, #ffa726 100%);
+}
+
+.modal-header-overdue {
+  background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+}
+
+.modal-header-notes {
+  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
 }
 
 /* All Notes header specific layout */
@@ -787,22 +873,6 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.all-notes-search {
-  width: 420px;
-  max-width: 50vw;
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: 2px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.08);
-  color: white;
-  font-size: 14px;
-}
-
-.all-notes-search::placeholder {
-  color: rgba(255,255,255,0.9);
-  opacity: 0.9;
 }
 
 .modal-header h2 {
@@ -835,6 +905,7 @@ body {
   padding: 30px;
   overflow-y: auto;
   max-height: calc(80vh - 100px);
+  position: relative;
 }
 
 .modal-body::-webkit-scrollbar {
@@ -851,170 +922,97 @@ body {
   border-radius: 10px;
 }
 
-/* ==================== COMPLETED TASKS LIST ==================== */
+/* ==================== MODAL FILTERS ==================== */
+.modal-filters {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 2px solid #dee2e6;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 16px;
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.filter-search:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.filter-search::placeholder {
+  color: #adb5bd;
+}
+
+.filter-search::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+  cursor: pointer;
+}
+
+.filter-select {
+  padding: 10px 16px;
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.filter-select:hover {
+  border-color: #4a90e2;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* ==================== TASK ITEMS IN MODALS ==================== */
 .completed-tasks-list {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  padding: 20px;
 }
 
 .completed-task-item {
   display: flex;
-  gap: 20px;
-  padding: 20px;
-  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: white;
   border-radius: 12px;
-  border-left: 4px solid #4caf50;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
+  border-left: 4px solid transparent;
 }
 
 .completed-task-item:hover {
-  transform: translateX(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateX(4px);
 }
 
-.task-icon {
-  font-size: 32px;
-  line-height: 1;
+.completed-task-item {
+  border-left-color: #28a745;
 }
 
-.task-details {
-  flex: 1;
-}
-
-.task-details h4 {
-  margin: 0 0 8px 0;
-  font-size: 18px;
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.task-details p {
-  margin: 0 0 12px 0;
-  color: #7f8c8d;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.task-meta {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badge-high {
-  background: #ffebee;
-  color: #f44336;
-}
-
-.badge-medium {
-  background: #fff3e0;
-  color: #ff9800;
-}
-
-.badge-low {
-  background: #e8f5e9;
-  color: #4caf50;
-}
-
-.task-date {
-  font-size: 12px;
-  color: #95a5a6;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #95a5a6;
-}
-
-.empty-state p {
-  font-size: 18px;
-  margin: 0;
-}
-
-/* ==================== RESPONSIVE DESIGN ==================== */
-@media (max-width: 1200px) {
-  .grid {
-    grid-template-columns: 1fr 1fr;
-  }
-  
-  .calendar {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 768px) {
-  body {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    padding: 20px;
-  }
-  
-  .main {
-    padding: 20px;
-  }
-  
-  .grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-overview {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .topbar {
-    flex-direction: column;
-    gap: 15px;
-    text-align: center;
-  }
-
-  .task-content {
-    flex-direction: column;
-  }
-  
-  .task-actions {
-    width: 100%;
-    justify-content: flex-start;
-    margin-top: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-overview {
-    grid-template-columns: 1fr;
-  }
-  
-  .stat-card .stat-number {
-    font-size: 36px;
-  }
-}
-/* ==================== MODAL HEADER VARIANTS ==================== */
-.modal-header-pending {
-  background: linear-gradient(135deg, #ff9800 0%, #ffa726 100%);
-}
-
-.modal-header-overdue {
-  background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
-}
-
-.modal-header-notes {
-  background: linear-gradient(135deg, #2196f3 0%, #42a5f5 100%);
-}
-
-/* ==================== PENDING TASK ITEMS ==================== */
 .pending-item {
   border-left-color: #ff9800;
 }
@@ -1023,7 +1021,6 @@ body {
   border-left-color: #f57c00;
 }
 
-/* ==================== OVERDUE TASK ITEMS ==================== */
 .overdue-item {
   border-left-color: #f44336;
   background: linear-gradient(135deg, #ffebee 0%, #ffffff 100%);
@@ -1033,19 +1030,169 @@ body {
   border-left-color: #d32f2f;
 }
 
+.task-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.task-details {
+  flex: 1;
+}
+
+.task-details h4 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.task-details p {
+  margin: 0 0 10px 0;
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.task-meta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-high {
+  background: #dc3545;
+  color: white;
+}
+
+.badge-medium {
+  background: #ffc107;
+  color: #212529;
+}
+
+.badge-low {
+  background: #28a745;
+  color: white;
+}
+
+.task-date {
+  font-size: 13px;
+  color: #6c757d;
+}
+
 .overdue-date {
   color: #f44336;
   font-weight: 600;
 }
 
+/* ==================== EMPTY STATE ==================== */
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-state p {
+  font-size: 18px;
+  color: #6c757d;
+  margin: 0;
+}
+
 /* ==================== NOTES GRID IN MODAL ==================== */
 .notes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
+  padding: 20px;
 }
 
-/* ==================== ADD NOTE LAYOUT (REFERENCE UI) ==================== */
+.note-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  border-left: 4px solid #2196f3;
+}
+
+.note-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border-color: #4a90e2;
+}
+
+.note-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.note-card-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  flex: 1;
+}
+
+.note-date {
+  font-size: 12px;
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.note-card-body {
+  margin-bottom: 12px;
+}
+
+.note-card-body p {
+  margin: 0;
+  color: #495057;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.note-card-footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.note-subject {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.note-tags {
+  display: inline-block;
+  background: #e9ecef;
+  color: #495057;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+}
+
+/* ==================== ADD NOTE LAYOUT ==================== */
 .add-note-form {
   position: relative;
 }
@@ -1119,8 +1266,8 @@ body {
 /* Floating circular submit button */
 .floating-submit {
   position: absolute;
-  right: 36px; /* inside modal-content padding */
-  bottom: 36px; /* inside modal-content padding */
+  right: 36px;
+  bottom: 36px;
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -1141,91 +1288,11 @@ body {
   box-shadow: 0 16px 36px rgba(76,175,80,0.36);
 }
 
-@media (max-width: 900px) {
-  .add-note-grid {
-    grid-template-columns: 1fr;
-  }
-  .add-note-content {
-    min-height: 260px;
-  }
-  .all-notes-search {
-    width: 200px;
-  }
-}
-
-.note-card {
-  background: linear-gradient(135deg, #f9f9f9 0%, #ffffff 100%);
-  border-radius: 12px;
-  padding: 20px;
-  border-left: 4px solid #2196f3;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.note-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-left-width: 6px;
-}
-
-.note-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #f0f0f0;
-}
-
-.note-card-header h4 {
-  margin: 0;
-  font-size: 18px;
-  color: #2c3e50;
-  font-weight: 600;
-  flex: 1;
-}
-
-.note-date {
-  font-size: 11px;
-  color: #95a5a6;
-  font-weight: 500;
-  white-space: nowrap;
-  margin-left: 10px;
-}
-
-.note-card-body {
-  margin-bottom: 12px;
-}
-
-.note-card-body p {
-  margin: 0;
-  color: #7f8c8d;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.note-card-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.note-subject {
-  display: inline-block;
-  padding: 4px 12px;
-  background: #e3f2fd;
-  color: #2196f3;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
 /* Floating add button for All Notes modal */
 .floating-add-btn {
   position: absolute;
-  right: 36px; /* inside modal-content padding */
-  bottom: 36px; /* inside modal-content padding */
+  right: 36px;
+  bottom: 36px;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -1246,68 +1313,7 @@ body {
   box-shadow: 0 12px 30px rgba(76,175,80,0.4);
 }
 
-/* Make all stat cards clickable */
-.stat-card.pending:hover {
-  cursor: pointer;
-  transform: translateY(-10px) scale(1.02);
-}
-
-.stat-card.overdue:hover {
-  cursor: pointer;
-  transform: translateY(-10px) scale(1.02);
-}
-
-/* Responsive notes grid */
-@media (max-width: 768px) {
-  .notes-grid {
-    grid-template-columns: 1fr;
-  }
-}
-/* ====================== HIGHLIGHT OVERDUE TASK ====================== */
-.task-list li.highlight-overdue {
-  background-color: #ffe6e6 !important;
-  border-left: 5px solid #ff4d4d;
-  animation: pulseOverdue 1s infinite alternate;
-}
-
-@keyframes pulseOverdue {
-  from {
-    background-color: #ffe6e6;
-  }
-  to {
-    background-color: #ffcccc;
-  }
-}
-
-/* ====================== DEADLINE NOTIFICATION STYLE ====================== */
-.deadline-notification {
-  position: fixed;
-  top: 20px;
-  right: -400px;
-  background-color: #222;
-  color: #fff;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.4);
-  font-size: 14px;
-  line-height: 1.4;
-  z-index: 9999;
-  transition: right 0.8s ease;
-  max-width: 300px;
-}
-
-.deadline-notification.show {
-  right: 20px;
-}
-
-.deadline-notification strong {
-  color: #ffd700;
-  font-size: 15px;
-}
-
-/* ===========================
-   🔔 Notification Modal (Professional Compact Style)
-   =========================== */
+/* ==================== NOTIFICATION MODAL ==================== */
 .notification-modal {
   display: none;
   position: fixed;
@@ -1320,11 +1326,10 @@ body {
   animation: fadeInOverlay 0.25s ease;
 }
 
-/* The modal card */
 .notification-modal-content {
   background: #fdfdfd;
   border: 1px solid #e2e8f0;
-  border-top: 4px solid #007bff; /* Blue accent bar */
+  border-top: 4px solid #007bff;
   border-radius: 12px;
   padding: 1.5rem 1.8rem;
   width: 380px;
@@ -1336,7 +1341,6 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Modal Header */
 .notification-modal-content h3 {
   font-size: 1.3rem;
   font-weight: 700;
@@ -1347,23 +1351,6 @@ body {
   padding-bottom: 0.5rem;
 }
 
-/* Close Button */
-.close-modal {
-  position: absolute;
-  right: 16px;
-  top: 12px;
-  font-size: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  color: #6b7280;
-  transition: color 0.25s ease;
-}
-
-.close-modal:hover {
-  color: #ef4444;
-}
-
-/* Task List */
 .notification-modal-content ul {
   list-style: none;
   padding: 0;
@@ -1397,100 +1384,119 @@ body {
   color: #6b7280;
 }
 
-/* Animations */
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Scrollbar Styling */
 .notification-modal-content ul::-webkit-scrollbar {
   width: 6px;
 }
+
 .notification-modal-content ul::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
 }
 
-
-/* ========== Animations ========== */
 @keyframes fadeInOverlay {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.notification-bell {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 50%;
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s ease;
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .calendar {
+    grid-column: span 2;
+  }
 }
 
-.notification-bell:hover {
-  background: #f5f7fa;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+@media (max-width: 900px) {
+  .add-note-grid {
+    grid-template-columns: 1fr;
+  }
+  .add-note-content {
+    min-height: 260px;
+  }
 }
 
-.notification-count {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  background: #e74c3c;
-  color: white;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 50%;
-  padding: 2px 5px;
-}
-/* ===============================
-   🔔 Notification Bell with Badge
-   =============================== */
-.notification-wrapper {
-  position: relative;
-  display: inline-block;
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .main {
+    padding: 20px;
+  }
+  
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .stats-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .topbar {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .task-content {
+    flex-direction: column;
+  }
+  
+  .task-actions {
+    width: 100%;
+    justify-content: flex-start;
+    margin-top: 10px;
+  }
+
+  .notes-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+
+  .completed-tasks-list {
+    padding: 12px;
+  }
+
+  .completed-task-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .floating-add-btn,
+  .floating-submit {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+  }
+
+  .modal-filters {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-search,
+  .filter-select {
+    width: 100%;
+    min-width: unset;
+  }
 }
 
-.notification-bell {
-  background: none;
-  border: none;
-  font-size: 26px;
-  cursor: pointer;
-  color: #333;
-  position: relative;
-  transition: transform 0.2s ease;
-}
-
-.notification-bell:hover {
-  transform: scale(1.1);
-  color: #1d4ed8; /* nice blue hover effect */
-}
-
-.notification-count {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background-color: #ef4444; /* red circle */
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 3px 6px;
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+@media (max-width: 480px) {
+  .stats-overview {
+    grid-template-columns: 1fr;
+  }
+  
+  .stat-card .stat-number {
+    font-size: 36px;
+  }
 }
