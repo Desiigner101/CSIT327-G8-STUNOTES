@@ -367,14 +367,45 @@
   <div id="completedTasksModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>✅ Completed Tasks History</h2>
+        <div class="modal-header-left">
+          <h2>✅ Completed Tasks History <span class="modal-count">({{ completed_tasks_list|length }})</span></h2>
+        </div>
         <span class="close-modal" onclick="closeModal('completedTasksModal')">&times;</span>
       </div>
+      
+      <!-- Search and Filter Controls -->
+      <div class="modal-filters">
+        <input type="search" 
+               id="completedTasksSearch" 
+               placeholder="Search completed tasks..." 
+               class="filter-search">
+        
+        <select id="completedPriorityFilter" class="filter-select">
+          <option value="all">All Priorities</option>
+          <option value="high">High Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="low">Low Priority</option>
+        </select>
+        
+        <select id="completedSortFilter" class="filter-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="priority_high">Priority: High to Low</option>
+          <option value="priority_low">Priority: Low to High</option>
+          <option value="title_asc">Title: A to Z</option>
+          <option value="title_desc">Title: Z to A</option>
+        </select>
+      </div>
+      
       <div class="modal-body">
         {% if completed_tasks_list %}
           <div class="completed-tasks-list">
             {% for task in completed_tasks_list %}
-            <div class="completed-task-item">
+            <div class="completed-task-item"
+                 data-title="{{ task.title|lower|escapejs }}"
+                 data-description="{{ task.description|default:''|lower|escapejs }}"
+                 data-priority="{{ task.priority }}"
+                 data-date="{{ task.updated_at|date:'c' }}">
               <div class="task-icon">✅</div>
               <div class="task-details">
                 <h4>{{ task.title }}</h4>
@@ -400,14 +431,46 @@
   <div id="pendingTasksModal" class="modal">
     <div class="modal-content">
       <div class="modal-header modal-header-pending">
-        <h2>📋 Pending Tasks</h2>
+        <div class="modal-header-left">
+          <h2>📋 Pending Tasks <span class="modal-count">({{ pending_tasks_list|length }})</span></h2>
+        </div>
         <span class="close-modal" onclick="closeModal('pendingTasksModal')">&times;</span>
       </div>
+      
+      <!-- Search and Filter Controls -->
+      <div class="modal-filters">
+        <input type="search" 
+               id="pendingTasksSearch" 
+               placeholder="Search pending tasks..." 
+               class="filter-search">
+        
+        <select id="pendingPriorityFilter" class="filter-select">
+          <option value="all">All Priorities</option>
+          <option value="high">High Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="low">Low Priority</option>
+        </select>
+        
+        <select id="pendingSortFilter" class="filter-select">
+          <option value="due_date">Due Date: Soonest</option>
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="priority_high">Priority: High to Low</option>
+          <option value="priority_low">Priority: Low to High</option>
+          <option value="title_asc">Title: A to Z</option>
+          <option value="title_desc">Title: Z to A</option>
+        </select>
+      </div>
+      
       <div class="modal-body">
         {% if pending_tasks_list %}
           <div class="completed-tasks-list">
             {% for task in pending_tasks_list %}
-            <div class="completed-task-item pending-item">
+            <div class="completed-task-item pending-item"
+                 data-title="{{ task.title|lower|escapejs }}"
+                 data-description="{{ task.description|default:''|lower|escapejs }}"
+                 data-priority="{{ task.priority }}"
+                 data-date="{{ task.due_date|date:'c' }}">
               <div class="task-icon">⏳</div>
               <div class="task-details">
                 <h4>{{ task.title }}</h4>
@@ -433,14 +496,46 @@
   <div id="overdueTasksModal" class="modal">
     <div class="modal-content">
       <div class="modal-header modal-header-overdue">
-        <h2>⚠️ Overdue Tasks</h2>
+        <div class="modal-header-left">
+          <h2>⚠️ Overdue Tasks <span class="modal-count">({{ overdue_tasks_list|length }})</span></h2>
+        </div>
         <span class="close-modal" onclick="closeModal('overdueTasksModal')">&times;</span>
       </div>
+      
+      <!-- Search and Filter Controls -->
+      <div class="modal-filters">
+        <input type="search" 
+               id="overdueTasksSearch" 
+               placeholder="Search overdue tasks..." 
+               class="filter-search">
+        
+        <select id="overduePriorityFilter" class="filter-select">
+          <option value="all">All Priorities</option>
+          <option value="high">High Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="low">Low Priority</option>
+        </select>
+        
+        <select id="overdueSortFilter" class="filter-select">
+          <option value="most_overdue">Most Overdue First</option>
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="priority_high">Priority: High to Low</option>
+          <option value="priority_low">Priority: Low to High</option>
+          <option value="title_asc">Title: A to Z</option>
+          <option value="title_desc">Title: Z to A</option>
+        </select>
+      </div>
+      
       <div class="modal-body">
         {% if overdue_tasks_list %}
           <div class="completed-tasks-list">
             {% for task in overdue_tasks_list %}
-            <div class="completed-task-item overdue-item">
+            <div class="completed-task-item overdue-item"
+                 data-title="{{ task.title|lower|escapejs }}"
+                 data-description="{{ task.description|default:''|lower|escapejs }}"
+                 data-priority="{{ task.priority }}"
+                 data-date="{{ task.due_date|date:'c' }}">
               <div class="task-icon">🔴</div>
               <div class="task-details">
                 <h4>{{ task.title }}</h4>
@@ -467,38 +562,63 @@
     <div class="modal-content">
       <div class="modal-header modal-header-notes all-notes-header">
         <div class="all-notes-header-left">
-          <h2 style="display:flex; align-items:center; gap:10px;">📚 All Notes <span id="all-notes-count" style="font-weight:600; color: rgba(255,255,255,0.9); font-size:16px;">({{ all_notes_list|length }})</span>
-            <!-- search immediately after title -->
-            <input id="allNotesSearch" type="search" placeholder="Search notes..." class="all-notes-search" style="margin-left:8px;" />
-          </h2>
+          <h2>📚 All Notes <span id="all-notes-count">({{ all_notes_list|length }})</span></h2>
         </div>
         <div class="all-notes-header-right">
           <span class="close-modal" onclick="closeModal('allNotesModal')">&times;</span>
         </div>
       </div>
+      
+      <!-- Search and Filter Controls -->
+      <div class="modal-filters">
+        <input type="search" 
+               id="allNotesSearch" 
+               placeholder="Search notes..." 
+               class="filter-search">
+        
+        <select id="noteSubjectFilter" class="filter-select">
+          <option value="all">All Subjects</option>
+          {% for subject in unique_subjects %}
+            <option value="{{ subject }}">{{ subject }}</option>
+          {% endfor %}
+        </select>
+        
+        <select id="noteSortFilter" class="filter-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="title_asc">Title: A to Z</option>
+          <option value="title_desc">Title: Z to A</option>
+        </select>
+      </div>
+      
       <div class="modal-body">
         {% if all_notes_list %}
-          <!-- Search moved to header -->
           <div class="notes-grid">
             {% for note in all_notes_list %}
-            <div class="note-card" data-title="{{ note.title|lower|escapejs }}" data-content="{{ note.content|lower|escapejs }}" data-tags="{{ note.tags|default:''|lower|escapejs }}">
-              <div class="note-card-header" style="position:relative;">
+            <div class="note-card" 
+                 data-title="{{ note.title|lower|escapejs }}" 
+                 data-content="{{ note.content|lower|escapejs }}" 
+                 data-tags="{{ note.tags|default:''|lower|escapejs }}"
+                 data-subject="{{ note.subject|default:''|escapejs }}"
+                 data-date="{{ note.created_at|date:'c' }}">
+              <div class="note-card-header">
                 <h4>{{ note.title }}</h4>
                 <span class="note-date">{{ note.created_at|date:"M d, Y" }}</span>
               </div>
               <div class="note-card-body">
                 <p>{{ note.content|truncatewords:30 }}</p>
               </div>
-              <!-- Read-only card in All Notes modal (no edit/delete here) -->
               <div class="note-card-footer">
                 {% if note.subject %}
                 <span class="note-subject">{{ note.subject }}</span>
+                {% endif %}
+                {% if note.tags %}
+                <span class="note-tags">{{ note.tags }}</span>
                 {% endif %}
               </div>
             </div>
             {% endfor %}
           </div>
-          <!-- Floating Add Button inside All Notes modal -->
           <button class="floating-add-btn" onclick="openModal('addNoteModal')" title="Add new note">+</button>
         {% else %}
           <div class="empty-state">
@@ -508,6 +628,7 @@
       </div>
     </div>
   </div>
+
  <!-- 🔔 Notification Modal -->
 <div id="notificationModal" class="notification-modal">
   <div class="notification-modal-content">
