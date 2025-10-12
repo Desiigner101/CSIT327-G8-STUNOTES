@@ -151,6 +151,15 @@ def home(request):
     
     # ✅ NEW: Get all notes list
     all_notes_list = Note.objects.filter(user=user).order_by('-created_at')
+
+    # ✅ NEW: Get upcoming tasks due within 24 hours
+    from datetime import timedelta
+    next_24h = now + timedelta(hours=24)
+    upcoming_tasks = tasks.filter(
+        due_date__gte=now,
+        due_date__lte=next_24h,
+        status__in=['pending', 'in_progress']
+    ).order_by('due_date')
     
     # Detect if editing
     edit_task_id = request.GET.get("edit")
@@ -206,6 +215,7 @@ def home(request):
         'pending_tasks_list': pending_tasks_list,       # ✅ NEW
         'overdue_tasks_list': overdue_tasks_list,       # ✅ NEW
         'all_notes_list': all_notes_list,               # ✅ NEW
+        'upcoming_tasks': upcoming_tasks,               # ✅ ADDED
         
         # Dynamic sidebar counters
         'total_tasks_count': total_tasks,
