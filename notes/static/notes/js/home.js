@@ -9,6 +9,7 @@ function closeModal(modalId) {
 
 window.openModal = openModal;
 window.closeModal = closeModal;
+
 // home.js - Enhanced Dashboard JavaScript
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -292,28 +293,276 @@ document.addEventListener("DOMContentLoaded", function() {
         openModal('globalEditNoteModal');
     };
 
-    // ==================== All Notes Search Filter ====================
+    // ==================== ALL NOTES MODAL - SEARCH & FILTER ====================
     const allNotesSearch = document.getElementById('allNotesSearch');
+    const noteSubjectFilter = document.getElementById('noteSubjectFilter');
+    const noteSortFilter = document.getElementById('noteSortFilter');
     const allNotesCount = document.getElementById('all-notes-count');
+
     if (allNotesSearch) {
-        allNotesSearch.addEventListener('input', function(e) {
-            const q = (e.target.value || '').trim().toLowerCase();
-            const cards = document.querySelectorAll('#allNotesModal .note-card');
-            let visible = 0;
-            cards.forEach(card => {
-                const title = (card.dataset.title || '').toLowerCase();
-                const content = (card.dataset.content || '').toLowerCase();
-                const tags = (card.dataset.tags || '').toLowerCase();
-                const match = q === '' || title.includes(q) || content.includes(q) || tags.includes(q);
-                card.style.display = match ? '' : 'none';
-                if (match) visible += 1;
-            });
-            if (allNotesCount) {
-                // update count display in header
-                const totalText = `(${visible})`;
-                allNotesCount.textContent = totalText;
+        allNotesSearch.addEventListener('input', filterAndSearchNotes);
+    }
+    if (noteSubjectFilter) {
+        noteSubjectFilter.addEventListener('change', filterAndSearchNotes);
+    }
+    if (noteSortFilter) {
+        noteSortFilter.addEventListener('change', filterAndSearchNotes);
+    }
+
+    function filterAndSearchNotes() {
+        const searchTerm = (allNotesSearch?.value || '').toLowerCase();
+        const selectedSubject = noteSubjectFilter?.value || 'all';
+        const sortOrder = noteSortFilter?.value || 'newest';
+        
+        const noteCards = Array.from(document.querySelectorAll('#allNotesModal .note-card'));
+        let visibleCount = 0;
+
+        // Filter and search
+        noteCards.forEach(card => {
+            const title = card.dataset.title || '';
+            const content = card.dataset.content || '';
+            const tags = card.dataset.tags || '';
+            const subject = card.dataset.subject || '';
+
+            const matchesSearch = title.includes(searchTerm) || 
+                                 content.includes(searchTerm) || 
+                                 tags.includes(searchTerm);
+            
+            const matchesSubject = selectedSubject === 'all' || subject === selectedSubject;
+
+            if (matchesSearch && matchesSubject) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
             }
         });
+
+        // Sort visible cards
+        const visibleCards = noteCards.filter(card => card.style.display !== 'none');
+        sortNoteCards(visibleCards, sortOrder);
+
+        // Update count
+        if (allNotesCount) {
+            allNotesCount.textContent = `(${visibleCount})`;
+        }
+    }
+
+    function sortNoteCards(cards, sortOrder) {
+        const container = document.querySelector('#allNotesModal .notes-grid');
+        if (!container) return;
+
+        cards.sort((a, b) => {
+            const dateA = new Date(a.dataset.date);
+            const dateB = new Date(b.dataset.date);
+            const titleA = a.dataset.title;
+            const titleB = b.dataset.title;
+
+            switch(sortOrder) {
+                case 'newest':
+                    return dateB - dateA;
+                case 'oldest':
+                    return dateA - dateB;
+                case 'title_asc':
+                    return titleA.localeCompare(titleB);
+                case 'title_desc':
+                    return titleB.localeCompare(titleA);
+                default:
+                    return 0;
+            }
+        });
+
+        cards.forEach(card => container.appendChild(card));
+    }
+
+    // ==================== COMPLETED TASKS MODAL - SEARCH & FILTER ====================
+    const completedSearch = document.getElementById('completedTasksSearch');
+    const completedPriorityFilter = document.getElementById('completedPriorityFilter');
+    const completedSortFilter = document.getElementById('completedSortFilter');
+
+    if (completedSearch) {
+        completedSearch.addEventListener('input', filterCompletedTasks);
+    }
+    if (completedPriorityFilter) {
+        completedPriorityFilter.addEventListener('change', filterCompletedTasks);
+    }
+    if (completedSortFilter) {
+        completedSortFilter.addEventListener('change', filterCompletedTasks);
+    }
+
+    function filterCompletedTasks() {
+        const searchTerm = (completedSearch?.value || '').toLowerCase();
+        const selectedPriority = completedPriorityFilter?.value || 'all';
+        const sortOrder = completedSortFilter?.value || 'newest';
+        
+        const taskItems = Array.from(document.querySelectorAll('#completedTasksModal .completed-task-item'));
+        let visibleCount = 0;
+
+        // Filter and search
+        taskItems.forEach(item => {
+            const title = item.dataset.title || '';
+            const description = item.dataset.description || '';
+            const priority = item.dataset.priority || '';
+
+            const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+            const matchesPriority = selectedPriority === 'all' || priority === selectedPriority;
+
+            if (matchesSearch && matchesPriority) {
+                item.style.display = 'flex';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Sort visible items
+        const visibleItems = taskItems.filter(item => item.style.display !== 'none');
+        sortTaskItems(visibleItems, sortOrder, 'completedTasksModal');
+
+        // Update count
+        updateModalCount('completedTasksModal', visibleCount);
+    }
+
+    // ==================== PENDING TASKS MODAL - SEARCH & FILTER ====================
+    const pendingSearch = document.getElementById('pendingTasksSearch');
+    const pendingPriorityFilter = document.getElementById('pendingPriorityFilter');
+    const pendingSortFilter = document.getElementById('pendingSortFilter');
+
+    if (pendingSearch) {
+        pendingSearch.addEventListener('input', filterPendingTasks);
+    }
+    if (pendingPriorityFilter) {
+        pendingPriorityFilter.addEventListener('change', filterPendingTasks);
+    }
+    if (pendingSortFilter) {
+        pendingSortFilter.addEventListener('change', filterPendingTasks);
+    }
+
+    function filterPendingTasks() {
+        const searchTerm = (pendingSearch?.value || '').toLowerCase();
+        const selectedPriority = pendingPriorityFilter?.value || 'all';
+        const sortOrder = pendingSortFilter?.value || 'due_date';
+        
+        const taskItems = Array.from(document.querySelectorAll('#pendingTasksModal .completed-task-item'));
+        let visibleCount = 0;
+
+        // Filter and search
+        taskItems.forEach(item => {
+            const title = item.dataset.title || '';
+            const description = item.dataset.description || '';
+            const priority = item.dataset.priority || '';
+
+            const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+            const matchesPriority = selectedPriority === 'all' || priority === selectedPriority;
+
+            if (matchesSearch && matchesPriority) {
+                item.style.display = 'flex';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Sort visible items
+        const visibleItems = taskItems.filter(item => item.style.display !== 'none');
+        sortTaskItems(visibleItems, sortOrder, 'pendingTasksModal');
+
+        // Update count
+        updateModalCount('pendingTasksModal', visibleCount);
+    }
+
+    // ==================== OVERDUE TASKS MODAL - SEARCH & FILTER ====================
+    const overdueSearch = document.getElementById('overdueTasksSearch');
+    const overduePriorityFilter = document.getElementById('overduePriorityFilter');
+    const overdueSortFilter = document.getElementById('overdueSortFilter');
+
+    if (overdueSearch) {
+        overdueSearch.addEventListener('input', filterOverdueTasks);
+    }
+    if (overduePriorityFilter) {
+        overduePriorityFilter.addEventListener('change', filterOverdueTasks);
+    }
+    if (overdueSortFilter) {
+        overdueSortFilter.addEventListener('change', filterOverdueTasks);
+    }
+
+    function filterOverdueTasks() {
+        const searchTerm = (overdueSearch?.value || '').toLowerCase();
+        const selectedPriority = overduePriorityFilter?.value || 'all';
+        const sortOrder = overdueSortFilter?.value || 'most_overdue';
+        
+        const taskItems = Array.from(document.querySelectorAll('#overdueTasksModal .completed-task-item'));
+        let visibleCount = 0;
+
+        // Filter and search
+        taskItems.forEach(item => {
+            const title = item.dataset.title || '';
+            const description = item.dataset.description || '';
+            const priority = item.dataset.priority || '';
+
+            const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm);
+            const matchesPriority = selectedPriority === 'all' || priority === selectedPriority;
+
+            if (matchesSearch && matchesPriority) {
+                item.style.display = 'flex';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+
+        // Sort visible items
+        const visibleItems = taskItems.filter(item => item.style.display !== 'none');
+        sortTaskItems(visibleItems, sortOrder, 'overdueTasksModal');
+
+        // Update count
+        updateModalCount('overdueTasksModal', visibleCount);
+    }
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function sortTaskItems(items, sortOrder, modalId) {
+        const container = document.querySelector(`#${modalId} .completed-tasks-list`);
+        if (!container) return;
+
+        items.sort((a, b) => {
+            const dateA = new Date(a.dataset.date);
+            const dateB = new Date(b.dataset.date);
+            const titleA = a.dataset.title;
+            const titleB = b.dataset.title;
+            const priorityOrder = { high: 3, medium: 2, low: 1 };
+            const priorityA = priorityOrder[a.dataset.priority] || 0;
+            const priorityB = priorityOrder[b.dataset.priority] || 0;
+
+            switch(sortOrder) {
+                case 'newest':
+                    return dateB - dateA;
+                case 'oldest':
+                    return dateA - dateB;
+                case 'due_date':
+                    return dateA - dateB;
+                case 'most_overdue':
+                    return dateA - dateB;
+                case 'priority_high':
+                    return priorityB - priorityA;
+                case 'priority_low':
+                    return priorityA - priorityB;
+                case 'title_asc':
+                    return titleA.localeCompare(titleB);
+                case 'title_desc':
+                    return titleB.localeCompare(titleA);
+                default:
+                    return 0;
+            }
+        });
+
+        items.forEach(item => container.appendChild(item));
+    }
+
+    function updateModalCount(modalId, count) {
+        const countElement = document.querySelector(`#${modalId} .modal-count`);
+        if (countElement) {
+            countElement.textContent = `(${count})`;
+        }
     }
 
     // ==================== AJAX Add Note Submission ====================
@@ -459,7 +708,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
-            modal.style.display = 'block';
+            modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
     }
@@ -469,14 +718,37 @@ document.addEventListener("DOMContentLoaded", function() {
         if (modal) {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            
+            // Reset filters when closing
+            if (modalId === 'completedTasksModal' && completedSearch) {
+                completedSearch.value = '';
+                if (completedPriorityFilter) completedPriorityFilter.value = 'all';
+                if (completedSortFilter) completedSortFilter.value = 'newest';
+                filterCompletedTasks();
+            } else if (modalId === 'pendingTasksModal' && pendingSearch) {
+                pendingSearch.value = '';
+                if (pendingPriorityFilter) pendingPriorityFilter.value = 'all';
+                if (pendingSortFilter) pendingSortFilter.value = 'due_date';
+                filterPendingTasks();
+            } else if (modalId === 'overdueTasksModal' && overdueSearch) {
+                overdueSearch.value = '';
+                if (overduePriorityFilter) overduePriorityFilter.value = 'all';
+                if (overdueSortFilter) overdueSortFilter.value = 'most_overdue';
+                filterOverdueTasks();
+            } else if (modalId === 'allNotesModal' && allNotesSearch) {
+                allNotesSearch.value = '';
+                if (noteSubjectFilter) noteSubjectFilter.value = 'all';
+                if (noteSortFilter) noteSortFilter.value = 'newest';
+                filterAndSearchNotes();
+            }
         }
     }
 
     // Close modal when clicking outside
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
-            event.target.style.display = 'none';
-            document.body.style.overflow = 'auto';
+            const modalId = event.target.id;
+            closeModal(modalId);
         }
     }
 
@@ -485,9 +757,10 @@ document.addEventListener("DOMContentLoaded", function() {
         if (e.key === 'Escape') {
             const modals = document.querySelectorAll('.modal');
             modals.forEach(modal => {
-                modal.style.display = 'none';
+                if (modal.style.display === 'flex' || modal.style.display === 'block') {
+                    closeModal(modal.id);
+                }
             });
-            document.body.style.overflow = 'auto';
         }
     });
 
@@ -526,38 +799,38 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
+    // =======================
+    // 🔔 Notification Modal Logic
+    // =======================
+    const bell = document.getElementById("notificationBell");
+    const notifModal = document.getElementById("notificationModal");
+    const closeNotificationModal = document.getElementById("closeNotificationModal");
+
+    if (bell && notifModal && closeNotificationModal) {
+        // ✅ Open modal when bell is clicked
+        bell.addEventListener("click", () => {
+            notifModal.style.display = "flex";
+        });
+
+        // ✅ Close modal when X is clicked
+        closeNotificationModal.addEventListener("click", () => {
+            notifModal.style.display = "none";
+        });
+
+        // ✅ Close modal when clicking outside the content
+        window.addEventListener("click", (event) => {
+            if (event.target === notifModal) {
+                notifModal.style.display = "none";
+            }
+        });
+    } else {
+        console.warn("⚠️ Notification modal elements not found in DOM.");
+    }
+
     console.log('✅ StuNotes Dashboard Enhanced!');
     console.log('💡 Keyboard shortcuts:');
     console.log('   - Ctrl/Cmd + N: Add new task');
     console.log('   - ESC: Close task form');
-
-
- // =======================
-// 🔔 Notification Modal Logic
-// =======================
-const bell = document.getElementById("notificationBell");
-const notifModal = document.getElementById("notificationModal");
-const closeNotificationModal = document.getElementById("closeNotificationModal");
-
-if (bell && notifModal && closeNotificationModal) {
-    // ✅ Open modal when bell is clicked
-    bell.addEventListener("click", () => {
-        notifModal.style.display = "flex";
-    });
-
-    // ✅ Close modal when X is clicked
-    closeNotificationModal.addEventListener("click", () => {
-        notifModal.style.display = "none";
-    });
-
-    // ✅ Close modal when clicking outside the content
-    window.addEventListener("click", (event) => {
-        if (event.target === notifModal) {
-            notifModal.style.display = "none";
-        }
-    });
-} else {
-    console.warn("⚠️ Notification modal elements not found in DOM.");
-}
+    console.log('🎯 All search and filter features loaded!');
 
 });
