@@ -4,10 +4,11 @@
   "description": "- [Overview](#overview)\r - [Features](#features)\r - [Technology Stack](#technology-stack)\r - [Installation](#installation)\r - [Usage](#usage)\r - [Team](#team)",
   "main": "index.js",
   "scripts": {
-  "build": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css",
-  "watch": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css --watch",
-  "build:prod": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css --minify"
-},
+    "build": "chmod +x ./build_files.sh && ./build_files.sh",
+    "tailwind:build": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css",
+    "watch": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css --watch",
+    "build:prod": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css --minify"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Desiigner101/CSIT327-G8-STUNOTES.git"
