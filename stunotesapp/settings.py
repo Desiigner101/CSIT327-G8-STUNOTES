@@ -32,7 +32,12 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-local-placeholder')
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allow hosts can be provided as comma-separated list in env (default to vercel)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.vercel.app').split(',')
+raw_allowed = config('ALLOWED_HOSTS', default='.vercel.app')
+# Split, strip whitespace and remove empty entries
+ALLOWED_HOSTS = [h.strip() for h in raw_allowed.split(',') if h.strip()]
+# Ensure localhost loopback is allowed for local testing
+if '127.0.0.1' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('127.0.0.1')
 
 
 # Application definition
@@ -82,39 +87,55 @@ WSGI_APPLICATION = 'stunotesapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# For security purposes, read database credentials from environment variables safely.
-# We avoid calling config(...) without a default to prevent decouple.UndefinedValueError
-db_engine = config('DB_ENGINE', default='')
-if db_engine:
-    # read optional port safely
-    db_port_raw = config('DB_PORT', default=None)
-    try:
-        db_port = int(db_port_raw) if db_port_raw else ''
-    except (TypeError, ValueError):
-        db_port = ''
-
+"""
+Database configuration order of precedence:
+1. DATABASE_URL (useful for Supabase / single connection string)
+2. Individual DB_* environment variables
+3. sqlite fallback for local/testing when none provided
+"""
+database_url = config('DATABASE_URL', default='')
+if database_url:
+    # Parse DATABASE_URL using dj_database_url (already in requirements)
     DATABASES = {
-        'default': {
-            'ENGINE': db_engine,
-            'HOST': config('DB_HOST', default=''),
-            'NAME': config('DB_NAME', default=''),
-            'USER': config('DB_USER', default=''),
-            'PASSWORD': config('DB_PASSWORD', default=''),
-            'PORT': db_port,
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
-            'CONN_MAX_AGE': 0,
-        }
+        'default': dj_database_url.parse(database_url, conn_max_age=600)
     }
+    # Ensure SSL when using managed Postgres (Supabase usually requires it)
+    if 'OPTIONS' not in DATABASES['default']:
+        DATABASES['default']['OPTIONS'] = {}
+    DATABASES['default']['OPTIONS'].setdefault('sslmode', 'require')
 else:
-    # Lightweight sqlite fallback for testing / initial deploy when no DB env vars set
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+    # For security purposes, read database credentials from environment variables safely.
+    db_engine = config('DB_ENGINE', default='')
+    if db_engine:
+        # read optional port safely
+        db_port_raw = config('DB_PORT', default=None)
+        try:
+            db_port = int(db_port_raw) if db_port_raw else ''
+        except (TypeError, ValueError):
+            db_port = ''
+
+        DATABASES = {
+            'default': {
+                'ENGINE': db_engine,
+                'HOST': config('DB_HOST', default=''),
+                'NAME': config('DB_NAME', default=''),
+                'USER': config('DB_USER', default=''),
+                'PASSWORD': config('DB_PASSWORD', default=''),
+                'PORT': db_port,
+                'OPTIONS': {
+                    'sslmode': 'require',
+                },
+                'CONN_MAX_AGE': 0,
+            }
         }
-    }
+    else:
+        # Lightweight sqlite fallback for testing / initial deploy when no DB env vars set
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 # Redirect to login page if user is not authenticated
 LOGIN_URL = 'notes:login'

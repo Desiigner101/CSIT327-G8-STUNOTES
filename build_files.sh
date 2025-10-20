@@ -18,8 +18,8 @@ if [ -f requirements.txt ]; then
 	"$PY" -m pip install -r requirements.txt
 fi
 
-# Ensure DJANGO settings module for collectstatic
-export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-stunotesapp.settings}
+# Ensure DJANGO settings module for collectstatic; use minimal settings during build to avoid DB imports
+export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-stunotesapp.settings_static}
 
 # Prepare dist dir expected by vercel
 DIST_DIR=staticfiles_build
