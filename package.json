@@ -1,0 +1,26 @@
+{
+  "name": "csit327-g8-stunotes",
+  "version": "1.0.0",
+  "description": "- [Overview](#overview)\r - [Features](#features)\r - [Technology Stack](#technology-stack)\r - [Installation](#installation)\r - [Usage](#usage)\r - [Team](#team)",
+  "main": "index.js",
+  "scripts": {
+  "build": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css",
+  "watch": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css --watch",
+  "build:prod": "npx @tailwindcss/cli -i ./static/notes/css/input.css -o ./static/notes/css/output.css --minify"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Desiigner101/CSIT327-G8-STUNOTES.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Desiigner101/CSIT327-G8-STUNOTES/issues"
+  },
+  "homepage": "https://github.com/Desiigner101/CSIT327-G8-STUNOTES#readme",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.14",
+    "tailwindcss": "^4.1.14"
+  }
+}

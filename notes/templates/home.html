@@ -4,213 +4,237 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard - Home</title>
-   <link rel="icon" type="image/png" href="{% static 'notes/images/favicon.png' %}">
-  <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'notes/images/favicon.png' %}">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'emerald-custom': {
+              50: '#e8f5e9',
+              100: '#c8e6c9',
+              500: '#4caf50',
+              600: '#43a047',
+              700: '#388e3c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slideDown { animation: slideDown 0.5s ease; }
+    .animate-fadeIn { animation: fadeIn 0.6s ease; }
+    .animate-slideUp { animation: slideUp 0.5s ease; }
+    
+    /* Custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #4caf50; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #388e3c; }
+  </style>
 </head>
-<body>
+<body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  
   <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="logo" style="font-size: 2rem; font-weight: 800; color: white;">StuNotes</div>
-    <nav>
-      <ul>
-        <li><a href="#" class="active">🏠 Home</a></li>
-        <li><a href="#">📅 Calendar</a></li>
-        <li><a href="#">⚙ Settings</a></li>
-        <li><a href="{% url 'notes:logout' %}">🚪 Logout</a></li>
+  <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
+    <!-- Logo -->
+    <div class="logo p-6 border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
+        <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
+      </div>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="flex-1 p-4">
+      <ul class="space-y-2">
+        <li>
+          <a href="#" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 text-emerald-600 rounded-lg font-semibold">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span>Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span>Profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+            <span>Calendar</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span>Logout</span>
+          </a>
+        </li>
       </ul>
     </nav>
-    <div class="stats">
-      <p>Tasks: <span id="sidebar-tasks-count">{{ total_tasks_count }}</span></p>
-      <p>Notes: <span id="sidebar-notes-count">{{ total_notes_sidebar }}</span></p>
+    
+    <!-- Stats Area -->
+    <div class="stats p-6 border-t border-gray-200 bg-gray-50">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600 font-medium">Tasks:</span>
+          <span class="text-lg font-bold text-emerald-600">{{ total_tasks_count }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600 font-medium">Notes:</span>
+          <span class="text-lg font-bold text-emerald-600">{{ total_notes_sidebar }}</span>
+        </div>
+      </div>
     </div>
   </aside>
-    
 
   <!-- Main Content -->
-  <main class="main">
+  <main class="main flex-1 p-8 overflow-y-auto custom-scrollbar">
     <!-- Topbar -->
-    <header class="topbar">
+    <header class="topbar flex justify-between items-center p-6 bg-white rounded-2xl shadow-lg mb-8 animate-slideDown">
       <div class="topbar-left">
-        <h2>Welcome, {{ user.full_name }}</h2>
-        <p class="user-email-display">{{ user.email }} 👋</p> 
+        <h2 class="text-3xl font-bold text-gray-800">Welcome, {{ user.full_name }}</h2>
+        <p class="user-email-display text-gray-500 text-sm mt-1">{{ user.email }}</p>
       </div>
 
-        <div class="topbar-right">
-        <p>Today is <strong>October 02, 2025</strong></p>
+      <div class="topbar-right flex items-center gap-5">
+        <p class="text-sm text-gray-600">Today is <strong>October 02, 2025</strong></p>
 
-        <!-- 🔔 Notification Bell -->
-        <div class="notification-wrapper">
-          <button id="notificationBell" class="notification-bell" title="View Upcoming Deadlines">
-            🔔
+        <!-- Notification Bell -->
+        <div class="notification-wrapper relative">
+          <button id="notificationBell" class="notification-bell flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition" title="View Upcoming Deadlines">
+            <i data-lucide="bell" class="w-5 h-5 text-gray-600"></i>
             {% if upcoming_tasks|length > 0 %}
-            <span class="notification-count">{{ upcoming_tasks|length }}</span>
+            <span class="notification-count absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-md">{{ upcoming_tasks|length }}</span>
             {% endif %}
           </button>
         </div>
 
         <!-- Profile Picture -->
         <a href="{% url 'notes:profile_view' %}" class="profile-link">
-          <img src="{% static 'notes/images/profile_pic.png' %}" 
-              alt="Profile" 
-              class="profile-icon">
+          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+               alt="Profile" 
+               class="profile-icon w-10 h-10 rounded-full object-cover border-2 border-emerald-500 hover:border-emerald-600 transition cursor-pointer shadow-md">
         </a>
       </div>
     </header>
 
     <!-- Stats Overview Cards -->
-    <section class="stats-overview">
-      <div class="stat-card completed" onclick="openCompletedTasksModal()" style="cursor: pointer;">
-        <h4>Completed Tasks</h4>
-        <div class="stat-number">{{ completed_tasks }}</div>
-        <div class="stat-label">Click to view history 📜</div>
+    <section class="stats-overview grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 animate-fadeIn">
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border-l-4 border-emerald-500 relative overflow-hidden" onclick="openCompletedTasksModal()">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 font-semibold mb-3 tracking-wider">Completed Tasks</h4>
+        <div class="stat-number text-5xl font-bold text-emerald-500 mb-2">{{ completed_tasks }}</div>
+        <div class="stat-label text-xs text-gray-400 font-medium">Click to view history 📜</div>
       </div>
       
-      <div class="stat-card pending" onclick="openPendingTasksModal()" style="cursor: pointer;">
-        <h4>Pending Tasks</h4>
-        <div class="stat-number">{{ pending_tasks }}</div>
-        <div class="stat-label">Click to view list 📋</div>
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border-l-4 border-orange-500 relative overflow-hidden" onclick="openPendingTasksModal()">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 font-semibold mb-3 tracking-wider">Pending Tasks</h4>
+        <div class="stat-number text-5xl font-bold text-orange-500 mb-2">{{ pending_tasks }}</div>
+        <div class="stat-label text-xs text-gray-400 font-medium">Click to view list 📋</div>
       </div>
       
-      <div class="stat-card overdue" onclick="openOverdueTasksModal()" style="cursor: pointer;">
-        <h4>Overdue Tasks</h4>
-        <div class="stat-number">{{ overdue_tasks }}</div>
-        <div class="stat-label">Click to view urgent ⚠️</div>
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border-l-4 border-red-500 relative overflow-hidden" onclick="openOverdueTasksModal()">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-red-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 font-semibold mb-3 tracking-wider">Overdue Tasks</h4>
+        <div class="stat-number text-5xl font-bold text-red-500 mb-2">{{ overdue_tasks }}</div>
+        <div class="stat-label text-xs text-gray-400 font-medium">Click to view urgent ⚠️</div>
       </div>
       
-      <div class="stat-card" onclick="openAllNotesModal()" style="cursor: pointer;">
-        <h4>Total Notes</h4>
-        <div class="stat-number">{{ total_notes }}</div>
-        <div class="stat-label">Click to view all 📚</div>
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all cursor-pointer border-l-4 border-emerald-500 relative overflow-hidden" onclick="openAllNotesModal()">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 font-semibold mb-3 tracking-wider">Total Notes</h4>
+        <div class="stat-number text-5xl font-bold text-gray-800 mb-2">{{ total_notes }}</div>
+        <div class="stat-label text-xs text-gray-400 font-medium">Click to view all 📚</div>
       </div>
     </section>
 
     <!-- GRID CONTAINER -->
-    <div class="grid">
-      <!-- Notes -->
-      <section class="card notes">
-        <div class="card-header">
-          <h3>Notes</h3>
-          <div class="card-actions">
-            <button class="btn" onclick="openModal('addNoteModal')">+ Add Note</button>
-            <button class="btn btn-secondary" onclick="openAllNotesModal()">View all</button>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <!-- Notes Section -->
+      <section class="card notes bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all animate-slideUp">
+        <div class="card-header flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100">
+          <h3 class="text-xl font-bold text-gray-800">Notes</h3>
+          <div class="card-actions flex gap-2">
+            <button class="btn px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg text-sm font-semibold" onclick="openModal('addNoteModal')">+ Add Note</button>
+            <button class="btn btn-secondary px-4 py-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg text-sm font-semibold" onclick="openAllNotesModal()">View all</button>
           </div>
         </div>
-        {% for note in notes %}
-        <div class="note">
-          <div style="position:relative;">
-            <h4>{{ note.title }}</h4>
-            <div class="note-ellipsis">⋯</div>
+        
+        <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+          {% for note in notes %}
+          <div class="note bg-gradient-to-br from-gray-50 to-white border-l-4 border-emerald-500 p-4 rounded-lg hover:translate-x-2 hover:shadow-md transition-all cursor-pointer">
+            <div class="relative">
+              <h4 class="text-base font-semibold text-gray-800 mb-2">{{ note.title }}</h4>
+            </div>
+            <p class="text-sm text-gray-600 leading-relaxed mb-2">{{ note.content|truncatewords:15 }}</p>
+            <span class="date text-xs text-gray-400 font-medium">{{ note.created_at|date:"M d, Y" }}</span>
+            <div class="note-actions mt-3 flex gap-2">
+              <button type="button" class="btn btn-sm px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition text-xs font-semibold"
+                      onclick="openEditModal(this)"
+                      data-id="{{ note.id }}"
+                      data-title="{{ note.title|escapejs }}"
+                      data-content="{{ note.content|escapejs }}"
+                      data-subject="{{ note.subject|default:''|escapejs }}"
+                      data-tags="{{ note.tags|default:''|escapejs }}"
+                      data-url="{% url 'notes:edit_note' note.id %}">
+                ✏️ Edit
+              </button>
+              <form method="post" action="{% url 'notes:delete_note' note.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-danger px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-xs font-semibold" onclick="return confirm('Delete this note?');">🗑️ Delete</button>
+              </form>
+            </div>
           </div>
-          <p>{{ note.content|truncatewords:15 }}</p>
-          <span class="date">{{ note.created_at|date:"M d, Y" }}</span>
-          <div class="note-actions" style="margin-top:8px;">
-            <button type="button" class="btn btn-sm" style="margin-right:6px;"
-                    onclick="openEditModal(this)"
-                    data-id="{{ note.id }}"
-                    data-title="{{ note.title|escapejs }}"
-                    data-content="{{ note.content|escapejs }}"
-                    data-subject="{{ note.subject|default:''|escapejs }}"
-                    data-tags="{{ note.tags|default:''|escapejs }}"
-                    data-url="{% url 'notes:edit_note' note.id %}">
-              ✏️ Edit
-            </button>
-            <form method="post" action="{% url 'notes:delete_note' note.id %}" style="display:inline;">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this note?');">🗑️ Delete</button>
-            </form>
+          {% empty %}
+          <div class="note bg-gradient-to-br from-gray-50 to-white border-l-4 border-gray-300 p-4 rounded-lg">
+            <h4 class="text-base font-semibold text-gray-800 mb-2">No notes yet</h4>
+            <p class="text-sm text-gray-600">Start creating notes to organize your study materials.</p>
           </div>
+          {% endfor %}
         </div>
-        {% empty %}
-        <div class="note">
-          <h4>No notes yet</h4>
-          <p>Start creating notes to organize your study materials.</p>
-        </div>
-        {% endfor %}
       </section>
 
-      <!-- Add Note Modal -->
-      <div id="addNoteModal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header modal-header-notes">
-            <h2>📝 Add Note</h2>
-            <span class="close-modal" onclick="closeModal('addNoteModal')">&times;</span>
-          </div>
-          <div class="modal-body">
-            <form method="post" action="{% url 'notes:add_note' %}" id="addNoteForm" class="add-note-form">
-              {% csrf_token %}
-              <div class="add-note-grid">
-                <div class="add-note-left">
-                  <label class="input-label" for="id_title">Title</label>
-                  <input type="text" name="title" maxlength="200" required class="add-note-title" id="id_title" placeholder="Title">
-
-                  <label class="input-label" for="id_content" style="margin-top:18px;">Content</label>
-                  <textarea name="content" required class="add-note-content" id="id_content" placeholder="Write your notes here..."></textarea>
-                </div>
-
-                <div class="add-note-right">
-                  <label class="input-label" for="id_tags">Tags</label>
-                  <input type="text" name="tags" maxlength="255" class="add-note-tags" id="id_tags" placeholder="e.g. Work, Lecture">
-
-                  <label class="input-label" for="id_subject" style="margin-top:18px;">Subject</label>
-                  <input type="text" name="subject" maxlength="100" class="add-note-subject" id="id_subject" placeholder="Subject">
-
-                  <div class="add-note-help">
-                    <p class="muted">Tip: separate tags with commas. Use subject to group notes.</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Floating circular submit button -->
-              <button type="submit" class="floating-submit" title="Create Note">✓</button>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- Global Edit Note Modal (single instance) -->
-      <div id="globalEditNoteModal" class="modal">
-        <div class="modal-content">
-          <div class="modal-header modal-header-notes">
-            <h2>✏️ Edit Note</h2>
-            <span class="close-modal" onclick="closeModal('globalEditNoteModal')">&times;</span>
-          </div>
-          <div class="modal-body">
-            <form method="post" id="globalEditForm" action="">
-              {% csrf_token %}
-              <div class="form-group">
-                <label for="global_edit_title">Title</label>
-                <input type="text" name="title" id="global_edit_title" class="form-control" maxlength="200" required>
-              </div>
-              <div class="form-group">
-                <label for="global_edit_content">Content</label>
-                <textarea name="content" id="global_edit_content" rows="6" class="form-control" required></textarea>
-              </div>
-              <div class="form-group">
-                <label for="global_edit_subject">Subject</label>
-                <input type="text" name="subject" id="global_edit_subject" class="form-control" maxlength="100">
-              </div>
-              <div class="form-group">
-                <label for="global_edit_tags">Tags</label>
-                <input type="text" name="tags" id="global_edit_tags" class="form-control" maxlength="255">
-              </div>
-              <div style="height:10px"></div>
-              <button type="submit" class="btn btn-primary">Save</button>
-              <button type="button" class="btn btn-secondary" onclick="closeModal('globalEditNoteModal')">Cancel</button>
-            </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- To Do List -->
-      <section class="card todo">
-        <div class="card-header">
-          <h3>To Do List</h3>
-          <button class="btn btn-primary" id="toggleTaskForm">+ Add Task</button>
+      <!-- To Do List Section -->
+      <section class="card todo bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all animate-slideUp lg:col-span-1">
+        <div class="card-header flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100">
+          <h3 class="text-xl font-bold text-gray-800">To Do List</h3>
+          <button class="btn btn-primary px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg text-sm font-semibold" id="toggleTaskForm">+ Add Task</button>
         </div>
 
         <!-- Hidden Task Form -->
-        <div class="task-form" id="taskForm" style="display: none; margin-top: 10px;">
-          <form method="post" class="form-container">
+        <div class="task-form hidden mt-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-200" id="taskForm">
+          <form method="post" class="form-container space-y-4">
             {% csrf_token %}
 
             <div class="form-group">
@@ -233,7 +257,7 @@
               {{ form.due_date }}
             </div>
 
-            <div class="form-row">
+            <div class="grid grid-cols-2 gap-4">
               <div class="form-group">
                 {{ form.priority.label_tag }}
                 {{ form.priority }}
@@ -244,47 +268,53 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-success">Save Task</button>
+            <button type="submit" class="btn btn-success w-full py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-md font-semibold">Save Task</button>
           </form>
         </div>
 
         <!-- Task List -->
-        <ul class="task-list">
+        <ul class="task-list space-y-3 max-h-96 overflow-y-auto custom-scrollbar mt-4">
           {% for task in tasks %}
-          <li class="{% if task.is_overdue %}overdue{% endif %}">
-            <div class="task-content">
-              <div class="task-info">
-                <strong>{{ task.title }}</strong> 
-                <span class="priority-badge priority-{{ task.priority }}">{{ task.priority|title }}</span>
-                <br>
-                <small>Due: {{ task.due_date|date:"M d, Y H:i" }} | Status: {{ task.get_status_display }}</small>
+          <li class="bg-gradient-to-br from-gray-50 to-white border border-gray-200 border-l-4 border-emerald-500 rounded-xl p-4 hover:translate-x-1 hover:shadow-md transition-all {% if task.is_overdue %}!border-red-500 bg-gradient-to-br from-red-50 to-white{% endif %}">
+            <div class="task-content flex justify-between items-start gap-4">
+              <div class="task-info flex-1">
+                <div class="flex items-center gap-2 mb-1">
+                  <strong class="text-gray-800 text-base">{{ task.title }}</strong>
+                  <span class="priority-badge px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wide
+                    {% if task.priority == 'high' %}bg-red-100 text-red-600
+                    {% elif task.priority == 'medium' %}bg-orange-100 text-orange-600
+                    {% else %}bg-emerald-100 text-emerald-600{% endif %}">
+                    {{ task.priority|title }}
+                  </span>
+                </div>
+                <small class="text-xs text-gray-500">Due: {{ task.due_date|date:"M d, Y H:i" }} | Status: {{ task.get_status_display }}</small>
                 {% if task.description %}
-                <p class="task-description">{{ task.description|truncatewords:15 }}</p>
+                <p class="task-description mt-2 text-sm text-gray-600">{{ task.description|truncatewords:15 }}</p>
                 {% endif %}
               </div>
 
               <!-- Action Buttons -->
-              <div class="task-actions">
+              <div class="task-actions flex gap-2 flex-shrink-0">
                 <form method="post" action="{% url 'notes:toggle_task_status' task.id %}" style="display:inline;">
                   {% csrf_token %}
-                  <button type="submit" class="btn-complete" title="Mark as complete">
-                    ✓ Complete
+                  <button type="submit" class="btn-complete px-3 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-sm text-xs font-semibold" title="Mark as complete">
+                    ✓
                   </button>
                 </form>
                 
-                <a href="?edit={{ task.id }}" class="btn-edit" title="Edit task">✏️</a>
+                <a href="?edit={{ task.id }}" class="btn-edit px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-sm text-xs" title="Edit task">✏️</a>
                 
                 <form method="post" action="{% url 'notes:delete_task' task.id %}" style="display:inline;">
                   {% csrf_token %}
-                  <button type="submit" class="btn-delete" title="Delete task">🗑️</button>
+                  <button type="submit" class="btn-delete px-3 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:-translate-y-0.5 transition-all shadow-sm text-xs" title="Delete task">🗑️</button>
                 </form>
               </div>
             </div>
 
             <!-- Inline Edit Form -->
             {% if task_to_edit and task_to_edit.id == task.id %}
-            <div class="task-form" style="margin-top: 10px;">
-              <form method="post" class="form-container">
+            <div class="task-form mt-4 p-4 bg-gray-50 rounded-xl">
+              <form method="post" class="form-container space-y-4">
                 {% csrf_token %}
                 <input type="hidden" name="edit_task_id" value="{{ task.id }}">
                 
@@ -308,7 +338,7 @@
                   {{ edit_form.due_date }}
                 </div>
 
-                <div class="form-row">
+                <div class="grid grid-cols-2 gap-4">
                   <div class="form-group">
                     {{ edit_form.priority.label_tag }}
                     {{ edit_form.priority }}
@@ -319,52 +349,60 @@
                   </div>
                 </div>
 
-                <button type="submit" class="btn btn-success">💾 Save</button>
-                <a href="{% url 'notes:home' %}" class="btn btn-danger">✖ Cancel</a>
+                <div class="flex gap-2">
+                  <button type="submit" class="btn btn-success flex-1 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:-translate-y-0.5 transition-all font-semibold">💾 Save</button>
+                  <a href="{% url 'notes:home' %}" class="btn btn-danger flex-1 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:-translate-y-0.5 transition-all font-semibold text-center">✖ Cancel</a>
+                </div>
               </form>
             </div>
             {% endif %}
           </li>
           {% empty %}
-          <li>No tasks yet.</li>
+          <li class="bg-gray-50 p-4 rounded-lg text-gray-500 text-center">No tasks yet.</li>
           {% endfor %}
         </ul>
       </section>
 
-      <!-- Calendar -->
-      <section class="card calendar">
-        <div class="card-header">
-          <h3>October</h3>
+      <!-- Calendar Section -->
+      <section class="card calendar bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all animate-slideUp">
+        <div class="card-header flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100">
+          <h3 class="text-xl font-bold text-gray-800">October</h3>
         </div>
-         <div class="calendar-box">
-          <table>
-            <tr>
-              <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
-            </tr>
-            <tr>
-              <td></td><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
-            </tr>
-            <tr>
-              <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
-            </tr>
-            <tr>
-              <td>13</td><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td>
-            </tr>
-            <tr>
-              <td>20</td><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td>
-            </tr>
-            <tr>
-              <td>27</td><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td>
-            </tr>
+        
+        <div class="calendar-box mb-5">
+          <table class="w-full">
+            <thead>
+              <tr class="text-xs uppercase text-gray-500 font-semibold">
+                <th class="p-2">Mo</th><th class="p-2">Tu</th><th class="p-2">We</th><th class="p-2">Th</th><th class="p-2">Fr</th><th class="p-2">Sa</th><th class="p-2">Su</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm">
+              <tr>
+                <td class="text-center p-3"></td><td class="text-center p-3"></td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">1</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">2</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">3</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">4</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">5</td>
+              </tr>
+              <tr>
+                <td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">6</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">7</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">8</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">9</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">10</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">11</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">12</td>
+              </tr>
+              <tr>
+                <td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">13</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">14</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">15</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">16</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">17</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">18</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">19</td>
+              </tr>
+              <tr>
+                <td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">20</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">21</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">22</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">23</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">24</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">25</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">26</td>
+              </tr>
+              <tr>
+                <td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">27</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">28</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">29</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">30</td><td class="text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition">31</td><td class="text-center p-3"></td><td class="text-center p-3"></td>
+              </tr>
+            </tbody>
           </table>
         </div>
-        <div class="todos-today">
-          <h4>To-dos Today:</h4>
-          <ul>
+        
+        <div class="todos-today bg-gray-50 p-4 rounded-xl border-l-4 border-emerald-500">
+          <h4 class="text-sm font-semibold text-gray-800 mb-3">To-dos Today:</h4>
+          <ul class="space-y-2 text-xs">
             {% for task in today_tasks %}
-            <li>{{ task.title }} - {{ task.due_date|date:"H:i" }}</li>
+            <li class="pb-2 border-b border-gray-200 last:border-0 text-gray-600">{{ task.title }} - {{ task.due_date|date:"H:i" }}</li>
             {% empty %}
-            <li>No tasks due today</li>
+            <li class="text-gray-500">No tasks due today</li>
             {% endfor %}
           </ul>
         </div>
@@ -372,31 +410,111 @@
     </div>
   </main>
 
+  <!-- Add Note Modal -->
+  <div id="addNoteModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-5xl rounded-3xl shadow-2xl max-h-[80vh] flex flex-col animate-slideUp">
+      <div class="modal-header px-8 py-6 border-b-2 border-gray-100 flex justify-between items-center bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">📝 Add Note</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('addNoteModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8 overflow-y-auto custom-scrollbar">
+        <form method="post" action="{% url 'notes:add_note' %}" id="addNoteForm" class="add-note-form relative">
+          {% csrf_token %}
+          <div class="add-note-grid grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="add-note-left lg:col-span-2 space-y-5">
+              <div>
+                <label class="input-label block font-bold text-gray-800 mb-2" for="id_title">Title</label>
+                <input type="text" name="title" maxlength="200" required class="add-note-title w-full px-5 py-4 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" id="id_title" placeholder="Title">
+              </div>
+
+              <div>
+                <label class="input-label block font-bold text-gray-800 mb-2" for="id_content">Content</label>
+                <textarea name="content" required class="add-note-content w-full px-5 py-5 text-base border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition min-h-[300px] leading-relaxed" id="id_content" placeholder="Write your notes here..."></textarea>
+              </div>
+            </div>
+
+            <div class="add-note-right space-y-5">
+              <div>
+                <label class="input-label block font-bold text-gray-800 mb-2" for="id_tags">Tags</label>
+                <input type="text" name="tags" maxlength="255" class="add-note-tags w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" id="id_tags" placeholder="e.g. Work, Lecture">
+              </div>
+
+              <div>
+                <label class="input-label block font-bold text-gray-800 mb-2" for="id_subject">Subject</label>
+                <input type="text" name="subject" maxlength="100" class="add-note-subject w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition" id="id_subject" placeholder="Subject">
+              </div>
+
+              <div class="add-note-help">
+                <p class="muted text-sm text-gray-500 mt-4">💡 Tip: separate tags with commas. Use subject to group notes.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Floating circular submit button -->
+          <button type="submit" class="floating-submit fixed bottom-9 right-9 w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-3xl shadow-xl hover:-translate-y-1 hover:shadow-2xl transition-all z-[20000]" title="Create Note">✓</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Edit Note Modal -->
+  <div id="globalEditNoteModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-2xl rounded-3xl shadow-2xl animate-slideUp">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">✏️ Edit Note</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('globalEditNoteModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        <form method="post" id="globalEditForm" action="" class="space-y-4">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="global_edit_title" class="block font-semibold text-gray-800 mb-2">Title</label>
+            <input type="text" name="title" id="global_edit_title" class="form-control w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 transition" maxlength="200" required>
+          </div>
+          <div class="form-group">
+            <label for="global_edit_content" class="block font-semibold text-gray-800 mb-2">Content</label>
+            <textarea name="content" id="global_edit_content" rows="6" class="form-control w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 transition" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="global_edit_subject" class="block font-semibold text-gray-800 mb-2">Subject</label>
+            <input type="text" name="subject" id="global_edit_subject" class="form-control w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 transition" maxlength="100">
+          </div>
+          <div class="form-group">
+            <label for="global_edit_tags" class="block font-semibold text-gray-800 mb-2">Tags</label>
+            <input type="text" name="tags" id="global_edit_tags" class="form-control w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 transition" maxlength="255">
+          </div>
+          <div class="flex gap-3 mt-6">
+            <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Save</button>
+            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('globalEditNoteModal')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Completed Tasks Modal -->
-  <div id="completedTasksModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <h2>✅ Completed Tasks History <span class="modal-count">({{ completed_tasks_list|length }})</span></h2>
+  <div id="completedTasksModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-5xl rounded-3xl shadow-2xl max-h-[80vh] flex flex-col animate-slideUp">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-t-3xl text-white">
+        <div class="modal-header-left flex items-center gap-3">
+          <h2 class="text-2xl font-bold">✅ Completed Tasks History</h2>
+          <span class="modal-count text-base font-semibold bg-white/20 px-3 py-1 rounded-xl">({{ completed_tasks_list|length }})</span>
         </div>
-        <span class="close-modal" onclick="closeModal('completedTasksModal')">&times;</span>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('completedTasksModal')">&times;</span>
       </div>
       
       <!-- Search and Filter Controls -->
-      <div class="modal-filters">
-        <input type="search" 
-               id="completedTasksSearch" 
-               placeholder="Search completed tasks..." 
-               class="filter-search">
+      <div class="modal-filters flex flex-wrap gap-3 p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-b-2 border-gray-200">
+        <input type="search" id="completedTasksSearch" placeholder="Search completed tasks..." class="filter-search flex-1 min-w-[200px] px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition bg-white">
         
-        <select id="completedPriorityFilter" class="filter-select">
+        <select id="completedPriorityFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="all">All Priorities</option>
           <option value="high">High Priority</option>
           <option value="medium">Medium Priority</option>
           <option value="low">Low Priority</option>
         </select>
         
-        <select id="completedSortFilter" class="filter-select">
+        <select id="completedSortFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
           <option value="priority_high">Priority: High to Low</option>
@@ -406,30 +524,35 @@
         </select>
       </div>
       
-      <div class="modal-body">
+      <div class="modal-body p-8 overflow-y-auto custom-scrollbar">
         {% if completed_tasks_list %}
-          <div class="completed-tasks-list">
+          <div class="completed-tasks-list space-y-3">
             {% for task in completed_tasks_list %}
-            <div class="completed-task-item"
+            <div class="completed-task-item flex items-start gap-4 p-4 bg-white border-l-4 border-emerald-500 rounded-xl shadow-sm hover:shadow-md hover:translate-x-1 transition-all"
                  data-title="{{ task.title|lower|escapejs }}"
                  data-description="{{ task.description|default:''|lower|escapejs }}"
                  data-priority="{{ task.priority }}"
                  data-date="{{ task.updated_at|date:'c' }}">
-              <div class="task-icon">✅</div>
-              <div class="task-details">
-                <h4>{{ task.title }}</h4>
-                <p>{{ task.description|truncatewords:20 }}</p>
-                <div class="task-meta">
-                  <span class="badge badge-{{ task.priority }}">{{ task.priority|title }}</span>
-                  <span class="task-date">Completed: {{ task.updated_at|date:"M d, Y H:i" }}</span>
+              <div class="task-icon text-2xl flex-shrink-0">✅</div>
+              <div class="task-details flex-1">
+                <h4 class="text-base font-bold text-gray-800 mb-2">{{ task.title }}</h4>
+                <p class="text-sm text-gray-600 mb-3 leading-relaxed">{{ task.description|truncatewords:20 }}</p>
+                <div class="task-meta flex gap-3 flex-wrap items-center">
+                  <span class="badge px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wide
+                    {% if task.priority == 'high' %}bg-red-500 text-white
+                    {% elif task.priority == 'medium' %}bg-orange-500 text-white
+                    {% else %}bg-emerald-500 text-white{% endif %}">
+                    {{ task.priority|title }}
+                  </span>
+                  <span class="task-date text-sm text-gray-500">Completed: {{ task.updated_at|date:"M d, Y H:i" }}</span>
                 </div>
               </div>
             </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="empty-state">
-            <p>🎯 No completed tasks yet. Keep working on your goals!</p>
+          <div class="empty-state py-16 text-center">
+            <p class="text-lg text-gray-500">No completed tasks yet. Keep working on your goals!</p>
           </div>
         {% endif %}
       </div>
@@ -437,30 +560,27 @@
   </div>
 
   <!-- Pending Tasks Modal -->
-  <div id="pendingTasksModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header modal-header-pending">
-        <div class="modal-header-left">
-          <h2>📋 Pending Tasks <span class="modal-count">({{ pending_tasks_list|length }})</span></h2>
+  <div id="pendingTasksModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-5xl rounded-3xl shadow-2xl max-h-[80vh] flex flex-col animate-slideUp">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-orange-500 to-orange-600 rounded-t-3xl text-white">
+        <div class="modal-header-left flex items-center gap-3">
+          <h2 class="text-2xl font-bold">📋 Pending Tasks</h2>
+          <span class="modal-count text-base font-semibold bg-white/20 px-3 py-1 rounded-xl">({{ pending_tasks_list|length }})</span>
         </div>
-        <span class="close-modal" onclick="closeModal('pendingTasksModal')">&times;</span>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('pendingTasksModal')">&times;</span>
       </div>
       
-      <!-- Search and Filter Controls -->
-      <div class="modal-filters">
-        <input type="search" 
-               id="pendingTasksSearch" 
-               placeholder="Search pending tasks..." 
-               class="filter-search">
+      <div class="modal-filters flex flex-wrap gap-3 p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-b-2 border-gray-200">
+        <input type="search" id="pendingTasksSearch" placeholder="Search pending tasks..." class="filter-search flex-1 min-w-[200px] px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition bg-white">
         
-        <select id="pendingPriorityFilter" class="filter-select">
+        <select id="pendingPriorityFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="all">All Priorities</option>
           <option value="high">High Priority</option>
           <option value="medium">Medium Priority</option>
           <option value="low">Low Priority</option>
         </select>
         
-        <select id="pendingSortFilter" class="filter-select">
+        <select id="pendingSortFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="due_date">Due Date: Soonest</option>
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
@@ -471,30 +591,35 @@
         </select>
       </div>
       
-      <div class="modal-body">
+      <div class="modal-body p-8 overflow-y-auto custom-scrollbar">
         {% if pending_tasks_list %}
-          <div class="completed-tasks-list">
+          <div class="completed-tasks-list space-y-3">
             {% for task in pending_tasks_list %}
-            <div class="completed-task-item pending-item"
+            <div class="completed-task-item pending-item flex items-start gap-4 p-4 bg-white border-l-4 border-orange-500 rounded-xl shadow-sm hover:shadow-md hover:translate-x-1 transition-all"
                  data-title="{{ task.title|lower|escapejs }}"
                  data-description="{{ task.description|default:''|lower|escapejs }}"
                  data-priority="{{ task.priority }}"
                  data-date="{{ task.due_date|date:'c' }}">
-              <div class="task-icon">⏳</div>
-              <div class="task-details">
-                <h4>{{ task.title }}</h4>
-                <p>{{ task.description|truncatewords:20 }}</p>
-                <div class="task-meta">
-                  <span class="badge badge-{{ task.priority }}">{{ task.priority|title }}</span>
-                  <span class="task-date">Due: {{ task.due_date|date:"M d, Y H:i" }}</span>
+              <div class="task-icon text-2xl flex-shrink-0">⏳</div>
+              <div class="task-details flex-1">
+                <h4 class="text-base font-bold text-gray-800 mb-2">{{ task.title }}</h4>
+                <p class="text-sm text-gray-600 mb-3 leading-relaxed">{{ task.description|truncatewords:20 }}</p>
+                <div class="task-meta flex gap-3 flex-wrap items-center">
+                  <span class="badge px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wide
+                    {% if task.priority == 'high' %}bg-red-500 text-white
+                    {% elif task.priority == 'medium' %}bg-orange-500 text-white
+                    {% else %}bg-emerald-500 text-white{% endif %}">
+                    {{ task.priority|title }}
+                  </span>
+                  <span class="task-date text-sm text-gray-500">Due: {{ task.due_date|date:"M d, Y H:i" }}</span>
                 </div>
               </div>
             </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="empty-state">
-            <p>🎉 No pending tasks! You're all caught up!</p>
+          <div class="empty-state py-16 text-center">
+            <p class="text-lg text-gray-500">No pending tasks! You're all caught up!</p>
           </div>
         {% endif %}
       </div>
@@ -502,30 +627,27 @@
   </div>
 
   <!-- Overdue Tasks Modal -->
-  <div id="overdueTasksModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header modal-header-overdue">
-        <div class="modal-header-left">
-          <h2>⚠️ Overdue Tasks <span class="modal-count">({{ overdue_tasks_list|length }})</span></h2>
+  <div id="overdueTasksModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-5xl rounded-3xl shadow-2xl max-h-[80vh] flex flex-col animate-slideUp">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-red-500 to-red-600 rounded-t-3xl text-white">
+        <div class="modal-header-left flex items-center gap-3">
+          <h2 class="text-2xl font-bold">⚠️ Overdue Tasks</h2>
+          <span class="modal-count text-base font-semibold bg-white/20 px-3 py-1 rounded-xl">({{ overdue_tasks_list|length }})</span>
         </div>
-        <span class="close-modal" onclick="closeModal('overdueTasksModal')">&times;</span>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('overdueTasksModal')">&times;</span>
       </div>
       
-      <!-- Search and Filter Controls -->
-      <div class="modal-filters">
-        <input type="search" 
-               id="overdueTasksSearch" 
-               placeholder="Search overdue tasks..." 
-               class="filter-search">
+      <div class="modal-filters flex flex-wrap gap-3 p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-b-2 border-gray-200">
+        <input type="search" id="overdueTasksSearch" placeholder="Search overdue tasks..." class="filter-search flex-1 min-w-[200px] px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition bg-white">
         
-        <select id="overduePriorityFilter" class="filter-select">
+        <select id="overduePriorityFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="all">All Priorities</option>
           <option value="high">High Priority</option>
           <option value="medium">Medium Priority</option>
           <option value="low">Low Priority</option>
         </select>
         
-        <select id="overdueSortFilter" class="filter-select">
+        <select id="overdueSortFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="most_overdue">Most Overdue First</option>
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
@@ -536,63 +658,65 @@
         </select>
       </div>
       
-      <div class="modal-body">
+      <div class="modal-body p-8 overflow-y-auto custom-scrollbar">
         {% if overdue_tasks_list %}
-          <div class="completed-tasks-list">
+          <div class="completed-tasks-list space-y-3">
             {% for task in overdue_tasks_list %}
-            <div class="completed-task-item overdue-item"
+            <div class="completed-task-item overdue-item flex items-start gap-4 p-4 bg-gradient-to-br from-red-50 to-white border-l-4 border-red-500 rounded-xl shadow-sm hover:shadow-md hover:translate-x-1 transition-all"
                  data-title="{{ task.title|lower|escapejs }}"
                  data-description="{{ task.description|default:''|lower|escapejs }}"
                  data-priority="{{ task.priority }}"
                  data-date="{{ task.due_date|date:'c' }}">
-              <div class="task-icon">🔴</div>
-              <div class="task-details">
-                <h4>{{ task.title }}</h4>
-                <p>{{ task.description|truncatewords:20 }}</p>
-                <div class="task-meta">
-                  <span class="badge badge-{{ task.priority }}">{{ task.priority|title }}</span>
-                  <span class="task-date overdue-date">Due: {{ task.due_date|date:"M d, Y H:i" }}</span>
+              <div class="task-icon text-2xl flex-shrink-0">🔴</div>
+              <div class="task-details flex-1">
+                <h4 class="text-base font-bold text-gray-800 mb-2">{{ task.title }}</h4>
+                <p class="text-sm text-gray-600 mb-3 leading-relaxed">{{ task.description|truncatewords:20 }}</p>
+                <div class="task-meta flex gap-3 flex-wrap items-center">
+                  <span class="badge px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wide
+                    {% if task.priority == 'high' %}bg-red-500 text-white
+                    {% elif task.priority == 'medium' %}bg-orange-500 text-white
+                    {% else %}bg-emerald-500 text-white{% endif %}">
+                    {{ task.priority|title }}
+                  </span>
+                  <span class="task-date overdue-date text-sm text-red-600 font-semibold">Due: {{ task.due_date|date:"M d, Y H:i" }}</span>
                 </div>
               </div>
             </div>
             {% endfor %}
           </div>
         {% else %}
-          <div class="empty-state">
-            <p>✨ Great! No overdue tasks!</p>
+          <div class="empty-state py-16 text-center">
+            <p class="text-lg text-gray-500">Great! No overdue tasks!</p>
           </div>
         {% endif %}
       </div>
     </div>
   </div>
 
-  <!--  All Notes Modal -->
-  <div id="allNotesModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header modal-header-notes all-notes-header">
-        <div class="all-notes-header-left">
-          <h2>📚 All Notes <span id="all-notes-count">({{ all_notes_list|length }})</span></h2>
+  <!-- All Notes Modal -->
+  <div id="allNotesModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-6xl rounded-3xl shadow-2xl max-h-[80vh] flex flex-col animate-slideUp">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-blue-500 to-blue-600 rounded-t-3xl text-white">
+        <div class="all-notes-header-left flex items-center gap-3">
+          <h2 class="text-2xl font-bold">📚 All Notes</h2>
+          <span id="all-notes-count" class="text-base font-semibold bg-white/20 px-3 py-1 rounded-xl">({{ all_notes_list|length }})</span>
         </div>
         <div class="all-notes-header-right">
-          <span class="close-modal" onclick="closeModal('allNotesModal')">&times;</span>
+          <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('allNotesModal')">&times;</span>
         </div>
       </div>
       
-      <!-- Search and Filter Controls -->
-      <div class="modal-filters">
-        <input type="search" 
-               id="allNotesSearch" 
-               placeholder="Search notes..." 
-               class="filter-search">
+      <div class="modal-filters flex flex-wrap gap-3 p-6 bg-gradient-to-br from-gray-50 to-gray-100 border-b-2 border-gray-200">
+        <input type="search" id="allNotesSearch" placeholder="Search notes..." class="filter-search flex-1 min-w-[200px] px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition bg-white">
         
-        <select id="noteSubjectFilter" class="filter-select">
+        <select id="noteSubjectFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="all">All Subjects</option>
           {% for subject in unique_subjects %}
             <option value="{{ subject }}">{{ subject }}</option>
           {% endfor %}
         </select>
         
-        <select id="noteSortFilter" class="filter-select">
+        <select id="noteSortFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
           <option value="title_asc">Title: A to Z</option>
@@ -600,65 +724,175 @@
         </select>
       </div>
       
-      <div class="modal-body">
+      <div class="modal-body p-8 overflow-y-auto custom-scrollbar relative">
         {% if all_notes_list %}
-          <div class="notes-grid">
+          <div class="notes-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {% for note in all_notes_list %}
-            <div class="note-card" 
+            <div class="note-card bg-white border-l-4 border-blue-500 rounded-xl p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all" 
                  data-title="{{ note.title|lower|escapejs }}" 
                  data-content="{{ note.content|lower|escapejs }}" 
                  data-tags="{{ note.tags|default:''|lower|escapejs }}"
                  data-subject="{{ note.subject|default:''|escapejs }}"
                  data-date="{{ note.created_at|date:'c' }}">
-              <div class="note-card-header">
-                <h4>{{ note.title }}</h4>
-                <span class="note-date">{{ note.created_at|date:"M d, Y" }}</span>
+              <div class="note-card-header flex justify-between items-start gap-3 mb-3 pb-3 border-b-2 border-gray-100">
+                <h4 class="text-lg font-bold text-gray-800 flex-1">{{ note.title }}</h4>
+                <span class="note-date text-xs text-gray-500 whitespace-nowrap">{{ note.created_at|date:"M d, Y" }}</span>
               </div>
-              <div class="note-card-body">
-                <p>{{ note.content|truncatewords:30 }}</p>
+              <div class="note-card-body mb-3">
+                <p class="text-sm text-gray-600 leading-relaxed">{{ note.content|truncatewords:30 }}</p>
               </div>
-              <div class="note-card-footer">
+              <div class="note-card-footer flex gap-2 flex-wrap items-center">
                 {% if note.subject %}
-                <span class="note-subject">{{ note.subject }}</span>
+                <span class="note-subject bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 py-1 rounded-2xl text-xs font-semibold">{{ note.subject }}</span>
                 {% endif %}
                 {% if note.tags %}
-                <span class="note-tags">{{ note.tags }}</span>
+                <span class="note-tags bg-gray-200 text-gray-700 px-3 py-1 rounded-2xl text-xs">{{ note.tags }}</span>
                 {% endif %}
               </div>
             </div>
             {% endfor %}
           </div>
-          <button class="floating-add-btn" onclick="openModal('addNoteModal')" title="Add new note">+</button>
+          <button class="floating-add-btn fixed bottom-9 right-9 w-14 h-14 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-3xl shadow-xl hover:-translate-y-1 hover:shadow-2xl transition-all z-[20000]" onclick="openModal('addNoteModal')" title="Add new note">+</button>
         {% else %}
-          <div class="empty-state">
-            <p>📝 No notes yet. Start creating notes to organize your knowledge!</p>
+          <div class="empty-state py-16 text-center">
+            <p class="text-lg text-gray-500">No notes yet. Start creating notes to organize your knowledge!</p>
           </div>
         {% endif %}
       </div>
     </div>
   </div>
 
- <!-- 🔔 Notification Modal -->
-<div id="notificationModal" class="notification-modal">
-  <div class="notification-modal-content">
-    <span id="closeNotificationModal" class="close-modal">&times;</span>
-    <h3>Upcoming Deadlines</h3>
-    <ul>
-      {% if upcoming_tasks %}
-        {% for task in upcoming_tasks %}
-          <li>
-            <strong>{{ task.title }}</strong>
-            <span>Due {{ task.due_date|date:"M d, Y H:i" }}</span>
+  <!-- Notification Modal -->
+  <div id="notificationModal" class="notification-modal hidden fixed inset-0 bg-black/45 backdrop-blur-sm z-[2000] items-center justify-center">
+    <div class="notification-modal-content bg-white border border-gray-200 border-t-4 border-t-blue-500 rounded-2xl p-6 w-96 max-w-[90%] shadow-2xl animate-slideUp">
+      <span id="closeNotificationModal" class="close-modal absolute top-4 right-4 text-3xl font-bold text-gray-400 hover:text-gray-600 cursor-pointer">&times;</span>
+      <h3 class="text-xl font-bold text-gray-800 mb-4 text-center pb-2 border-b border-gray-200">Upcoming Deadlines</h3>
+      <ul class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar">
+        {% if upcoming_tasks %}
+          {% for task in upcoming_tasks %}
+          <li class="bg-gray-50 border border-gray-200 p-3 rounded-lg hover:bg-blue-50 hover:translate-x-1 transition-all">
+            <strong class="text-gray-800 font-semibold">{{ task.title }}</strong>
+            <span class="block text-sm text-gray-500 mt-1">Due {{ task.due_date|date:"M d, Y H:i" }}</span>
           </li>
-        {% endfor %}
-      {% else %}
-        <li>No tasks due in the next 24 hours 🎉</li>
-      {% endif %}
-    </ul>
+          {% endfor %}
+        {% else %}
+          <li class="bg-gray-50 p-3 rounded-lg text-center text-gray-500">No tasks due in the next 24 hours</li>
+        {% endif %}
+      </ul>
+    </div>
   </div>
-</div>
 
+  <!-- Add form styling -->
+  <style>
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.875rem;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #4caf50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
 
+    .modal {
+      display: none;
+    }
+    
+    .modal.flex {
+      display: flex !important;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        padding: 1.25rem;
+      }
+      
+      .grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .stats-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .topbar {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+      }
+      
+      .task-content {
+        flex-direction: column;
+      }
+      
+      .task-actions {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 0.5rem;
+      }
+      
+      .notes-grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .floating-add-btn,
+      .floating-submit {
+        bottom: 1.25rem;
+        right: 1.25rem;
+        width: 3.125rem;
+        height: 3.125rem;
+        font-size: 1.5rem;
+      }
+      
+      .modal-filters {
+        flex-direction: column;
+      }
+      
+      .filter-search,
+      .filter-select {
+        width: 100%;
+        min-width: unset;
+      }
+      
+      .add-note-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-overview {
+        grid-template-columns: 1fr;
+      }
+      
+      .stat-number {
+        font-size: 2.25rem !important;
+      }
+    }
+  </style>
+
+  <!-- Initialize Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
 
   <script src="{% static 'notes/js/home.js' %}"></script>
 </body>

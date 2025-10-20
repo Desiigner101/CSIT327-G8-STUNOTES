@@ -5,108 +5,298 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile - {{ user.username }}</title>
-    <link rel="stylesheet" href="{% static 'notes/css/home.css' %}"> 
-    <link rel="stylesheet" href="{% static 'notes/css/edit_profile.css' %}">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideDown { animation: slideDown 0.5s ease; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4caf50; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #388e3c; }
+    </style>
 </head>
-<body>
-    <aside class="sidebar">
-        <div class="logo">StuNotes</div>
-        <nav>
-            <ul>
-                <li><a href="{% url 'notes:home' %}">🏠 Home</a></li>
-                <li><a href="{% url 'notes:profile_view' %}">👤 Profile</a></li>
-                <li><a href="#">📅 Calendar</a></li>
-                <li><a href="#">⚙ Settings</a></li>
-                <li><a href="{% url 'notes:logout' %}">🚪 Logout</a></li>
-            </ul>
-        </nav>
-        <div class="stats">
-            <p>Tasks: <span>21</span></p> 
-            <p>Notes: <span>12</span></p>
-        </div>
-    </aside>
-
-    <main class="main profile-page-content">
-        {% if messages %}
-            <div class="messages">
-                {% for message in messages %}
-                    <div class="message-item {% if message.tags %}message-{{ message.tags }}{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="profile-card">
-            <div class="profile-cover"></div>
-
-            <div class="profile-header">
-                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
-                     alt="{{ user.username }}" 
-                     class="profile-pic">
-                
-                <div class="user-details">
-                    <h2>{{ user.full_name|default:user.username }}</h2>
-                    <p class="email-display">{{ user.email }}</p>
-                </div>
-
-                <button type="submit" form="profile-form" class="btn-edit btn-save">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-            </div>
-        </div>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div class="flex h-screen overflow-hidden">
         
-        <form method="post" id="profile-form" class="edit-form-container" enctype="multipart/form-data">
-            {% csrf_token %}
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg flex flex-col">
+            <!-- Logo -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
+                    <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
+                </div>
+            </div>
             
-            <div class="form-grid">
-                
-                <div class="form-group">
-                    <label for="{{ form.full_name.id_for_label }}">Full Name</label>
-                    {{ form.full_name }}
-                    {% for error in form.full_name.errors %} <p class="error-text">{{ error }}</p> {% endfor %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.theme.id_for_label }}">App Theme</label>
-                    {{ form.theme }}
-                    {% for error in form.theme.errors %} <p class="error-text">{{ error }}</p> {% endfor %}
-                </div>
-                
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email Address</label>
-                    {{ form.email }}
-                    {% for error in form.email.errors %} <p class="error-text">{{ error }}</p> {% endfor %}
-                </div>
-                <div class="form-group">
-                    <label for="{{ form.profile_pic.id_for_label }}" class="pic-upload-label">
-                        {{ form.profile_pic.label }}
-                    </label>
-                    {{ form.profile_pic }} 
-                    {% for error in form.profile_pic.errors %} <p class="error-text">{{ error }}</p> {% endfor %}
-                </div>
-
-                <div class="form-group full-width">
-                    <label for="{{ form.bio.id_for_label }}">Bio (Tell us about yourself)</label>
-                    {{ form.bio }}
-                    {% for error in form.bio.errors %} <p class="error-text">{{ error }}</p> {% endfor %}
-                </div>
-            </div>
-
-            <div class="email-section">
-                <h3>My Primary Email Address</h3>
-                <div class="email-display-box">
-                    <i class="fas fa-envelope-open-text"></i>
-                    <div class="email-details">
-                        <span class="email-address">{{ user.email }}</span>
-                        <span class="email-status">Primary</span>
+            <!-- Navigation -->
+            <nav class="flex-1 p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                            <i data-lucide="calendar" class="w-5 h-5"></i>
+                            <span>Calendar</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Stats Area -->
+            <div class="p-6 border-t border-gray-200 bg-gray-50">
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 font-medium">Tasks:</span>
+                        <span class="text-lg font-bold text-emerald-600">{{ total_tasks_count }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600 font-medium">Notes:</span>
+                        <span class="text-lg font-bold text-emerald-600">{{ total_notes_sidebar }}</span>
                     </div>
                 </div>
-                <button type="button" class="btn-add-email">+ Add Email Address</button>
             </div>
-        </form>
-        
-    </main>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-8">
+            <div class="max-w-4xl mx-auto">
+                
+                <!-- Messages -->
+                {% if messages %}
+                    <div class="mb-6 space-y-3 animate-slideDown">
+                        {% for message in messages %}
+                            <div class="px-6 py-4 rounded-xl font-semibold shadow-md {% if message.tags == 'success' %}bg-emerald-100 text-emerald-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                                <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5 inline mr-3"></i>
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Profile Card Header -->
+                <div class="bg-white rounded-2xl shadow-lg mb-8 overflow-hidden">
+                    <!-- Cover Banner -->
+                    <div class="h-36 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
+                    
+                    <!-- Profile Header -->
+                    <div class="flex items-end px-8 pb-6 -mt-16 relative">
+                        <!-- Profile Picture -->
+                        <img 
+                            src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                            alt="{{ user.username }}" 
+                            class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg mr-6 bg-gray-100"
+                        >
+                        
+                        <!-- User Details -->
+                        <div class="flex-1 pb-3">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-1">
+                                {{ user.full_name|default:user.username }}
+                            </h2>
+                            <p class="text-gray-600">
+                                {{ user.email }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Form -->
+                <form method="post" class="space-y-8" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Personal Information -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-6 border-b-2 border-gray-100">
+                            <i data-lucide="user-circle" class="w-6 h-6 text-emerald-600"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">Personal Information</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Full Name -->
+                            <div class="form-group">
+                                <label for="{{ form.full_name.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
+                                    <i data-lucide="user" class="w-4 h-4 inline mr-2"></i>Full Name
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="full_name" 
+                                    id="{{ form.full_name.id_for_label }}"
+                                    value="{{ form.full_name.value|default:'' }}"
+                                    class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                                    placeholder="Your full name"
+                                >
+                                {% if form.full_name.errors %}
+                                    <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                        <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.full_name.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="form-group">
+                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
+                                    <i data-lucide="mail" class="w-4 h-4 inline mr-2"></i>Email Address
+                                </label>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    id="{{ form.email.id_for_label }}"
+                                    value="{{ form.email.value|default:'' }}"
+                                    class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                                    placeholder="your.email@example.com"
+                                >
+                                {% if form.email.errors %}
+                                    <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                        <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.email.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <!-- App Theme -->
+                            <div class="form-group">
+                                <label for="{{ form.theme.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
+                                    <i data-lucide="palette" class="w-4 h-4 inline mr-2"></i>App Theme
+                                </label>
+                                <select 
+                                    name="theme" 
+                                    id="{{ form.theme.id_for_label }}"
+                                    class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                                >
+                                    <option value="light" {% if form.theme.value == 'light' %}selected{% endif %}>Light Mode</option>
+                                    <option value="dark" {% if form.theme.value == 'dark' %}selected{% endif %}>Dark Mode</option>
+                                </select>
+                                {% if form.theme.errors %}
+                                    <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                        <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.theme.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Profile Picture Upload -->
+                            <div class="form-group">
+                                <label for="{{ form.profile_pic.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
+                                    <i data-lucide="image" class="w-4 h-4 inline mr-2"></i>Profile Picture
+                                </label>
+                                <input 
+                                    type="file" 
+                                    name="profile_pic" 
+                                    id="{{ form.profile_pic.id_for_label }}"
+                                    accept="image/*"
+                                    class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100"
+                                >
+                                {% if form.profile_pic.errors %}
+                                    <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                        <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.profile_pic.errors.0 }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio Section -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-6 border-b-2 border-gray-100">
+                            <i data-lucide="file-text" class="w-6 h-6 text-emerald-600"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">About You</h3>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.bio.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
+                                <i data-lucide="pencil" class="w-4 h-4 inline mr-2"></i>Bio
+                            </label>
+                            <textarea 
+                                name="bio" 
+                                id="{{ form.bio.id_for_label }}"
+                                rows="6"
+                                class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                                placeholder="Tell us a little bit about yourself..."
+                            >{{ form.bio.value|default:'' }}</textarea>
+                            <p class="text-xs text-gray-500 mt-2">Share your interests, skills, or anything else you'd like others to know about you.</p>
+                            {% if form.bio.errors %}
+                                <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
+                                    <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.bio.errors.0 }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Email Section -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8">
+                        <div class="flex items-center gap-3 mb-6 pb-6 border-b-2 border-gray-100">
+                            <i data-lucide="mail" class="w-6 h-6 text-emerald-600"></i>
+                            <h3 class="text-2xl font-bold text-gray-800">Primary Email Address</h3>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-emerald-50 to-white border-2 border-emerald-200 rounded-xl p-6 flex items-center gap-4 mb-6">
+                            <i data-lucide="mail-check" class="w-8 h-8 text-emerald-600 flex-shrink-0"></i>
+                            <div class="flex-1">
+                                <p class="font-bold text-gray-800">{{ user.email }}</p>
+                                <p class="text-sm text-emerald-600 font-semibold">Primary Email</p>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="flex items-center gap-2 px-6 py-3 text-emerald-600 border-2 border-emerald-200 rounded-xl font-semibold hover:bg-emerald-50 transition">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                            Add Email Address
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-4 pb-8">
+                        <button 
+                            type="submit" 
+                            class="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                        >
+                            <i data-lucide="save" class="w-5 h-5"></i>
+                            Save Changes
+                        </button>
+                        <a 
+                            href="{% url 'notes:profile_view' %}" 
+                            class="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl font-bold text-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                        >
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
