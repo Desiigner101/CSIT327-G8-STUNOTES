@@ -4,17 +4,9 @@
     {
       "src": "stunotesapp/wsgi.py",
       "use": "@vercel/python",
-      "config": { 
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.12",
-        "buildCommand": "chmod +x build_files.sh && ./build_files.sh"
-      }
-    },
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
       "config": {
-        "distDir": "staticfiles"
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.12"
       }
     }
   ],
@@ -31,5 +23,8 @@
       "src": "/(.*)",
       "dest": "stunotesapp/wsgi.py"
     }
-  ]
+  ],
+  "hooks": {
+    "build": "chmod +x build_files.sh && ./build_files.sh"
+  }
 }
