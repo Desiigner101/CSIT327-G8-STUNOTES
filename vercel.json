@@ -6,15 +6,14 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.12",
-        "buildCommand": "chmod +x build_files.sh && ./build_files.sh"
+        "runtime": "python3.12"
       }
     }
   ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/staticfiles/$1"
+      "dest": "/static/$1"
     },
     {
       "src": "/media/(.*)",
