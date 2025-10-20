@@ -73,8 +73,10 @@ document.addEventListener("DOMContentLoaded", function() {
     const statNumbers = document.querySelectorAll('.stat-number');
     statNumbers.forEach(stat => {
         const finalValue = parseInt(stat.textContent);
-        stat.textContent = '0';
-        animateValue(stat, 0, finalValue, 1500);
+        if (!isNaN(finalValue)) {
+            stat.textContent = '0';
+            animateValue(stat, 0, finalValue, 1500);
+        }
     });
 
     // ==================== Real-time Clock ====================
@@ -222,9 +224,14 @@ document.addEventListener("DOMContentLoaded", function() {
     // ==================== Sidebar Stats Animation ====================
     const sidebarStats = document.querySelectorAll('.sidebar .stats span');
     sidebarStats.forEach(stat => {
-        const finalValue = parseInt(stat.textContent);
-        stat.textContent = '0';
-        animateValue(stat, 0, finalValue, 2000);
+        const textContent = stat.textContent.trim();
+        const finalValue = parseInt(textContent);
+        
+        // Only animate if it's a valid number
+        if (!isNaN(finalValue)) {
+            stat.textContent = '0';
+            animateValue(stat, 0, finalValue, 2000);
+        }
     });
 
     // ==================== Task Due Date Warning ====================
@@ -807,24 +814,24 @@ document.addEventListener("DOMContentLoaded", function() {
     const closeNotificationModal = document.getElementById("closeNotificationModal");
 
     if (bell && notifModal && closeNotificationModal) {
-        // ✅ Open modal when bell is clicked
+        // Open modal when bell is clicked
         bell.addEventListener("click", () => {
             notifModal.style.display = "flex";
         });
 
-        // ✅ Close modal when X is clicked
+        // Close modal when X is clicked
         closeNotificationModal.addEventListener("click", () => {
             notifModal.style.display = "none";
         });
 
-        // ✅ Close modal when clicking outside the content
+        // Close modal when clicking outside the content
         window.addEventListener("click", (event) => {
             if (event.target === notifModal) {
                 notifModal.style.display = "none";
             }
         });
     } else {
-        console.warn("⚠️ Notification modal elements not found in DOM.");
+        console.warn("Notification modal elements not found in DOM.");
     }
 
     console.log('✅ StuNotes Dashboard Enhanced!');

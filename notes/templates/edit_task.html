@@ -3,19 +3,254 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Edit Task</title>
-  <link rel="stylesheet" href="{% static 'notes/css/home.css' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Task - {{ task.title }}</title>
+  <link rel="icon" type="image/png" href="{% static 'notes/images/favicon.png' %}">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-slideIn { animation: slideIn 0.5s ease; }
+    
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #4caf50; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #388e3c; }
+  </style>
 </head>
-<body>
-  <main class="main">
-    <h2>Edit Task: {{ task.title }}</h2>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+  
+  <div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
+      <!-- Logo -->
+      <div class="logo p-6 border-b border-gray-200">
+        <div class="flex items-center gap-2">
+          <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
+          <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
+        </div>
+      </div>
+      
+      <!-- Navigation -->
+      <nav class="flex-1 p-4">
+        <ul class="space-y-2">
+          <li>
+            <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+              <i data-lucide="home" class="w-5 h-5"></i>
+              <span>Home</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+              <i data-lucide="user" class="w-5 h-5"></i>
+              <span>Profile</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+              <i data-lucide="calendar" class="w-5 h-5"></i>
+              <span>Calendar</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+              <i data-lucide="settings" class="w-5 h-5"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+              <i data-lucide="log-out" class="w-5 h-5"></i>
+              <span>Logout</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
 
-    <form method="post" class="form-container">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-success">💾 Save Changes</button>
-      <a href="{% url 'notes:home' %}" class="btn btn-danger">Cancel</a>
-    </form>
-  </main>
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto custom-scrollbar p-8">
+      <div class="max-w-3xl mx-auto">
+        
+        <!-- Header -->
+        <div class="mb-8 animate-slideIn">
+          <a href="{% url 'notes:home' %}" class="inline-flex items-center gap-2 text-emerald-600 hover:text-emerald-700 mb-4 font-semibold">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            Back to Dashboard
+          </a>
+          <div class="flex items-center gap-3 mb-2">
+            <i data-lucide="edit-3" class="w-8 h-8 text-emerald-600"></i>
+            <h1 class="text-4xl font-bold text-gray-800">Edit Task</h1>
+          </div>
+          <p class="text-gray-600">{{ task.title }}</p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Title Field -->
+            <div class="form-group">
+              <label class="block text-sm font-bold text-gray-800 mb-3" for="{{ form.title.id_for_label }}">
+                <i data-lucide="type" class="w-4 h-4 inline mr-2"></i>Task Title
+              </label>
+              <input 
+                type="text" 
+                name="title" 
+                maxlength="200"
+                value="{{ form.title.value }}"
+                required
+                class="w-full px-5 py-3 text-lg border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                placeholder="Enter task title"
+              >
+              {% if form.title.errors %}
+                <p class="text-red-500 text-sm mt-2">{{ form.title.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Description Field -->
+            <div class="form-group">
+              <label class="block text-sm font-bold text-gray-800 mb-3" for="{{ form.description.id_for_label }}">
+                <i data-lucide="file-text" class="w-4 h-4 inline mr-2"></i>Description
+              </label>
+              <textarea 
+                name="description" 
+                rows="4"
+                class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                placeholder="Add task description..."
+              >{{ form.description.value }}</textarea>
+              {% if form.description.errors %}
+                <p class="text-red-500 text-sm mt-2">{{ form.description.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Subject Field -->
+            <div class="form-group">
+              <label class="block text-sm font-bold text-gray-800 mb-3" for="{{ form.subject.id_for_label }}">
+                <i data-lucide="bookmark" class="w-4 h-4 inline mr-2"></i>Subject
+              </label>
+              <input 
+                type="text" 
+                name="subject" 
+                maxlength="100"
+                value="{{ form.subject.value }}"
+                class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                placeholder="e.g., Mathematics, Biology"
+              >
+              {% if form.subject.errors %}
+                <p class="text-red-500 text-sm mt-2">{{ form.subject.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Due Date Field -->
+            <div class="form-group">
+              <label class="block text-sm font-bold text-gray-800 mb-3" for="{{ form.due_date.id_for_label }}">
+                <i data-lucide="calendar" class="w-4 h-4 inline mr-2"></i>Due Date
+              </label>
+              <input 
+                type="datetime-local" 
+                name="due_date"
+                value="{{ form.due_date.value }}"
+                required
+                class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+              >
+              {% if form.due_date.errors %}
+                <p class="text-red-500 text-sm mt-2">{{ form.due_date.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <!-- Priority and Status Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Priority Field -->
+              <div class="form-group">
+                <label class="block text-sm font-bold text-gray-800 mb-3" for="{{ form.priority.id_for_label }}">
+                  <i data-lucide="alert-circle" class="w-4 h-4 inline mr-2"></i>Priority
+                </label>
+                <select 
+                  name="priority"
+                  class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                >
+                  <option value="low" {% if form.priority.value == 'low' %}selected{% endif %}>Low</option>
+                  <option value="medium" {% if form.priority.value == 'medium' %}selected{% endif %}>Medium</option>
+                  <option value="high" {% if form.priority.value == 'high' %}selected{% endif %}>High</option>
+                </select>
+                {% if form.priority.errors %}
+                  <p class="text-red-500 text-sm mt-2">{{ form.priority.errors.0 }}</p>
+                {% endif %}
+              </div>
+
+              <!-- Status Field -->
+              <div class="form-group">
+                <label class="block text-sm font-bold text-gray-800 mb-3" for="{{ form.status.id_for_label }}">
+                  <i data-lucide="check-circle" class="w-4 h-4 inline mr-2"></i>Status
+                </label>
+                <select 
+                  name="status"
+                  class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                >
+                  <option value="pending" {% if form.status.value == 'pending' %}selected{% endif %}>Pending</option>
+                  <option value="in_progress" {% if form.status.value == 'in_progress' %}selected{% endif %}>In Progress</option>
+                  <option value="completed" {% if form.status.value == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+                {% if form.status.errors %}
+                  <p class="text-red-500 text-sm mt-2">{{ form.status.errors.0 }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 pt-6 border-t border-gray-200">
+              <button 
+                type="submit" 
+                class="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+              >
+                <i data-lucide="save" class="w-5 h-5"></i>
+                Save Changes
+              </button>
+              <a 
+                href="{% url 'notes:home' %}" 
+                class="flex-1 flex items-center justify-center gap-2 py-4 px-6 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl font-bold text-lg shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all"
+              >
+                <i data-lucide="x" class="w-5 h-5"></i>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Quick Info Section -->
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-white rounded-xl p-6 shadow-md">
+            <p class="text-sm text-gray-600 mb-1">Created</p>
+            <p class="text-lg font-bold text-gray-800">{{ task.created_at|date:"M d, Y" }}</p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-md">
+            <p class="text-sm text-gray-600 mb-1">Current Status</p>
+            <p class="text-lg font-bold text-gray-800">{{ task.get_status_display }}</p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-md">
+            <p class="text-sm text-gray-600 mb-1">Priority Level</p>
+            <p class="text-lg font-bold {% if task.priority == 'high' %}text-red-600{% elif task.priority == 'medium' %}text-orange-600{% else %}text-emerald-600{% endif %}">
+              {{ task.priority|title }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Initialize Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
 </body>
 </html>

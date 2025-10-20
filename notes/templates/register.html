@@ -6,86 +6,185 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register - StuNotes</title>
-  <link rel="stylesheet" href="{% static 'notes/css/register.css' %}">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
-  <!-- Left Panel -->
-  <div class="left-panel">
-    <h1>Your path to<br>success starts here.</h1>
-    <p>Stay organized, motivated and ready for every challenges.</p>
+<body class="h-screen flex overflow-hidden">
+  
+  <!-- Left Panel - Green Background -->
+  <div class="left-panel hidden md:flex md:w-2/3 bg-gradient-to-br from-emerald-600 to-emerald-700 flex-col items-start justify-center px-16 text-white relative overflow-hidden">
+    <!-- Decorative Circles -->
+    <div class="absolute -top-48 -right-36 w-[500px] h-[500px] rounded-full bg-white/15 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-24 -left-20 w-[350px] h-[350px] rounded-full bg-white/12 blur-3xl pointer-events-none"></div>
+    
+    <div class="relative z-10">
+      <h1 class="text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-6">
+        Your path to<br>success starts here.
+      </h1>
+      <p class="text-xl lg:text-2xl xl:text-3xl text-white/95 leading-relaxed max-w-lg">
+        Stay organized, motivated and ready for every challenges.
+      </p>
+    </div>
   </div>
 
-  <!-- Right Panel -->
-  <div class="right-panel">
+  <!-- Right Panel - Form -->
+  <div class="right-panel flex-1 bg-white flex flex-col px-8 md:px-16 py-12 overflow-y-auto relative">
+    <!-- Decorative Circles - Scattered -->
+    <div class="absolute top-10 right-20 w-32 h-32 rounded-full bg-emerald-100/40 blur-2xl pointer-events-none"></div>
+    <div class="absolute top-40 right-10 w-24 h-24 rounded-full bg-emerald-200/30 blur-xl pointer-events-none"></div>
+    <div class="absolute bottom-32 right-32 w-40 h-40 rounded-full bg-emerald-50/50 blur-3xl pointer-events-none"></div>
+    <div class="absolute top-1/2 right-5 w-20 h-20 rounded-full bg-emerald-100/30 blur-xl pointer-events-none"></div>
+    <div class="absolute bottom-20 left-10 w-28 h-28 rounded-full bg-emerald-100/35 blur-2xl pointer-events-none"></div>
+    <div class="absolute top-24 left-16 w-36 h-36 rounded-full bg-emerald-50/40 blur-3xl pointer-events-none"></div>
+    
     <!-- Logo -->
-    <div class="logo-container">
-      <img src="{% static 'notes/images/stunotes_logo.png' %}" alt="StuNotes Logo" class="logo">
-      <span class="logo-text">StuNotes</span>
+    <div class="logo-container flex items-center gap-3 mb-12">
+      <img src="{% static 'notes/images/stunotes_logo.png' %}" alt="StuNotes Logo" class="w-10 h-10 object-contain">
+      <span class="text-3xl font-bold text-emerald-600">StuNotes</span>
     </div>
 
-    <!-- ✅ Messages -->
+    <!-- Messages -->
     {% if messages %} 
-      <div class="messages">
+      <div class="mb-6">
         {% for message in messages %}
-          <div class="alert {{ message.tags }}">
-            {{ message }}
-          </div>
+          {% if message.tags == 'success' %}
+            <div class="flex items-center gap-2 px-4 py-3 mb-2 bg-green-50 text-green-800 border border-green-200 rounded-lg">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% elif message.tags == 'error' %}
+            <div class="flex items-center gap-2 px-4 py-3 mb-2 bg-red-50 text-red-800 border border-red-200 rounded-lg">
+              <i data-lucide="alert-circle" class="w-5 h-5"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% elif message.tags == 'warning' %}
+            <div class="flex items-center gap-2 px-4 py-3 mb-2 bg-yellow-50 text-yellow-800 border border-yellow-200 rounded-lg">
+              <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% else %}
+            <div class="flex items-center gap-2 px-4 py-3 mb-2 bg-blue-50 text-blue-800 border border-blue-200 rounded-lg">
+              <i data-lucide="info" class="w-5 h-5"></i>
+              <span>{{ message }}</span>
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
     {% endif %}
-    <!-- ✅ End messages -->
 
-    <!-- Form -->
-    <div class="form-container">
-      <h2>Sign Up</h2>
-      <div class="switch-link">
-        <span class="already-have-account">Already have an account?</span>
-        <a href="{% url 'notes:login' %}" class="create-now">Sign in</a>
+    <!-- Form Container -->
+    <div class="form-container max-w-md w-full mx-auto">
+      <h2 class="text-4xl font-bold text-gray-900 mb-2">Sign Up</h2>
+      
+      <div class="text-lg text-gray-600 mb-8">
+        <span>Already have an account?</span>
+        <a href="{% url 'notes:login' %}" class="create-now text-emerald-600 font-semibold hover:text-emerald-700 hover:underline ml-1">
+          Sign in
+        </a>
       </div>
 
-      <form method="POST">
+      <form method="POST" class="space-y-6">
         {% csrf_token %}
         
+        <!-- Full Name -->
         <div class="form-group">
-          <label for="full_name">Full Name</label>
-          <input type="text" id="full_name" name="full_name" placeholder="Full Name" required>
+          <label for="full_name" class="block font-semibold text-lg text-gray-700 mb-2">
+            Full Name
+          </label>
+          <input 
+            type="text" 
+            id="full_name" 
+            name="full_name" 
+            placeholder="Full Name" 
+            required
+            class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-600 transition"
+          >
         </div>
 
+        <!-- Email -->
         <div class="form-group">
-          <label for="email">E-mail</label>
-          <input type="email" id="email" name="email" placeholder="example@gmail.com" required>
+          <label for="email" class="block font-semibold text-lg text-gray-700 mb-2">
+            E-mail
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            placeholder="example@gmail.com" 
+            required
+            class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-600 transition"
+          >
         </div>
 
+        <!-- Password -->
         <div class="form-group">
-          <label for="password1">Password</label>
-          <div class="input-wrapper">
-            <input type="password" id="password1" name="password1" placeholder="••••••" required>
-            <button type="button" class="toggle-password" onclick="togglePassword('password1')">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
+          <label for="password1" class="block font-semibold text-lg text-gray-700 mb-2">
+            Password
+          </label>
+          <div class="input-wrapper relative">
+            <input 
+              type="password" 
+              id="password1" 
+              name="password1" 
+              placeholder="••••••" 
+              required
+              class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-600 transition pr-12"
+            >
+            <button 
+              type="button" 
+              onclick="togglePassword('password1')"
+              class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1"
+            >
+              <i data-lucide="eye" class="w-5 h-5"></i>
             </button>
           </div>
         </div>
 
+        <!-- Confirm Password -->
         <div class="form-group">
-          <label for="password2">Confirm Password</label>
-          <div class="input-wrapper">
-            <input type="password" id="password2" name="password2" placeholder="••••••" required>
-            <button type="button" class="toggle-password" onclick="togglePassword('password2')">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
+          <label for="password2" class="block font-semibold text-lg text-gray-700 mb-2">
+            Confirm Password
+          </label>
+          <div class="input-wrapper relative">
+            <input 
+              type="password" 
+              id="password2" 
+              name="password2" 
+              placeholder="••••••" 
+              required
+              class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-600 transition pr-12"
+            >
+            <button 
+              type="button" 
+              onclick="togglePassword('password2')"
+              class="toggle-password absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1"
+            >
+              <i data-lucide="eye" class="w-5 h-5"></i>
             </button>
           </div>
         </div>
 
-        <button type="submit" class="submit-btn">Sign Up</button>
+        <!-- Submit Button -->
+        <button 
+          type="submit" 
+          class="submit-btn w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white text-lg font-semibold rounded-lg transition focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2 mt-2"
+        >
+          Sign Up
+        </button>
       </form>
     </div>
   </div>
+
+  <!-- Initialize Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <!-- Custom Register JavaScript -->
   <script src="{% static 'notes/js/register.js' %}"></script>
 </body>
 </html>
