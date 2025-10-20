@@ -13,4 +13,6 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'stunotesapp.settings')
 
 application = get_wsgi_application()
-app = application  # ADD THIS LINE - Vercel needs it!
+
+# Vercel needs this
+app = application
