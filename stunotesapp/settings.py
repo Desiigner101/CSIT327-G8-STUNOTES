@@ -26,13 +26,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-bw0*1#$qn-^&l!4$*ke$j2q_de1k23^02%7kpr174-_m@xf+o0'
-
+# SECURITY: read secret key and debug mode from environment
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-local-placeholder')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['.vercel.app']
+# Allow hosts can be provided as comma-separated list in env (default to vercel)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='.vercel.app').split(',')
 
 
 # Application definition
@@ -49,6 +49,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise should come directly after SecurityMiddleware to serve static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -96,6 +98,15 @@ DATABASES = {
     }
 }
 
+# Provide a lightweight sqlite fallback when DB env vars are missing (useful for testing/deploy)
+if not config('DB_ENGINE', default=''):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 # Redirect to login page if user is not authenticated
 LOGIN_URL = 'notes:login'
 
@@ -111,6 +122,9 @@ STATICFILES_DIRS = [
 
 # Where collected static files will go after running `collectstatic`
 STATIC_ROOT = BASE_DIR / "static_cdn"
+
+# Use WhiteNoise compressed manifest storage in production for efficient static serving
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'notes.User'
 MEDIA_URL = '/media/'
