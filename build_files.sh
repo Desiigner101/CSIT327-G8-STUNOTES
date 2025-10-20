@@ -35,17 +35,27 @@ fi
 # Set Django settings module
 export DJANGO_SETTINGS_MODULE=stunotesapp.settings
 
-# Create staticfiles directory if it doesn't exist
+# Clean up any existing static files
+rm -rf staticfiles/
+
+# Create fresh staticfiles directory
 mkdir -p staticfiles
+
+# Install any static-related requirements
+$PY -m pip install whitenoise
 
 # Collect static files
 echo "Collecting static files..."
-$PY manage.py collectstatic --noinput --clear
+export DJANGO_SETTINGS_MODULE=stunotesapp.settings
+$PY manage.py collectstatic --noinput
 
 # Verify static files were collected
 if [ -d staticfiles ]; then
     echo "✓ Static files collected successfully in staticfiles/"
+    echo "Contents of staticfiles directory:"
     ls -la staticfiles/
+    echo "Contents of staticfiles/notes/js directory:"
+    ls -la staticfiles/notes/js/ || echo "JS directory not found"
 else
     echo "WARNING: staticfiles directory not found"
 fi
