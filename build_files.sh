@@ -1,42 +1,52 @@
 #!/usr/bin/env bash
-# Build script for Vercel: collect static files and prepare dist directory
+# Build script for Vercel
 set -e
 
-# If pip isn't available under the current python, use python -m pip
+echo "======================================"
+echo "Starting build process for Vercel..."
+echo "======================================"
+
+# Detect Python executable
 if command -v python >/dev/null 2>&1; then
-	PY=python
+    PY=python
 elif command -v python3 >/dev/null 2>&1; then
-	PY=python3
+    PY=python3
 else
-	echo "No python executable found"
-	exit 1
+    echo "ERROR: No python executable found"
+    exit 1
 fi
 
-# Install requirements locally (Vercel usually installs them automatically)
-"$PY" -m pip install --upgrade pip setuptools wheel
+echo "Using Python: $PY"
+$PY --version
+
+# Upgrade pip
+echo "Upgrading pip..."
+$PY -m pip install --upgrade pip setuptools wheel
+
+# Install requirements
+echo "Installing requirements..."
 if [ -f requirements.txt ]; then
-	"$PY" -m pip install -r requirements.txt
+    $PY -m pip install -r requirements.txt
+else
+    echo "ERROR: requirements.txt not found"
+    exit 1
 fi
 
-# Ensure DJANGO settings module for collectstatic; use minimal settings during build to avoid DB imports
-export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-stunotesapp.settings_static}
+# Set Django settings module
+export DJANGO_SETTINGS_MODULE=stunotesapp.settings
 
-# Prepare dist dir expected by vercel
-DIST_DIR=staticfiles
-rm -rf "$DIST_DIR"
-mkdir -p "$DIST_DIR"
+# Collect static files
+echo "Collecting static files..."
+$PY manage.py collectstatic --noinput --clear
 
-# Run collectstatic (won't fail if migrations or DB missing if sqlite fallback is present)
-"$PY" manage.py collectstatic --noinput || true
-
-# Copy collected static files to dist dir
+# Verify static files were collected
 if [ -d static_cdn ]; then
-	cp -a static_cdn/. "$DIST_DIR" || true
+    echo "✓ Static files collected successfully in static_cdn/"
+    ls -la static_cdn/
+else
+    echo "WARNING: static_cdn directory not found"
 fi
 
-# Also copy the app static directory if present
-if [ -d static ]; then
-	cp -a static/. "$DIST_DIR" || true
-fi
-
-echo "Static build complete"
+echo "======================================"
+echo "Build complete!"
+echo "======================================"

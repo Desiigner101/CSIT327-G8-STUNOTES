@@ -4,22 +4,16 @@
     {
       "src": "stunotesapp/wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
-    },
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "staticfiles" }
+      "config": { 
+        "maxLambdaSize": "15mb", 
+        "runtime": "python3.12" 
+      }
     }
   ],
-  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
-  "env": {
-    "PYTHONUNBUFFERED": "1"
-  },
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "dest": "/static_cdn/$1"
     },
     {
       "src": "/media/(.*)",
@@ -29,5 +23,6 @@
       "src": "/(.*)",
       "dest": "stunotesapp/wsgi.py"
     }
-  ]
+  ],
+  "outputDirectory": "static_cdn"
 }
