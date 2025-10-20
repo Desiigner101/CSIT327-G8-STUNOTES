@@ -122,7 +122,7 @@ LOGIN_URL = 'notes:login'
 # STATIC & MEDIA FILES
 # ---------------------------------------------------
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "notes" / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"  # renamed for Vercel clarity
 
 # Enable WhiteNoise for serving compressed static files
