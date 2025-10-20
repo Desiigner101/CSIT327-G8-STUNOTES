@@ -122,8 +122,8 @@ LOGIN_URL = 'notes:login'
 # STATIC & MEDIA FILES
 # ---------------------------------------------------
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]  # Make sure this folder exists!
-STATIC_ROOT = BASE_DIR / "staticfiles_build"  # ✅ Matches Vercel
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # renamed for Vercel clarity
 
 # Enable WhiteNoise for serving compressed static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

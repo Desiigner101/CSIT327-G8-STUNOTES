@@ -22,7 +22,7 @@ fi
 export DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE:-stunotesapp.settings_static}
 
 # Prepare dist dir expected by vercel
-DIST_DIR=staticfiles_build
+DIST_DIR=staticfiles
 rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
 
