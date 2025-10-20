@@ -35,16 +35,19 @@ fi
 # Set Django settings module
 export DJANGO_SETTINGS_MODULE=stunotesapp.settings
 
+# Create staticfiles directory if it doesn't exist
+mkdir -p staticfiles
+
 # Collect static files
 echo "Collecting static files..."
 $PY manage.py collectstatic --noinput --clear
 
 # Verify static files were collected
-if [ -d static_cdn ]; then
-    echo "✓ Static files collected successfully in static_cdn/"
-    ls -la static_cdn/
+if [ -d staticfiles ]; then
+    echo "✓ Static files collected successfully in staticfiles/"
+    ls -la staticfiles/
 else
-    echo "WARNING: static_cdn directory not found"
+    echo "WARNING: staticfiles directory not found"
 fi
 
 echo "======================================"

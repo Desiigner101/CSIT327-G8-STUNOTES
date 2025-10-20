@@ -8,12 +8,19 @@
         "maxLambdaSize": "15mb", 
         "runtime": "python3.12" 
       }
+    },
+    {
+      "src": "build_files.sh",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles"
+      }
     }
   ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static_cdn/$1"
+      "dest": "/staticfiles/$1"
     },
     {
       "src": "/media/(.*)",
@@ -23,6 +30,5 @@
       "src": "/(.*)",
       "dest": "stunotesapp/wsgi.py"
     }
-  ],
-  "outputDirectory": "static_cdn"
+  ]
 }

@@ -123,7 +123,7 @@ LOGIN_URL = 'notes:login'
 # ---------------------------------------------------
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "static_cdn"  # renamed for Vercel clarity
+STATIC_ROOT = BASE_DIR / "staticfiles"  # for Vercel deployment
 
 # Enable WhiteNoise for serving compressed static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
