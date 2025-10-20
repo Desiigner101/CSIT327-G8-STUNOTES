@@ -97,7 +97,7 @@ database_url = config('DATABASE_URL', default='')
 if database_url:
     # Parse DATABASE_URL using dj_database_url (already in requirements)
     DATABASES = {
-        'default': dj_database_url.parse(database_url, conn_max_age=600)
+        'default': dj_database_url.parse(database_url, conn_max_age=0)
     }
     # Ensure SSL when using managed Postgres (Supabase usually requires it)
     if 'OPTIONS' not in DATABASES['default']:
