@@ -82,24 +82,33 @@ WSGI_APPLICATION = 'stunotesapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-#for security purposes, we will hide the database credentials using environment variables
-DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'HOST': config('DB_HOST'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'PORT': config('DB_PORT', cast=int),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
-        'CONN_MAX_AGE': 0,
-    }
-}
+# For security purposes, read database credentials from environment variables safely.
+# We avoid calling config(...) without a default to prevent decouple.UndefinedValueError
+db_engine = config('DB_ENGINE', default='')
+if db_engine:
+    # read optional port safely
+    db_port_raw = config('DB_PORT', default=None)
+    try:
+        db_port = int(db_port_raw) if db_port_raw else ''
+    except (TypeError, ValueError):
+        db_port = ''
 
-# Provide a lightweight sqlite fallback when DB env vars are missing (useful for testing/deploy)
-if not config('DB_ENGINE', default=''):
+    DATABASES = {
+        'default': {
+            'ENGINE': db_engine,
+            'HOST': config('DB_HOST', default=''),
+            'NAME': config('DB_NAME', default=''),
+            'USER': config('DB_USER', default=''),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'PORT': db_port,
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+            'CONN_MAX_AGE': 0,
+        }
+    }
+else:
+    # Lightweight sqlite fallback for testing / initial deploy when no DB env vars set
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
