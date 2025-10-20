@@ -12,7 +12,14 @@
       "config": {
         "distDir": "staticfiles_build"
       }
-    }
+    },
+    {
+  "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
+  "env": {
+    "PYTHONUNBUFFERED": "1"
+  }
+}
+    
   ],
   "routes": [
     {
