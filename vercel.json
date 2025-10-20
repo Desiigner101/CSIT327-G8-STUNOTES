@@ -6,7 +6,8 @@
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "15mb",
-        "runtime": "python3.12"
+        "runtime": "python3.12",
+        "buildCommand": "chmod +x build_files.sh && ./build_files.sh"
       }
     }
   ],
@@ -23,8 +24,5 @@
       "src": "/(.*)",
       "dest": "stunotesapp/wsgi.py"
     }
-  ],
-  "hooks": {
-    "build": "chmod +x build_files.sh && ./build_files.sh"
-  }
+  ]
 }
