@@ -9,18 +9,13 @@
     {
       "src": "build_files.sh",
       "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles_build"
-      }
-    },
-    {
+      "config": { "distDir": "staticfiles_build" }
+    }
+  ],
   "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput",
   "env": {
     "PYTHONUNBUFFERED": "1"
-  }
-}
-    
-  ],
+  },
   "routes": [
     {
       "src": "/static/(.*)",
