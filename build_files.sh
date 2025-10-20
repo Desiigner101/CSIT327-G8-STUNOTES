@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Build script for Vercel
 set -e
 
 echo "======================================"
 echo "Starting build process for Vercel..."
-echo "======================================
+echo "======================================"
 
 # Detect Python executable
 if command -v python >/dev/null 2>&1; then
@@ -60,6 +60,4 @@ else
     echo "WARNING: staticfiles directory not found"
 fi
 
-echo "======================================"
 echo "Build complete!"
-echo "======================================"
