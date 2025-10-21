@@ -26,7 +26,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allow multiple domains (Vercel, localhost)
 raw_allowed = config('ALLOWED_HOSTS', default='.vercel.app,localhost,127.0.0.1')
-ALLOWED_HOSTS = [h.strip() for h in raw_allowed.split(',') if h.strip()]
+ALLOWED_HOSTS = ['*']
 
 
 # ---------------------------------------------------

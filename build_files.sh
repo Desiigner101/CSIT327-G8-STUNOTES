@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Build script for Vercel
 set -e
 
@@ -60,4 +60,6 @@ else
     echo "WARNING: staticfiles directory not found"
 fi
 
+echo "======================================"
 echo "Build complete!"
+echo "======================================"
