@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.urls import reverse
 from .models import Task, Note
 from .forms import TaskForm, UserProfileForm, NoteForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 # Get the custom User model
 User = get_user_model()
@@ -372,3 +374,82 @@ def delete_note(request, note_id):
         return redirect('notes:home')
     # If not POST, redirect back
     return redirect('notes:home')
+
+@login_required
+def settings_page(request):
+    user = request.user
+    
+    # Initialize form and the flag for opening the modal
+    password_form = PasswordChangeForm(user)
+    should_open_modal = False # Default to false for GET requests
+
+    if request.method == 'POST':
+        # 1. Handle the POST request (password change submission)
+        password_form = PasswordChangeForm(user, request.POST)
+        
+        if password_form.is_valid():
+            user = password_form.save()
+            
+            # Prevents the user from being logged out after password change
+            update_session_auth_hash(request, user)  
+            
+            messages.success(request, 'Your password was successfully updated!')
+            
+            # Redirect to the GET view to show messages and clear POST data
+            return redirect('notes:settings_page')
+        else:
+            # If the form is invalid, set error message and set flag to reopen modal
+            messages.error(request, 'Please correct the error(s) below.')
+            should_open_modal = True # Set flag to reopen modal in template
+            
+    # 2. Calculate the required counts for the statistics blocks
+    # NOTE: Using 'status='completed'' based on your profile_view logic
+    try:
+        total_notes = Note.objects.filter(user=user).count()
+        total_tasks = Task.objects.filter(user=user).count()
+        completed_tasks_count = Task.objects.filter(user=user, status='completed').count()
+    except Exception:
+        # Provide safe default values in case models or data access fails
+        total_notes = 0
+        total_tasks = 0
+        completed_tasks_count = 0
+    
+    # 3. Compile the final context for rendering
+    context = {
+        'password_form': password_form,
+        
+        # Pass the calculated stats using the variable names from your template (e.g., {{ total_notes_sidebar }})
+        'total_notes_sidebar': total_notes,
+        'total_tasks_count': total_tasks,
+        'completed_tasks': completed_tasks_count,
+        
+        # Pass the flag to control modal visibility in JavaScript
+        'should_open_modal': should_open_modal,
+    }
+    
+    # 4. Render the template
+    return render(request, 'settings_page.html', context)
+
+@login_required
+def delete_account(request):
+    """
+    Handles the permanent deletion of the user's account.
+    """
+    if request.method == 'POST':
+        user = request.user
+        
+        # 1. Log the user out immediately
+        logout(request)
+        
+        # 2. Delete the user object (and cascade delete related data)
+        user.delete()
+        
+        # 3. Add a success message (will be shown on the homepage/login page)
+        messages.success(request, 'Your account was permanently deleted. We are sorry to see you go!')
+        
+        # 4. Redirect to a non-authenticated page (e.g., login or home)
+        # Assuming 'notes:home' is accessible without login, or use a general 'login' page name
+        return redirect('notes:home') 
+        
+    # If a GET request somehow reaches this, redirect them away
+    return redirect('notes:settings_page')

@@ -26,7 +26,12 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Allow multiple domains (Vercel, localhost)
 raw_allowed = config('ALLOWED_HOSTS', default='.vercel.app,localhost,127.0.0.1')
-ALLOWED_HOSTS = ['*']
+# FIX: Convert the comma-separated string to a list for proper host checking
+ALLOWED_HOSTS = [host.strip() for host in raw_allowed.split(',')] if raw_allowed else []
+if DEBUG:
+    ALLOWED_HOSTS.append('localhost')
+    ALLOWED_HOSTS.append('127.0.0.1')
+    ALLOWED_HOSTS.append('[::1]') # IPv6 local host
 
 
 # ---------------------------------------------------
@@ -40,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'notes',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +116,29 @@ else:
             }
         }
 
+
+# ---------------------------------------------------
+# SESSION MANAGEMENT (Auto Logout, Stay Signed In)
+# ---------------------------------------------------
+
+# Controls "Stay Signed In" and maximum session lifetime.
+# SETTINGS:
+# - True: Logs out when the browser is closed (Good for public/shared computers).
+# - False: Keeps the session active until SESSION_COOKIE_AGE expires (Default, "Stay Signed In").
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# Maximum age of the session cookie, in seconds. 
+# Used when SESSION_EXPIRE_AT_BROWSER_CLOSE is False.
+# Value below is 7 days (7 * 24 * 60 * 60 = 604800)
+SESSION_COOKIE_AGE = 604800 
+
+# CRITICAL SECURITY SETTINGS (MUST BE TRUE IN PRODUCTION)
+# Ensure cookies are only sent over HTTPS/SSL.
+SESSION_COOKIE_SECURE = not DEBUG 
+# Prevent client-side JavaScript access to the cookie (XSS defense).
+SESSION_COOKIE_HTTPONLY = True 
+# Helps protect against CSRF and cross-site requests.
+SESSION_COOKIE_SAMESITE = 'Lax' 
 
 # ---------------------------------------------------
 # AUTHENTICATION

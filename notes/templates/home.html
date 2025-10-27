@@ -2,34 +2,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard - Home</title>
-  <link rel="icon" type="image/png" href="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/favicon.png">
-  
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'emerald-custom': {
-              50: '#e8f5e9',
-              100: '#c8e6c9',
-              500: '#4caf50',
-              600: '#43a047',
-              700: '#388e3c'
+    <meta charset="UTF-8">
+    <title>Dashboard - Home</title>
+    <link rel="icon" type="image/png" href="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/favicon.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            // This line tells Tailwind to respect the '.dark' class on the HTML tag
+            darkMode: 'class', 
+            theme: {
+                extend: {
+                    colors: {
+                        'emerald-custom': {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            600: '#43a047',
+                            700: '#388e3c'
+                        }
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  </script>
-  
+    </script>
+
+    <script>
+        (() => {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+        })();
+    </script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const htmlElement = document.documentElement;
+            const toggle = document.getElementById('theme-toggle-home'); 
+            
+            // If there's no toggle button on this page, stop here.
+            if (!toggle) {
+                lucide.createIcons(); // Initialize all other icons on the page
+                return;
+            }
+
+            const icon = document.getElementById('theme-icon-home'); 
+            const text = document.getElementById('theme-text-home'); 
+            
+            // --- Initial State Setup (Ensures button matches current theme) ---
+            const isDarkInitially = htmlElement.classList.contains('dark');
+            if(icon) icon.setAttribute('data-lucide', isDarkInitially ? 'sun' : 'moon');
+            if(text) text.textContent = isDarkInitially ? 'Light Mode' : 'Dark Mode';
+            
+            // Create all Lucide icons on the page once (including the toggle icon)
+            lucide.createIcons(); 
+
+            // --- Click Handler ---
+            toggle.addEventListener('click', () => {
+                const isCurrentlyDark = htmlElement.classList.contains('dark');
+                const newIsDark = !isCurrentlyDark;
+
+                // 1. Theme Change: Add/remove 'dark' class from <html>
+                htmlElement.classList.toggle('dark', newIsDark);
+                
+                // 2. Persistence: Save the new theme (accessible by settings.html)
+                localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
+
+                // 3. UI Update: Set new icon and text
+                const newIconName = newIsDark ? 'sun' : 'moon';
+                const newTextContent = newIsDark ? 'Light Mode' : 'Dark Mode';
+                
+                if(icon) {
+                    icon.setAttribute('data-lucide', newIconName);
+                    // 4. Icon Refresh: Use lucide.replace() for the dynamic icon change
+                    lucide.replace(icon); 
+                }
+                if(text) text.textContent = newTextContent;
+            });
+        });
+    </script>
+
+</head>
+
   <style>
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-20px); }
@@ -88,7 +144,7 @@
           </a>
         </li>
         <li>
-          <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+          <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
             <i data-lucide="settings" class="w-5 h-5"></i>
             <span>Settings</span>
           </a>
