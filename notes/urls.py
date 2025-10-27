@@ -6,6 +6,11 @@ app_name = 'notes'
 urlpatterns = [
     #Home
     path('', views.home, name='home'),
+    
+    #Settings
+    path('settings/', views.settings_page, name='settings_page'),
+    path('delete-account/', views.delete_account, name='delete_account'),
+    
     # Note creation
     path('add_note/', views.add_note, name='add_note'),
     path('note/edit/<int:note_id>/', views.edit_note, name='edit_note'),
