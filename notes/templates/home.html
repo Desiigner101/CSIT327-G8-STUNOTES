@@ -966,6 +966,22 @@ window.closeModal = closeModal;
 // home.js - Enhanced Dashboard JavaScript
 
 document.addEventListener("DOMContentLoaded", function() {
+  // Helper: read CSRF token from cookies (Django sets `csrftoken` cookie)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
     
     // ==================== Task Form Toggle ====================
     const toggleBtn = document.getElementById("toggleTaskForm");
@@ -1152,17 +1168,8 @@ document.addEventListener("DOMContentLoaded", function() {
     
     updateTaskColors();
 
-    // ==================== Note Hover Effects ====================
-    const notes = document.querySelectorAll('.note');
-    notes.forEach(note => {
-        note.addEventListener('mouseenter', function() {
-            this.style.borderLeftWidth = '6px';
-        });
-        
-        note.addEventListener('mouseleave', function() {
-            this.style.borderLeftWidth = '4px';
-        });
-    });
+  // Initialize hover effects for notes (avoids double-binding)
+  initNoteHoverEffects();
 
     // ==================== Calendar Today Highlight ====================
     const today = new Date().getDate();
@@ -1551,45 +1558,81 @@ document.addEventListener("DOMContentLoaded", function() {
                         closeModal('addNoteModal');
 
                         // insert into compact notes list (top)
-                        try {
-                            const notesSection = document.querySelector('.card.notes');
-                            if (notesSection) {
-                                const container = notesSection.querySelector('.card-header').nextElementSibling;
-                                // create new compact note element
-                                const noteElem = createCompactNoteElement(data.note);
-                                if (container) {
-                                    container.parentNode.insertBefore(noteElem, container);
-                                } else {
-                                    // fallback: append to notes section
-                                    notesSection.insertBefore(noteElem, notesSection.querySelector('.card-header').nextSibling);
-                                }
-                            }
-                        } catch (err) {
-                            console.warn('Could not insert compact note element', err);
-                        }
+            try {
+              const notesSection = document.querySelector('.card.notes');
+              if (notesSection) {
+                // the notes container that holds the compact list
+                const container = notesSection.querySelector('.space-y-3');
+                const noteElem = createCompactNoteElement(data.note);
+                if (container) {
+                  // prepend so the newest appears at the top like server-rendered notes
+                  container.prepend(noteElem);
+                } else {
+                  // fallback: append after the header
+                  const header = notesSection.querySelector('.card-header');
+                  if (header && header.parentNode) header.parentNode.appendChild(noteElem);
+                }
+
+                // initialize UI for the newly-inserted element(s)
+                // re-render any lucide icons and set up hover handlers
+                try { lucide.createIcons(); } catch(e) {/* ignore if lucide not present */}
+                initNoteHoverEffects();
+              }
+            } catch (err) {
+              console.warn('Could not insert compact note element', err);
+            }
 
                         // insert into All Notes grid
-                        const allNotesGrid = document.querySelector('#allNotesModal .notes-grid');
-                        if (allNotesGrid) {
+                        (function insertIntoAllNotesModal() {
+                            const modalBody = document.querySelector('#allNotesModal .modal-body');
+                            if (!modalBody) return;
+
+                            // Try to find existing grid
+                            let grid = modalBody.querySelector('.notes-grid');
+
+                            // If grid doesn't exist (empty-state shown), create it and remove empty-state
+                            if (!grid) {
+                                const empty = modalBody.querySelector('.empty-state');
+                                if (empty) empty.remove();
+
+                                grid = document.createElement('div');
+                                grid.className = 'notes-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5';
+                                // insert grid at top of modal body
+                                modalBody.prepend(grid);
+                            }
+
                             const card = document.createElement('div');
-                            card.className = 'note-card';
+                            card.className = 'note-card bg-white border-l-4 border-blue-500 rounded-xl p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all';
                             card.setAttribute('data-title', (data.note.title || '').toLowerCase());
                             card.setAttribute('data-content', (data.note.content || '').toLowerCase());
                             card.setAttribute('data-tags', (data.note.tags || '').toLowerCase());
+                            card.setAttribute('data-subject', (data.note.subject || '').toLowerCase());
+                            card.setAttribute('data-date', new Date().toISOString());
                             card.innerHTML = `
-                                <div class="note-card-header" style="position:relative;">
-                                  <h4>${escapeHtml(data.note.title)}</h4>
-                                  <span class="note-date">${escapeHtml(data.note.created_at)}</span>
+                                <div class="note-card-header flex justify-between items-start gap-3 mb-3 pb-3 border-b-2 border-gray-100">
+                                  <h4 class="text-lg font-bold text-gray-800 flex-1">${escapeHtml(data.note.title)}</h4>
+                                  <span class="note-date text-xs text-gray-500 whitespace-nowrap">${escapeHtml(data.note.created_at)}</span>
                                 </div>
-                                <div class="note-card-body">
-                                  <p>${escapeHtml(truncateWords(data.note.content, 30))}</p>
+                                <div class="note-card-body mb-3">
+                                  <p class="text-sm text-gray-600 leading-relaxed">${escapeHtml(truncateWords(data.note.content, 30))}</p>
                                 </div>
-                                <div class="note-card-footer">
-                                  ${data.note.subject ? `<span class="note-subject">${escapeHtml(data.note.subject)}</span>` : ''}
+                                <div class="note-card-footer flex gap-2 flex-wrap items-center">
+                                  ${data.note.subject ? `<span class="note-subject bg-gradient-to-r from-purple-500 to-purple-600 text-white px-3 py-1 rounded-2xl text-xs font-semibold">${escapeHtml(data.note.subject)}</span>` : ''}
+                                  ${data.note.tags ? `<span class="note-tags bg-gray-200 text-gray-700 px-3 py-1 rounded-2xl text-xs">${escapeHtml(data.note.tags)}</span>` : ''}
                                 </div>
                             `;
-                            allNotesGrid.prepend(card);
-                        }
+
+                            grid.prepend(card);
+
+                            // Update count in header
+                            try {
+                                const allNotesCountEl = document.getElementById('all-notes-count');
+                                if (allNotesCountEl && data.total_notes) allNotesCountEl.textContent = `(${data.total_notes})`;
+                            } catch (e) { /* ignore */ }
+
+                            // Re-init icons / hover effects inside the modal
+                            try { lucide.createIcons(); } catch(e) {}
+                        })();
 
                         // update counts
                         const totalNode = document.querySelector('.stat-card .stat-number');
@@ -1623,29 +1666,50 @@ document.addEventListener("DOMContentLoaded", function() {
     // Helper: create compact note DOM element (small card used in main dashboard list)
     function createCompactNoteElement(note) {
         const wrapper = document.createElement('div');
-        wrapper.className = 'note';
+        // Match the server-rendered classes so the UI is identical
+        wrapper.className = 'note bg-gradient-to-br from-gray-50 to-white border-l-4 border-emerald-500 p-4 rounded-lg hover:translate-x-2 hover:shadow-md transition-all cursor-pointer';
         wrapper.innerHTML = `
-            <div style="position:relative;">
-              <h4>${escapeHtml(note.title)}</h4>
+            <div class="relative">
+              <h4 class="text-base font-semibold text-gray-800 mb-2">${escapeHtml(note.title)}</h4>
             </div>
-            <p>${escapeHtml(truncateWords(note.content, 15))}</p>
-            <span class="date">${escapeHtml(note.created_at)}</span>
-            <div class="note-actions" style="margin-top:8px;">
-              <button type="button" class="btn btn-sm" style="margin-right:6px;"
+            <p class="text-sm text-gray-600 leading-relaxed mb-2">${escapeHtml(truncateWords(note.content, 15))}</p>
+            <span class="date text-xs text-gray-400 font-medium">${escapeHtml(note.created_at)}</span>
+            <div class="note-actions mt-3 flex gap-2">
+              <button type="button" class="btn btn-sm px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition text-xs font-semibold"
                       onclick="openEditModal(this)"
                       data-id="${note.id}"
                       data-title="${escapeHtml(note.title)}"
                       data-content="${escapeHtml(note.content)}"
                       data-subject="${escapeHtml(note.subject)}"
                       data-tags="${escapeHtml(note.tags)}"
-                      data-url="${note.edit_url}">✏️ Edit</button>
+                      data-url="${note.edit_url}">
+                ✏️ Edit
+              </button>
               <form method="post" action="${note.delete_url}" style="display:inline;">
-                <input type="hidden" name="csrfmiddlewaretoken" value="">
-                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this note?');">🗑️ Delete</button>
+                <input type="hidden" name="csrfmiddlewaretoken" value="${getCookie('csrftoken') || ''}">
+                <button type="submit" class="btn btn-sm btn-danger px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-xs font-semibold" onclick="return confirm('Delete this note?');">🗑️ Delete</button>
               </form>
             </div>
         `;
+
+        // mark as not-initialized for hover listeners
+        wrapper.dataset.hoverInit = 'false';
         return wrapper;
+    }
+
+    // Initialize hover effects for notes that haven't been set up yet
+    function initNoteHoverEffects(root=document) {
+        const noteElems = (root === document) ? document.querySelectorAll('.note') : root.querySelectorAll('.note');
+        noteElems.forEach(note => {
+            if (note.dataset.hoverInit === 'true') return; // already initialized
+            note.addEventListener('mouseenter', function() {
+                this.style.borderLeftWidth = '6px';
+            });
+            note.addEventListener('mouseleave', function() {
+                this.style.borderLeftWidth = '4px';
+            });
+            note.dataset.hoverInit = 'true';
+        });
     }
 
     function truncateWords(text, num) {
