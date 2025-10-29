@@ -97,7 +97,7 @@
 
 6. **Access the application**
    
-   Open your browser and navigate to: `http://127.0.0.1:8000/`
+   Open your browser and navigate to: `https://csit-327-g8-stunotes.vercel.app/`
 
 ## Usage
 
