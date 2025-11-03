@@ -416,7 +416,8 @@
       <!-- Calendar Section -->
       <section class="card calendar bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all animate-slideUp">
         <div class="card-header flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100">
-          <h3 class="text-xl font-bold text-gray-800">October</h3>
+        <h3 id="calendar-month" class="text-xl font-bold text-gray-800"></h3>
+
         </div>
         
         <div class="calendar-box mb-5">
@@ -1853,5 +1854,78 @@ document.addEventListener("DOMContentLoaded", function() {
 
 });
   </script>
+  
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const today = new Date();
+  const currentMonth = today.getMonth(); // 0-based (0=Jan)
+  const currentYear = today.getFullYear();
+  const currentDate = today.getDate();
+
+  // Update the header month/year
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  document.getElementById("calendar-month").textContent =
+    `${monthNames[currentMonth]} ${currentYear}`;
+
+  // Get references
+  const tbody = document.querySelector(".calendar-box tbody");
+  tbody.innerHTML = ""; // clear current hardcoded days
+
+  // Compute first and last days
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const lastDay = new Date(currentYear, currentMonth + 1, 0);
+
+  // Adjust so Monday = 0
+  let startDay = firstDay.getDay(); // Sunday = 0
+  startDay = startDay === 0 ? 6 : startDay - 1;
+
+  let date = 1;
+
+  // Create 6 rows (max possible weeks)
+  for (let i = 0; i < 6; i++) {
+    const row = document.createElement("tr");
+
+    for (let j = 0; j < 7; j++) {
+      const cell = document.createElement("td");
+      cell.className =
+        "text-center p-3 hover:bg-emerald-50 hover:text-emerald-700 hover:font-semibold cursor-pointer rounded-lg transition";
+
+      if (i === 0 && j < startDay) {
+        cell.textContent = ""; // empty before month starts
+      } else if (date > lastDay.getDate()) {
+        cell.textContent = ""; // empty after month ends
+      } else {
+        cell.textContent = date;
+
+        // Highlight today's date
+        if (
+          date === currentDate &&
+          currentMonth === today.getMonth() &&
+          currentYear === today.getFullYear()
+        ) {
+          cell.classList.add(
+            "bg-emerald-500",
+            "text-white",
+            "font-bold",
+            "shadow-md"
+          );
+        }
+        date++;
+      }
+
+      row.appendChild(cell);
+    }
+    tbody.appendChild(row);
+
+    if (date > lastDay.getDate()) break;
+  }
+});
+</script>
+
+
+
 </body>
 </html>

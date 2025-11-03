@@ -94,9 +94,12 @@ def home(request):
         status__in=['pending', 'in_progress']
     ).count()
     
-    # ✅ Get today's tasks
+    # ✅ Get today's active tasks (exclude completed)
     today = now.date()
-    today_tasks = tasks.filter(due_date__date=today).order_by('due_date')
+    today_tasks = tasks.filter(
+        due_date__date=today,
+        status__in=['pending', 'in_progress']
+    ).order_by('due_date')
     
     # ✅ Total notes count
     total_notes = Note.objects.filter(user=user).count()
@@ -198,6 +201,7 @@ def home(request):
     }
 
     return render(request, "home.html", context)
+
 
 
 def logout_view(request):
