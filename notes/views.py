@@ -295,10 +295,29 @@ def edit_profile(request):
     user = request.user
     
     if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=user) 
-        
+        # Accept first_name and last_name from the form even though the ModelForm
+        # still manages full_name. We'll compose full_name from the two fields
+        # and set first_name/last_name on the user instance before saving.
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+
+        # Initialize the form with posted data
+        form = UserProfileForm(request.POST, request.FILES, instance=user)
+
         if form.is_valid():
-            form.save()
+            # Prepare instance without committing so we can set extras
+            profile = form.save(commit=False)
+            # Set first_name/last_name and ensure full_name is consistent
+            profile.first_name = first_name
+            profile.last_name = last_name
+            # If full_name provided via hidden field, prefer it; otherwise compose
+            full_from_post = request.POST.get('full_name', '').strip()
+            if full_from_post:
+                profile.full_name = full_from_post
+            else:
+                profile.full_name = (first_name + (' ' + last_name if first_name and last_name else '')).strip() or profile.full_name
+
+            profile.save()
             messages.success(request, "Your profile has been updated successfully!")
             return redirect("notes:profile_view")
         else:

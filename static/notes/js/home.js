@@ -615,28 +615,47 @@ document.addEventListener("DOMContentLoaded", function() {
                             console.warn('Could not insert compact note element', err);
                         }
 
-                        // insert into All Notes grid
-                        const allNotesGrid = document.querySelector('#allNotesModal .notes-grid');
-                        if (allNotesGrid) {
-                            const card = document.createElement('div');
-                            card.className = 'note-card';
-                            card.setAttribute('data-title', (data.note.title || '').toLowerCase());
-                            card.setAttribute('data-content', (data.note.content || '').toLowerCase());
-                            card.setAttribute('data-tags', (data.note.tags || '').toLowerCase());
-                            card.innerHTML = `
-                                <div class="note-card-header" style="position:relative;">
-                                  <h4>${escapeHtml(data.note.title)}</h4>
-                                  <span class="note-date">${escapeHtml(data.note.created_at)}</span>
-                                </div>
-                                <div class="note-card-body">
-                                  <p>${escapeHtml(truncateWords(data.note.content, 30))}</p>
-                                </div>
-                                <div class="note-card-footer">
-                                  ${data.note.subject ? `<span class="note-subject">${escapeHtml(data.note.subject)}</span>` : ''}
-                                </div>
-                            `;
-                            allNotesGrid.prepend(card);
-                        }
+                                                // insert into All Notes grid
+                                                const allNotesGrid = document.querySelector('#allNotesModal .notes-grid');
+                                                if (allNotesGrid) {
+                                                        const card = document.createElement('div');
+                                                        card.className = 'note-card';
+                                                        card.setAttribute('data-title', (data.note.title || '').toLowerCase());
+                                                        card.setAttribute('data-content', (data.note.content || '').toLowerCase());
+                                                        card.setAttribute('data-tags', (data.note.tags || '').toLowerCase());
+                                                        // set data-subject normalized to lower-case so filters match
+                                                        card.setAttribute('data-subject', (data.note.subject || '').toLowerCase());
+                                                        card.innerHTML = `
+                                                                <div class="note-card-header" style="position:relative;">
+                                                                    <h4>${escapeHtml(data.note.title)}</h4>
+                                                                    <span class="note-date">${escapeHtml(data.note.created_at)}</span>
+                                                                </div>
+                                                                <div class="note-card-body">
+                                                                    <p>${escapeHtml(truncateWords(data.note.content, 30))}</p>
+                                                                </div>
+                                                                <div class="note-card-footer">
+                                                                    ${data.note.subject ? `<span class="note-subject">${escapeHtml(data.note.subject)}</span>` : ''}
+                                                                </div>
+                                                        `;
+                                                        allNotesGrid.prepend(card);
+
+                                                        // If the subject is new, add it to the subject filter dropdown (normalized)
+                                                        if (data.note.subject) {
+                                                                const subjectLower = (data.note.subject || '').toLowerCase();
+                                                                const select = document.getElementById('noteSubjectFilter');
+                                                                if (select) {
+                                                                        const exists = Array.from(select.options).some(o => o.value === subjectLower);
+                                                                        if (!exists) {
+                                                                                const opt = document.createElement('option');
+                                                                                opt.value = subjectLower;
+                                                                                opt.textContent = data.note.subject;
+                                                                                select.appendChild(opt);
+                                                                                // Trigger filtering to update the view immediately after adding new subject
+                                                                                filterAndSearchNotes();
+                                                                        }
+                                                                }
+                                                        }
+                                                }
 
                         // update counts
                         const totalNode = document.querySelector('.stat-card .stat-number');
@@ -683,7 +702,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       data-id="${note.id}"
                       data-title="${escapeHtml(note.title)}"
                       data-content="${escapeHtml(note.content)}"
-                      data-subject="${escapeHtml(note.subject)}"
+                      data-subject="${escapeHtml((note.subject || '').toLowerCase())}"
                       data-tags="${escapeHtml(note.tags)}"
                       data-url="${note.edit_url}">✏️ Edit</button>
               <form method="post" action="${note.delete_url}" style="display:inline;">

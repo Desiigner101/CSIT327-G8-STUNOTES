@@ -255,7 +255,7 @@
                       data-id="{{ note.id }}"
                       data-title="{{ note.title|escapejs }}"
                       data-content="{{ note.content|escapejs }}"
-                      data-subject="{{ note.subject|default:''|escapejs }}"
+                      data-subject="{{ note.subject|default:''|lower|escapejs }}"
                       data-tags="{{ note.tags|default:''|escapejs }}"
                       data-url="{% url 'notes:edit_note' note.id %}">
                 ✏️ Edit
@@ -763,7 +763,7 @@
         <select id="noteSubjectFilter" class="filter-select px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500 transition bg-white cursor-pointer min-w-[150px]">
           <option value="all">All Subjects</option>
           {% for subject in unique_subjects %}
-            <option value="{{ subject }}">{{ subject }}</option>
+            <option value="{{ subject|lower }}">{{ subject }}</option>
           {% endfor %}
         </select>
         
@@ -779,11 +779,11 @@
         {% if all_notes_list %}
           <div class="notes-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {% for note in all_notes_list %}
-            <div class="note-card bg-white border-l-4 border-blue-500 rounded-xl p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all" 
+                <div class="note-card bg-white border-l-4 border-blue-500 rounded-xl p-5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all" 
                  data-title="{{ note.title|lower|escapejs }}" 
                  data-content="{{ note.content|lower|escapejs }}" 
                  data-tags="{{ note.tags|default:''|lower|escapejs }}"
-                 data-subject="{{ note.subject|default:''|escapejs }}"
+                 data-subject="{{ note.subject|default:''|lower|escapejs }}"
                  data-date="{{ note.created_at|date:'c' }}">
               <div class="note-card-header flex justify-between items-start gap-3 mb-3 pb-3 border-b-2 border-gray-100">
                 <h4 class="text-lg font-bold text-gray-800 flex-1">{{ note.title }}</h4>
@@ -948,11 +948,26 @@
   <script>
     // ==================== Modal Functions ====================
 function openModal(modalId) {
-    document.getElementById(modalId).style.display = 'block';
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+
+  // Ensure the modal is appended to body so it isn't trapped behind another modal's stacking context
+  if (modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+
+  // Use flex so the modal's centering classes work (items-center justify-center)
+  modal.style.display = 'flex';
+
+  // Bump z-index above other modals if necessary (addNote should be on top)
+  const topZ = 40000;
+  modal.style.zIndex = (modalId === 'addNoteModal') ? topZ : Math.max(parseInt(modal.style.zIndex || 10000, 10), 10000);
 }
 
 function closeModal(modalId) {
-    document.getElementById(modalId).style.display = 'none';
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.style.display = 'none';
 }
 
 window.openModal = openModal;
@@ -1166,6 +1181,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // Initialize hover effects for notes (avoids double-binding)
   initNoteHoverEffects();
 
+
     // ==================== Calendar Today Highlight ====================
     const today = new Date().getDate();
     const calendarCells = document.querySelectorAll('.calendar-box td');
@@ -1232,6 +1248,8 @@ document.addEventListener("DOMContentLoaded", function() {
     function openAllNotesModal() {
         openModal('allNotesModal');
     }
+
+    
 
     // ==================== Global Edit Note Modal Helper ====================
     window.openEditModal = function(buttonElement) {
@@ -1309,6 +1327,8 @@ document.addEventListener("DOMContentLoaded", function() {
             allNotesCount.textContent = `(${visibleCount})`;
         }
     }
+
+    
 
     function sortNoteCards(cards, sortOrder) {
         const container = document.querySelector('#allNotesModal .notes-grid');
@@ -1562,6 +1582,15 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (container) {
                   // prepend so the newest appears at the top like server-rendered notes
                   container.prepend(noteElem);
+                  // If the placeholder "No notes yet" element exists, remove it now that we have a note
+                  try {
+                    const placeholders = Array.from(container.querySelectorAll('.note'));
+                    const placeholder = placeholders.find(n => {
+                      const h4 = n.querySelector('h4');
+                      return h4 && h4.textContent.trim() === 'No notes yet';
+                    });
+                    if (placeholder) placeholder.remove();
+                  } catch (e) { /* ignore */ }
                 } else {
                   // fallback: append after the header
                   const header = notesSection.querySelector('.card-header');
@@ -1625,6 +1654,23 @@ document.addEventListener("DOMContentLoaded", function() {
                                 if (allNotesCountEl && data.total_notes) allNotesCountEl.textContent = `(${data.total_notes})`;
                             } catch (e) { /* ignore */ }
 
+              // If the subject is new, add it to the subject filter dropdown (normalized)
+              if (data.note.subject) {
+                const subjectLower = (data.note.subject || '').toLowerCase().trim();
+                const select = document.getElementById('noteSubjectFilter');
+                if (select) {
+                  const exists = Array.from(select.options).some(o => o.value === subjectLower);
+                  if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = subjectLower;
+                    opt.textContent = data.note.subject;
+                    select.appendChild(opt);
+                  }
+                  // Trigger filtering to update the view immediately after adding new subject
+                  try { filterAndSearchNotes(); } catch (e) { /* ignore if function not available yet */ }
+                }
+              }
+
                             // Re-init icons / hover effects inside the modal
                             try { lucide.createIcons(); } catch(e) {}
                         })();
@@ -1675,7 +1721,7 @@ document.addEventListener("DOMContentLoaded", function() {
                       data-id="${note.id}"
                       data-title="${escapeHtml(note.title)}"
                       data-content="${escapeHtml(note.content)}"
-                      data-subject="${escapeHtml(note.subject)}"
+                      data-subject="${escapeHtml((note.subject || '').toLowerCase())}"
                       data-tags="${escapeHtml(note.tags)}"
                       data-url="${note.edit_url}">
                 ✏️ Edit
