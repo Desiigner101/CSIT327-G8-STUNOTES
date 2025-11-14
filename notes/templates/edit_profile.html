@@ -122,10 +122,10 @@
                         
                         <!-- User Details -->
                         <div class="flex-1 pb-3">
-                            <h2 class="text-3xl font-bold text-gray-800 mb-1">
+                            <h2 class="text-3xl font-bold text-gray-800 mb-1 relative top-5">
                                 {{ user.full_name|default:user.username }}
                             </h2>
-                            <p class="text-gray-600">
+                            <p class="text-gray-600 relative top-3">
                                 {{ user.email }}
                             </p>
                         </div>
@@ -144,25 +144,36 @@
                         </div>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Full Name -->
+                            <!-- First Name -->
                             <div class="form-group">
-                                <label for="{{ form.full_name.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
-                                    <i data-lucide="user" class="w-4 h-4 inline mr-2"></i>Full Name
+                                <label for="first_name" class="block text-sm font-bold text-gray-800 mb-3">
+                                    <i data-lucide="user" class="w-4 h-4 inline mr-2"></i>First Name
                                 </label>
                                 <input 
                                     type="text" 
-                                    name="full_name" 
-                                    id="{{ form.full_name.id_for_label }}"
-                                    value="{{ form.full_name.value|default:'' }}"
+                                    name="first_name" 
+                                    id="first_name"
+                                    value="{{ user.first_name|default:user.full_name|default:user.username }}"
                                     class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
-                                    placeholder="Your full name"
+                                    placeholder="First name"
                                 >
-                                {% if form.full_name.errors %}
-                                    <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
-                                        <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.full_name.errors.0 }}
-                                    </p>
-                                {% endif %}
                             </div>
+
+                            <!-- Last Name -->
+                            <div class="form-group">
+                                <label for="last_name" class="block text-sm font-bold text-gray-800 mb-3">Last Name</label>
+                                <input 
+                                    type="text" 
+                                    name="last_name" 
+                                    id="last_name"
+                                    value="{{ user.last_name|default:'' }}"
+                                    class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
+                                    placeholder="Last name"
+                                >
+                            </div>
+
+                            <!-- Hidden full_name field (kept for the ModelForm) -->
+                            <input type="hidden" name="full_name" id="hidden_full_name" value="{{ form.full_name.value|default:user.full_name|default:user.username }}">
 
                             <!-- Email -->
                             <div class="form-group">
@@ -291,6 +302,30 @@
                         </a>
                     </div>
                 </form>
+                
+                <script>
+                    // Keep hidden full_name in sync with first and last name inputs
+                    (function(){
+                        const form = document.querySelector('form');
+                        const first = document.getElementById('first_name');
+                        const last = document.getElementById('last_name');
+                        const hidden = document.getElementById('hidden_full_name');
+
+                        function syncFullName(){
+                            const f = (first && first.value) ? first.value.trim() : '';
+                            const l = (last && last.value) ? last.value.trim() : '';
+                            hidden.value = (f || l) ? (f + (f && l ? ' ' : '') + l) : hidden.value;
+                        }
+
+                        if(first) first.addEventListener('input', syncFullName);
+                        if(last) last.addEventListener('input', syncFullName);
+
+                        // Also ensure it's synced on submit (in case JS changed)
+                        if(form){
+                            form.addEventListener('submit', function(){ syncFullName(); });
+                        }
+                    })();
+                </script>
             </div>
         </main>
     </div>
