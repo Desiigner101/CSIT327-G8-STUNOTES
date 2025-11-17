@@ -1,0 +1,18 @@
+<script>
+// Theme initialization: prefer server-saved user.theme when available, else use localStorage.
+(function(){
+    try{
+        const serverTheme = {% if user.is_authenticated %}"{{ user.theme|default:'light'|escapejs }}"{% else %}null{% endif %};
+        if(serverTheme !== null){
+            try{ localStorage.setItem('theme', serverTheme); }catch(e){}
+            document.documentElement.classList.toggle('dark', serverTheme === 'dark');
+        } else {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+        }
+    }catch(e){
+        // fallback: ensure no JS error interrupts page
+        try{ const theme = localStorage.getItem('theme'); if(theme === 'dark') document.documentElement.classList.add('dark'); }catch(e){}
+    }
+})();
+</script>

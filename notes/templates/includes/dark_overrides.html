@@ -1,0 +1,213 @@
+{% comment %} Centralized dark-mode overrides for StuNotes. Included in page <head>. {% endcomment %}
+<style>
+  :root{
+    --sn-bg: #071018;
+    --sn-surface: #0f1724;
+    --sn-surface-2: #111827;
+    --sn-text: #e6eef6;
+    --sn-subtext: #9ca3af;
+    --sn-accent: #34d399; /* emerald-400 */
+  }
+
+  /* Activate when 'dark' class is present on <html> */
+  html.dark, .dark html, .dark body, body.dark {
+    background: linear-gradient(135deg, var(--sn-bg), var(--sn-bg)) !important;
+    color: var(--sn-text) !important;
+  }
+
+  /* Text color helpers (only): make headings and common text readable in dark mode */
+  .dark h1, .dark h2, .dark h3, .dark h4 { color: var(--sn-text) !important; }
+  .dark .text-gray-800, .dark .text-gray-700, .dark .text-gray-600 { color: var(--sn-text) !important; }
+  .dark .text-gray-500, .dark .text-gray-400 { color: var(--sn-subtext) !important; }
+
+  /* Links / accents */
+  .dark a, .dark a:hover { color: var(--sn-accent) !important; }
+  .dark .text-emerald-600 { color: var(--sn-accent) !important; }
+
+  /* Ensure explicit white text utilities remain readable on dark surfaces */
+  .dark .text-white { color: var(--sn-text) !important; opacity: 1 !important; }
+
+  /* Preserve placeholders and icons color without changing inputs/controls */
+  .dark ::placeholder { color: rgba(156,163,175,0.6) !important; }
+
+  /* Borders and shadows (safe to keep) */
+  .dark .border-gray-100 { border-color: #172033 !important; }
+  .dark .shadow-lg { box-shadow: 0 8px 24px rgba(2,6,23,0.6) !important; }
+
+  /* Target content-area cards only: convert panels that use `bg-white` inside
+     the main content area to dark surfaces. This avoids touching buttons,
+     toggles and other controls that may also use `bg-white` elsewhere. */
+  .dark main .bg-white, .dark .main .bg-white, .dark .profile-layout .bg-white, .dark .max-w-4xl .bg-white {
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+  }
+  /* Additional targeted selectors to catch nested white boxes inside
+     stat cards, note/calendar widgets and other content panels while
+     avoiding controls and buttons elsewhere. These are intentionally
+     specific and limited to elements inside the page content. */
+  .dark main .grid [class*="bg-white"],
+  .dark .max-w-4xl .grid [class*="bg-white"],
+  .dark .notes [class*="bg-white"],
+  .dark .calendar [class*="bg-white"],
+  .dark .stat-card [class*="bg-white"],
+  .dark .widget [class*="bg-white"] {
+    background-color: var(--sn-surface-2) !important;
+    color: var(--sn-text) !important;
+  }
+
+  /* Ensure any headings or important text inside these converted boxes
+     are bright enough */
+  .dark main [class*="bg-white"] h1, .dark main [class*="bg-white"] h2, .dark main [class*="bg-white"] h3,
+  .dark .max-w-4xl [class*="bg-white"] h1, .dark .max-w-4xl [class*="bg-white"] h2 {
+    color: var(--sn-text) !important;
+    opacity: 1 !important;
+  }
+
+  /* Lucide icons use currentColor; ensure icons have readable color */
+  .dark [data-lucide], .dark svg { color: var(--sn-subtext) !important; }
+
+  /* Small text and meta */
+  .dark .text-sm, .dark small { color: rgba(230,238,246,0.72) !important; }
+
+  /* Sidebar text color (keep as subtext) */
+  .dark .sidebar, .dark .logo, .dark nav { color: var(--sn-subtext) !important; }
+  .dark .sidebar a { color: var(--sn-subtext) !important; }
+  .dark .sidebar a.active, .dark .sidebar a.active * { color: var(--sn-accent) !important; }
+
+  /* Make very dark text utilities readable in dark mode (e.g., username uses text-gray-900) */
+  .dark .text-gray-900 { color: var(--sn-text) !important; }
+
+  /* Toggle switches: make unchecked track darker and the knob visible.
+     Tailwind uses a div (track) with `bg-gray-200` and an `::after` knob. */
+  .dark [class*="w-11"][class*="h-6"][class*="bg-gray-200"],
+  .dark [class*="w-11"][class*="h-6"][class*="bg-gray-300"] {
+    background-color: rgba(255,255,255,0.06) !important;
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+  /* Ensure the knob (pseudo-element) remains visible */
+  .dark [class*="w-11"][class*="h-6"]::after {
+    background-color: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.12) !important;
+    box-shadow: 0 2px 6px rgba(2,6,23,0.5) !important;
+  }
+  /* When checked the track becomes emerald; keep the knob white above it */
+  .dark .peer:checked + [class*="w-11"][class*="h-6"] {
+    background-color: var(--sn-accent) !important;
+  }
+  .dark .peer:checked + [class*="w-11"][class*="h-6"]::after { background-color: #ffffff !important; }
+
+  /* Broaden gray utility neutralization to include bg-gray-200/bg-gray-300 */
+  .dark [class*="bg-gray-200"], .dark [class*="bg-gray-300"] {
+    background-color: var(--sn-surface-2) !important;
+    color: var(--sn-text) !important;
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+
+  /* Broader catch-all: convert remaining panels that use `bg-white` to dark
+     surfaces while avoiding form controls (inputs, selects, buttons, textareas)
+     and any element explicitly marked to preserve whiteness (`.keep-white`).
+     This helps darken cards, sidebars, modals and other content boxes that
+     still used `bg-white` classes. */
+  .dark .bg-white:not(button):not(input):not(select):not(textarea):not(.keep-white):not(.preserve-control) {
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+
+  /* Specific modal/content containers often named `modal-content` or
+     `.card` – ensure they are dark in dark mode. */
+  .dark .modal-content, .dark .card, .dark .right-panel, .dark .left-panel {
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+  }
+
+  /* Catch any element whose class contains 'bg-white' (including modifier
+     variants like `bg-white/20`) and convert it to a dark surface unless it
+     is an interactive control or explicitly preserved. This helps cover
+     utility-heavy templates without changing template markup. */
+  .dark [class*="bg-white"]:not(button):not(input):not(select):not(textarea):not(.keep-white):not(.preserve-control) {
+    background-image: none !important;
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+
+  /* Remove or neutralize light gradients that start from white so the
+     content area doesn't stay bright in dark mode. */
+  .dark [class*="bg-gradient"], .dark [class*="from-white"] {
+    background-image: none !important;
+    background-color: var(--sn-surface-2) !important;
+    color: var(--sn-text) !important;
+  }
+
+  /* Neutralize gradients and utility classes that end with `to-white` or
+     start with `from-gray-50`/`from-gray-100` (commonly used for light
+     cards). This covers patterns like `bg-gradient-to-br from-gray-50 to-white`
+     used for the stat cards and task items. */
+  .dark [class*="to-white"], .dark [class*="from-gray-50"], .dark [class*="to-gray-50"], .dark [class*="from-gray-100"], .dark [class*="bg-gray-50"], .dark [class*="bg-gray-100"] {
+    background-image: none !important;
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+
+  /* Some templates use inline styles with `background` or `background-color`
+     set to white; try to catch those common patterns but avoid being overly
+     greedy. */
+  .dark [style*="background: white"]:not(button):not(input):not(select):not(textarea):not(.keep-white),
+  .dark [style*="background-color: white"]:not(button):not(input):not(select):not(textarea):not(.keep-white),
+  .dark [style*="background:#fff"]:not(button):not(input):not(select):not(textarea):not(.keep-white) {
+    background-image: none !important;
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+  }
+
+  /* Darken form controls so inputs, selects and textareas are not bright
+     white in dark mode. Buttons are intentionally excluded to preserve their
+     visual styling (like the green file-choose button). Use `.keep-white` to
+     opt-out on a per-element basis. */
+  .dark input:not(button):not(.keep-white),
+  .dark select:not(.keep-white),
+  .dark textarea:not(.keep-white) {
+    background-color: var(--sn-surface-2) !important;
+    color: var(--sn-text) !important;
+    border-color: rgba(255,255,255,0.06) !important;
+    box-shadow: none !important;
+  }
+  .dark input::placeholder, .dark textarea::placeholder { color: rgba(230,238,246,0.45) !important; }
+
+  /* Target common rounded utility panels that still appear white */
+  .dark .rounded-lg.bg-white, .dark .rounded-xl.bg-white, .dark .rounded-2xl.bg-white {
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+    border-color: rgba(255,255,255,0.04) !important;
+  }
+
+  /* Small statistical cards and metric blocks sometimes use plain bg-white
+     without an additional class. Catch them when inside main areas. */
+  .dark main .stat-card, .dark main .metric-card, .dark .stats-panel {
+    background-color: var(--sn-surface) !important;
+    color: var(--sn-text) !important;
+  }
+
+  /* Settings page-specific control fixes: make the small Update button
+     visible and the Danger Zone Delete button high-contrast in dark mode. */
+  .dark #open-password-modal {
+    background-color: var(--sn-accent) !important; /* emerald */
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.6) !important;
+  }
+  .dark #open-password-modal:hover { background-color: #28a37a !important; }
+
+  .dark #open-delete-modal, .dark #open-delete-modal:focus {
+    background-color: #ef4444 !important; /* red-500 */
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.6) !important;
+    border-color: transparent !important;
+  }
+  .dark #open-delete-modal:hover { background-color: #dc2626 !important; }
+
+  /* Also ensure the small in-modal Cancel/Confirm buttons have good contrast */
+  .dark #close-delete-button { background-color: var(--sn-surface-2) !important; color: var(--sn-text) !important; }
+  .dark #close-delete-button:hover { background-color: #111827 !important; }
+</style>

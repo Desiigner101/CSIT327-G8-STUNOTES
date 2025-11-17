@@ -307,6 +307,19 @@ def edit_profile(request):
         if form.is_valid():
             # Prepare instance without committing so we can set extras
             profile = form.save(commit=False)
+            # If a new profile picture was uploaded, remove the old file to save space
+            # but avoid deleting the project's default placeholder image.
+            if 'profile_pic' in request.FILES:
+                try:
+                    old = User.objects.get(pk=user.pk).profile_pic
+                except User.DoesNotExist:
+                    old = None
+                if old and getattr(old, 'name', None) and old.name != 'default.jpg':
+                    try:
+                        old.delete(save=False)
+                    except Exception:
+                        # If deletion fails (e.g., storage not writable), continue silently
+                        pass
             # Set first_name/last_name and ensure full_name is consistent
             profile.first_name = first_name
             profile.last_name = last_name
@@ -324,7 +337,17 @@ def edit_profile(request):
             messages.error(request, "Please correct the errors below.")
             
     else:
-        form = UserProfileForm(instance=user)
+        # If the user doesn't have first_name/last_name populated but has
+        # a `full_name`, split it for a better UX so the form shows the
+        # name split across the two fields instead of all in `first_name`.
+        initial = {}
+        if (not user.first_name or not user.last_name) and getattr(user, 'full_name', None):
+            parts = user.full_name.strip().split()
+            if parts:
+                initial['first_name'] = parts[0]
+                initial['last_name'] = ' '.join(parts[1:]) if len(parts) > 1 else ''
+
+        form = UserProfileForm(instance=user, initial=initial)
         
     return render(request, 'edit_profile.html', {
         "form": form,
