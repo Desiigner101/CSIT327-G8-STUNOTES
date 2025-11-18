@@ -6,7 +6,16 @@
     <title>Settings - StuNotes</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        try { tailwind.config = tailwind.config || {}; tailwind.config.darkMode = 'class'; } catch(e){}
+        (function(){
+            const serverTheme = {% if user.is_authenticated %}"{{ user.theme|default:'light'|escapejs }}"{% else %}null{% endif %};
+            if(serverTheme !== null){ try{ localStorage.setItem('theme', serverTheme); }catch(e){}; document.documentElement.classList.toggle('dark', serverTheme === 'dark'); }
+            else { const theme = localStorage.getItem('theme') || 'light'; document.documentElement.classList.toggle('dark', theme === 'dark'); }
+        })();
+    </script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    {% include 'includes/dark_overrides.html' %}
 </head>
 
 <body class="flex bg-gray-50 text-gray-900 min-h-screen">

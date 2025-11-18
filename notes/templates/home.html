@@ -27,13 +27,8 @@
             }
         }
     </script>
-
-    <script>
-        (() => {
-            const theme = localStorage.getItem('theme') || 'light';
-            document.documentElement.classList.toggle('dark', theme === 'dark');
-        })();
-    </script>
+      {% include 'includes/theme_init.html' %}
+      {% include 'includes/dark_overrides.html' %}
     
     <script src="https://unpkg.com/lucide@latest"></script>
     

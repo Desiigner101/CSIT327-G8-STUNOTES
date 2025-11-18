@@ -12,6 +12,8 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    {% include 'includes/theme_init.html' %}
+    {% include 'includes/dark_overrides.html' %}
     
     <style>
         @keyframes slideDown {
@@ -153,7 +155,7 @@
                                     type="text" 
                                     name="first_name" 
                                     id="first_name"
-                                    value="{{ user.first_name|default:user.full_name|default:user.username }}"
+                                    value="{{ form.first_name.value|default:user.first_name|default:user.full_name|default:user.username }}"
                                     class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
                                     placeholder="First name"
                                 >
@@ -166,7 +168,7 @@
                                     type="text" 
                                     name="last_name" 
                                     id="last_name"
-                                    value="{{ user.last_name|default:'' }}"
+                                    value="{{ form.last_name.value|default:user.last_name|default:'' }}"
                                     class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition"
                                     placeholder="Last name"
                                 >
@@ -324,6 +326,18 @@
                         if(form){
                             form.addEventListener('submit', function(){ syncFullName(); });
                         }
+                    })();
+
+                    // Live theme preview: update page immediately when user changes App Theme
+                    (function(){
+                        const themeSelect = document.querySelector('select[name="theme"]');
+                        if(!themeSelect) return;
+
+                        themeSelect.addEventListener('change', function(e){
+                            const val = e.target.value;
+                            try{ localStorage.setItem('theme', val); }catch(e){}
+                            document.documentElement.classList.toggle('dark', val === 'dark');
+                        });
                     })();
                 </script>
             </div>

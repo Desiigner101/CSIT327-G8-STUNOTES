@@ -165,7 +165,15 @@ WHITENOISE_AUTOREFRESH = True
 WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Use an environment-configurable MEDIA_ROOT. In production (DEBUG=False)
+# the default is `/tmp/media` which is writable on many serverless hosts
+# (Vercel's `/var/task` is read-only), but can be overridden with the
+# `MEDIA_ROOT` environment variable (useful when configuring cloud storage
+# or a persistent file location).
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / 'media'
+else:
+    MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', '/tmp/media'))
 
 
 # ---------------------------------------------------
