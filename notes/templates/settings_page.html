@@ -1,287 +1,394 @@
 {% load static %}
-{% load widget_tweaks %} <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Settings - StuNotes</title>
+    <link rel="icon" type="image/png" href="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/favicon.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        try { tailwind.config = tailwind.config || {}; tailwind.config.darkMode = 'class'; } catch(e){}
-        (function(){
-            const serverTheme = {% if user.is_authenticated %}"{{ user.theme|default:'light'|escapejs }}"{% else %}null{% endif %};
-            if(serverTheme !== null){ try{ localStorage.setItem('theme', serverTheme); }catch(e){}; document.documentElement.classList.toggle('dark', serverTheme === 'dark'); }
-            else { const theme = localStorage.getItem('theme') || 'light'; document.documentElement.classList.toggle('dark', theme === 'dark'); }
-        })();
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'emerald-custom': {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            600: '#43a047',
+                            700: '#388e3c'
+                        }
+                    }
+                }
+            }
+        }
     </script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    {% include 'includes/theme_init.html' %}
     {% include 'includes/dark_overrides.html' %}
-</head>
-
-<body class="flex bg-gray-50 text-gray-900 min-h-screen">
-
-    <aside class="w-64 bg-white shadow-lg flex flex-col border-r border-gray-200">
-        <div class="p-6 text-2xl font-bold text-emerald-700 border-b border-gray-200">StuNotes</div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="{% url 'notes:home' %}" class="flex items-center gap-3 p-2 rounded-lg text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition">
-                <i data-lucide="home"></i> Dashboard
-            </a>
-            <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 p-2 rounded-lg text-gray-600 hover:bg-emerald-50 hover:text-emerald-700 transition">
-                <i data-lucide="user"></i> Profile
-            </a>
-            <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 p-2 rounded-lg bg-emerald-50 text-emerald-700 font-semibold transition">
-                <i data-lucide="settings"></i> Settings
-            </a>
-        </nav>
-        <div class="p-4 border-t border-gray-200">
-            <a href="{% url 'notes:logout' %}" class="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 transition">
-                <i data-lucide="log-out"></i> Logout
-            </a>
-        </div>
-    </aside>
-
-    <main class="flex-1 p-10">
-        <h1 class="text-3xl font-bold text-gray-800 mb-10 border-b pb-4">Account Settings</h1>
-
-        {% if messages %}
-            <div class="mb-6 space-y-3">
-                {% for message in messages %}
-                    <div class="p-4 rounded-lg shadow-md flex items-center gap-3 
-                        {% if message.tags == 'success' %}
-                            bg-emerald-100 text-emerald-800 border-l-4 border-emerald-500
-                        {% elif message.tags == 'error' %}
-                            bg-red-100 text-red-800 border-l-4 border-red-500
-                        {% else %}
-                            bg-blue-100 text-blue-800 border-l-4 border-blue-500
-                        {% endif %}" 
-                        role="alert">
-                        {% if message.tags == 'success' %}<i data-lucide="check-circle" class="w-5 h-5"></i>{% elif message.tags == 'error' %}<i data-lucide="alert-triangle" class="w-5 h-5"></i>{% endif %}
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        <div class="bg-white shadow-lg rounded-xl p-8 mb-10 border border-gray-100">
-            <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-3">User Profile</h2>
-            <div class="flex items-center gap-8">
-                <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
-                alt="Profile" 
-                class="w-20 h-20 rounded-full object-cover border-4 border-emerald-500 shadow-md">
-                
-                <div>
-                    <p class="text-2xl font-bold text-gray-900">{{ user.full_name|default:user.username }}</p>
-                    <p class="text-gray-600">{{ user.email }}</p>
-                    <p class="text-sm text-gray-500">@{{ user.full_name }}</p>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-3 gap-6 mt-8 pt-6 border-t border-gray-100">
-                <div class="bg-gray-50 p-4 rounded-lg text-center">
-                    <i data-lucide="file-text" class="mx-auto mb-2 text-emerald-600 w-5 h-5"></i>
-                    <h3 class="text-gray-500 text-sm">Total Notes</h3>
-                    <p class="text-2xl font-bold text-emerald-700">{{ total_notes_sidebar }}</p>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg text-center">
-                    <i data-lucide="check-circle" class="mx-auto mb-2 text-emerald-600 w-5 h-5"></i>
-                    <h3 class="text-gray-500 text-sm">Total Tasks</h3>
-                    <p class="text-2xl font-bold text-emerald-700">{{ total_tasks_count }}</p>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg text-center">
-                    <i data-lucide="trophy" class="mx-auto mb-2 text-emerald-600 w-5 h-5"></i>
-                    <h3 class="text-gray-500 text-sm">Completed Tasks</h3>
-                    <p class="text-2xl font-bold text-emerald-700">{{ completed_tasks }}</p>
-                </div>
-            </div>
-
-        </div> 
-        
-        <div class="space-y-6">
-
-            <div class="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center gap-3">
-                    <i data-lucide="lock" class="w-6 h-6 text-gray-500"></i> Security
-                </h2>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center py-2 border-b last:border-b-0 border-gray-100">
-                        <p class="text-gray-700">Change Password</p>
-                        <button id="open-password-modal" type="button" class="text-sm px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
-                            Update
-                        </button>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b last:border-b-0 border-gray-100">
-                        <p class="text-gray-700">Two-Factor Authentication</p>
-                        <span class="text-sm text-red-500 font-medium">Disabled</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white shadow-lg rounded-xl p-8 border border-gray-100">
-                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-3 flex items-center gap-3">
-                    <i data-lucide="bell" class="w-6 h-6 text-gray-500"></i> Notifications
-                </h2>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center py-2 border-b last:border-b-0 border-gray-100">
-                        <p class="text-gray-700">Email Alerts</p>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" value="" class="sr-only peer" checked>
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                        </label>
-                    </div>
-                    <div class="flex justify-between items-center py-2 border-b last:border-b-0 border-gray-100">
-                        <p class="text-gray-700">In-App Reminders</p>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" value="" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white shadow-lg rounded-xl p-8 border border-red-100">
-                <h2 class="text-xl font-semibold text-red-600 mb-6 border-b pb-3 flex items-center gap-3">
-                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i> Danger Zone
-                </h2>
-                <div class="flex justify-between items-center py-2">
-                    <p class="text-gray-700">Permanently Delete Account</p>
-                    <button id="open-delete-modal" type="button" class="text-sm px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">Delete</button>
-                </div>
-            </div>
-            
-        </div>
-    </main>
     
-    <div id="password-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center"> 
-        <div class="absolute inset-0 bg-black/50" id="close-modal-backdrop"></div> 
-
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-lg p-6 z-10 mx-4">
-            
-            <form method="POST" action="{% url 'notes:settings_page' %}" class="space-y-4"> 
-                {% csrf_token %}
-
-                <div class="flex justify-between items-center border-b border-gray-200 pb-3 mb-4">
-                    <h2 class="text-xl font-bold text-gray-900 flex items-center gap-2">
-                        <i data-lucide="key-round" class="w-5 h-5 text-emerald-600"></i>
-                        Change Your Password
-                    </h2>
-                    <button type="button" id="close-modal-button" class="text-gray-500 hover:text-gray-700">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                
-                {% for field in password_form %}
-                    <div class="text-left">
-                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
-                        {{ field|add_class:"mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:border-emerald-500 focus:ring-emerald-500" }} 
-                        
-                        {% if field.help_text %}
-                            <p class="text-xs text-gray-500 mt-1">{{ field.help_text }}</p>
-                        {% endif %}
-                        {% for error in field.errors %}
-                            <p class="text-red-500 text-xs mt-1">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-
-                {% if password_form.non_field_errors %}
-                    <div class="p-3 bg-red-100 border border-red-400 text-red-700 rounded-md">
-                        {{ password_form.non_field_errors }}
-                    </div>
-                {% endif %}
-
-                <div class="pt-4 flex justify-end">
-                    <button type="submit" class="px-6 py-2 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 transition shadow-md">
-                        Set New Password
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-
-    <div id="delete-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center"> 
-        <div class="absolute inset-0 bg-black/50" id="close-delete-backdrop"></div> 
-
-        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 z-10 mx-4">
-            <form method="POST" action="{% url 'notes:delete_account' %}" class="space-y-6"> 
-                {% csrf_token %}
-                <input type="hidden" name="user_id" value="{{ user.pk }}">
-
-                <div class="text-center">
-                    <i data-lucide="skull" class="w-12 h-12 mx-auto mb-4 text-red-500"></i>
-                    <h2 class="text-xl font-bold text-gray-900 mb-2">Confirm Account Deletion</h2>
-                    <p class="text-gray-600 text-sm">Are you absolutely sure you want to delete your account? This action is permanent and **cannot be undone.**</p>
-                </div>
-                
-                <div class="flex justify-end gap-3">
-                    <button type="button" id="close-delete-button" class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 transition">
-                        Cancel
-                    </button>
-                    <button type="submit" class="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition shadow-md">
-                        Yes, Delete My Account
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <script>
-    document.addEventListener('DOMContentLoaded', () => { 
-        lucide.createIcons();
-
-        // 1. Password Modal Elements
-        const passwordModal = document.getElementById('password-modal');
-        const openPasswordButton = document.getElementById('open-password-modal');
-        const closePasswordButton = document.getElementById('close-modal-button');
-        const backdropPassword = document.getElementById('close-modal-backdrop');
-
-        // 2. Delete Modal Elements (NEW)
-        const deleteModal = document.getElementById('delete-modal');
-        const openDeleteButton = document.getElementById('open-delete-modal');
-        const closeDeleteButton = document.getElementById('close-delete-button');
-        const backdropDelete = document.getElementById('close-delete-backdrop');
-
-
-        // Generic Modal Handlers (Updated to take modal element as argument)
-        const openModal = (modalElement) => { 
-            modalElement.classList.remove('hidden');
-            document.body.classList.add('overflow-hidden');
-        };
-
-        const closeModal = (modalElement) => { 
-            modalElement.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        };
-
-        // Event Listeners for Password Modal
-        if (openPasswordButton) {
-            openPasswordButton.addEventListener('click', () => openModal(passwordModal));
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        if (closePasswordButton) {
-            closePasswordButton.addEventListener('click', () => closeModal(passwordModal));
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        if (backdropPassword) {
-            backdropPassword.addEventListener('click', () => closeModal(passwordModal));
-        }
-
-        // Event Listeners for Delete Modal (NEW)
-        if (openDeleteButton) {
-            openDeleteButton.addEventListener('click', () => openModal(deleteModal));
-        }
-        if (closeDeleteButton) {
-            closeDeleteButton.addEventListener('click', () => closeModal(deleteModal));
-        }
-        if (backdropDelete) {
-            backdropDelete.addEventListener('click', () => closeModal(deleteModal));
-        }
-
-
-        // Password Modal Reopening Logic
-        const shouldOpenModalString = '{{ should_open_modal|yesno:"true,false" }}'; 
+        .animate-slideDown { animation: slideDown 0.5s ease; }
+        .animate-fadeIn { animation: fadeIn 0.6s ease; }
         
-        if (shouldOpenModalString === 'true') {
-            openModal(passwordModal); // Pass the passwordModal element
-        }
-    }); 
-    </script>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4caf50; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #388e3c; }
+    </style>
+</head>
+<body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
+    <div class="logo p-6 border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
+        <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
+      </div>
+    </div>
+    
+    <nav class="flex-1 p-4">
+      <ul class="space-y-2">
+        {% if is_admin %}
+        <li>
+          <a href="{% url 'notes:admin_dashboard' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <span>Admin Dashboard</span>
+          </a>
+        </li>
+        {% else %}
+        <li>
+          <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        {% endif %}
+        <li>
+          <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span>Profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:settings_page' %}" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 text-emerald-600 rounded-lg font-semibold">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="stats p-6 border-t border-gray-200 bg-gray-50">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600 font-medium">Tasks:</span>
+          <span class="text-lg font-bold text-emerald-600">{{ total_tasks_count }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600 font-medium">Notes:</span>
+          <span class="text-lg font-bold text-emerald-600">{{ total_notes_sidebar }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
 
+  <!-- Main Content -->
+  <main class="main flex-1 p-8 overflow-y-auto custom-scrollbar">
+    <!-- Topbar -->
+    <header class="topbar flex justify-between items-center p-6 bg-white rounded-2xl shadow-lg mb-8 animate-slideDown">
+      <div class="topbar-left">
+        <h2 class="text-3xl font-bold text-gray-800">Settings</h2>
+        <p class="text-gray-500 text-sm mt-1">Manage your account preferences</p>
+      </div>
+      <div class="topbar-right flex items-center gap-5">
+        {% if is_admin %}
+        <div class="flex items-center gap-3 px-4 py-2 bg-purple-50 rounded-lg">
+          <i data-lucide="shield" class="w-5 h-5 text-purple-600"></i>
+          <span class="text-sm font-semibold text-purple-600">Admin Mode</span>
+        </div>
+        {% endif %}
+        <a href="{% url 'notes:profile_view' %}" class="profile-link">
+          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+               alt="Profile" 
+               class="profile-icon w-10 h-10 rounded-full object-cover border-2 border-emerald-500 hover:border-emerald-600 transition cursor-pointer shadow-md">
+        </a>
+      </div>
+    </header>
+
+    <!-- Settings Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fadeIn">
+      <!-- Account Security -->
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
+          <i data-lucide="lock" class="w-6 h-6 text-emerald-600"></i>
+          <h3 class="text-xl font-bold text-gray-800">Account Security</h3>
+        </div>
+        <div class="space-y-4">
+          <button onclick="openModal('changePasswordModal')" 
+                  class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-emerald-50 transition cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <i data-lucide="key" class="w-5 h-5 text-gray-600 group-hover:text-emerald-600"></i>
+              <div>
+                <h4 class="font-semibold text-gray-800">Change Password</h4>
+                <p class="text-sm text-gray-500">Update your account password</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Role Management (Admin Only) -->
+      {% if is_admin %}
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
+          <i data-lucide="shield-check" class="w-6 h-6 text-purple-600"></i>
+          <h3 class="text-xl font-bold text-gray-800">Role Management</h3>
+        </div>
+        <div class="space-y-4">
+          <a href="{% url 'notes:switch_to_user_mode' %}" 
+             class="w-full flex items-center justify-between p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <i data-lucide="user-round" class="w-5 h-5 text-purple-600"></i>
+              <div>
+                <h4 class="font-semibold text-purple-800">Switch to User Mode</h4>
+                <p class="text-sm text-purple-600">View as regular user</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400"></i>
+          </a>
+          <a href="{% url 'notes:admin_dashboard' %}" 
+             class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-purple-50 transition cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <i data-lucide="layout-dashboard" class="w-5 h-5 text-gray-600 group-hover:text-purple-600"></i>
+              <div>
+                <h4 class="font-semibold text-gray-800">Go to Admin Dashboard</h4>
+                <p class="text-sm text-gray-500">Manage system settings</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+          </a>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Theme Settings -->
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
+          <i data-lucide="palette" class="w-6 h-6 text-emerald-600"></i>
+          <h3 class="text-xl font-bold text-gray-800">Appearance</h3>
+        </div>
+        <div class="space-y-4">
+          <button id="theme-toggle-settings" 
+                  class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-emerald-50 transition cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <i id="theme-icon-settings" data-lucide="moon" class="w-5 h-5 text-gray-600 group-hover:text-emerald-600"></i>
+              <div>
+                <h4 class="font-semibold text-gray-800">Theme</h4>
+                <p id="theme-text-settings" class="text-sm text-gray-500">Dark Mode</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-2 border-red-200">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-red-100">
+          <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+          <h3 class="text-xl font-bold text-red-800">Danger Zone</h3>
+        </div>
+        <div class="space-y-4">
+          <button onclick="openModal('deleteAccountModal')" 
+                  class="w-full flex items-center justify-between p-4 bg-red-50 rounded-lg hover:bg-red-100 transition cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
+              <div>
+                <h4 class="font-semibold text-red-800">Delete Account</h4>
+                <p class="text-sm text-red-600">Permanently delete your account</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-red-400"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Change Password Modal -->
+  <div id="changePasswordModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-md rounded-3xl shadow-2xl animate-slideDown">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">🔒 Change Password</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('changePasswordModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        <form method="post" action="{% url 'notes:settings_page' %}">
+          {% csrf_token %}
+          <div class="space-y-4">
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 mb-2">Old Password</label>
+              {{ password_form.old_password }}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 mb-2">New Password</label>
+              {{ password_form.new_password1 }}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 mb-2">Confirm New Password</label>
+              {{ password_form.new_password2 }}
+            </div>
+            {% if password_form.errors %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+              <p class="text-red-800 text-sm font-semibold">Please correct the errors:</p>
+              {{ password_form.errors }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex gap-3 mt-6">
+            <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Save Changes</button>
+            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('changePasswordModal')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account Modal -->
+  <div id="deleteAccountModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white mx-auto my-12 p-0 w-11/12 max-w-md rounded-3xl shadow-2xl animate-slideDown">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-red-500 to-red-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">⚠️ Delete Account</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('deleteAccountModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        <div class="mb-6">
+          <p class="text-gray-700 mb-4">Are you sure you want to delete your account? This action is <strong>permanent</strong> and cannot be undone.</p>
+          <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+            <p class="text-red-800 text-sm font-semibold">⚠️ Warning: All your data will be permanently deleted:</p>
+            <ul class="list-disc list-inside text-red-700 text-sm mt-2">
+              <li>All tasks</li>
+              <li>All notes</li>
+              <li>Profile information</li>
+              <li>Account settings</li>
+            </ul>
+          </div>
+        </div>
+        <form method="post" action="{% url 'notes:delete_account' %}">
+          {% csrf_token %}
+          <div class="flex gap-3">
+            <button type="submit" class="btn btn-danger flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Yes, Delete My Account</button>
+            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('deleteAccountModal')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: #4caf50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .modal {
+      display: none;
+    }
+    
+    .modal.flex {
+      display: flex !important;
+    }
+  </style>
+
+  <script>
+    lucide.createIcons();
+
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      }
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Auto-open password modal if there were errors
+    {% if should_open_modal %}
+    document.addEventListener('DOMContentLoaded', function() {
+      openModal('changePasswordModal');
+    });
+    {% endif %}
+
+    // Theme toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const htmlElement = document.documentElement;
+      const toggle = document.getElementById('theme-toggle-settings');
+      
+      if (!toggle) return;
+
+      const icon = document.getElementById('theme-icon-settings');
+      const text = document.getElementById('theme-text-settings');
+      
+      const isDarkInitially = htmlElement.classList.contains('dark');
+      if(icon) icon.setAttribute('data-lucide', isDarkInitially ? 'sun' : 'moon');
+      if(text) text.textContent = isDarkInitially ? 'Light Mode' : 'Dark Mode';
+      
+      lucide.createIcons();
+
+      toggle.addEventListener('click', () => {
+        const isCurrentlyDark = htmlElement.classList.contains('dark');
+        const newIsDark = !isCurrentlyDark;
+
+        htmlElement.classList.toggle('dark', newIsDark);
+        localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
+
+        const newIconName = newIsDark ? 'sun' : 'moon';
+        const newTextContent = newIsDark ? 'Light Mode' : 'Dark Mode';
+        
+        if(icon) {
+          icon.setAttribute('data-lucide', newIconName);
+          lucide.replace(icon);
+        }
+        if(text) text.textContent = newTextContent;
+      });
+    });
+  </script>
 </body>
 </html>

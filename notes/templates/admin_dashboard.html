@@ -1,0 +1,503 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - StuNotes</title>
+    <link rel="icon" type="image/png" href="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/favicon.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'emerald-custom': {
+                            50: '#e8f5e9',
+                            100: '#c8e6c9',
+                            500: '#4caf50',
+                            600: '#43a047',
+                            700: '#388e3c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    {% include 'includes/theme_init.html' %}
+    {% include 'includes/dark_overrides.html' %}
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideDown { animation: slideDown 0.5s ease; }
+        .animate-fadeIn { animation: fadeIn 0.6s ease; }
+        .animate-delay-100 { animation-delay: 0.1s; animation-fill-mode: both; }
+        .animate-delay-200 { animation-delay: 0.2s; animation-fill-mode: both; }
+        .animate-delay-300 { animation-delay: 0.3s; animation-fill-mode: both; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #9333ea; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #7e22ce; }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Mobile menu toggle */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                height: 100vh;
+                z-index: 50;
+                transition: left 0.3s ease;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+            .overlay.active {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+  
+  <!-- Mobile Menu Button -->
+  <button id="menuToggle" class="md:hidden fixed top-4 left-4 z-50 p-2 bg-purple-600 text-white rounded-lg shadow-lg">
+    <i data-lucide="menu" class="w-6 h-6"></i>
+  </button>
+
+  <!-- Overlay for mobile -->
+  <div id="overlay" class="overlay"></div>
+  
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar w-64 bg-white dark:bg-gray-800 shadow-lg flex flex-col">
+    <!-- Close button for mobile -->
+    <button id="closeSidebar" class="md:hidden absolute top-4 right-4 text-gray-600 dark:text-gray-300">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+
+    <div class="logo p-6 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-2">
+        <i data-lucide="shield-check" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+        <span class="text-2xl font-bold text-purple-600 dark:text-purple-400">StuNotes Admin</span>
+      </div>
+    </div>
+    
+    <nav class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+      <ul class="space-y-2">
+        <li>
+          <a href="{% url 'notes:admin_dashboard' %}" class="active flex items-center gap-3 px-4 py-3 bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-lg font-semibold transition">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span>Profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+        <li class="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <a href="{% url 'notes:switch_to_user_mode' %}" class="flex items-center gap-3 px-4 py-3 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+            <i data-lucide="user-round" class="w-5 h-5"></i>
+            <span>Switch to User View</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="stats p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Total Users:</span>
+          <span class="text-lg font-bold text-purple-600 dark:text-purple-400">{{ total_users|default:0 }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">System Tasks:</span>
+          <span class="text-lg font-bold text-purple-600 dark:text-purple-400">{{ total_tasks|default:0 }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar">
+    <!-- Topbar -->
+    <header class="topbar flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 animate-slideDown">
+      <div class="topbar-left">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white">Admin Dashboard</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">System Overview & Management</p>
+      </div>
+      <div class="topbar-right flex items-center gap-3 md:gap-5">
+        <div class="flex items-center gap-3 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+          <i data-lucide="shield" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+          <span class="text-sm font-semibold text-purple-600 dark:text-purple-400">Administrator</span>
+        </div>
+        <a href="{% url 'notes:profile_view' %}" class="profile-link">
+          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+               alt="Profile" 
+               class="profile-icon w-10 h-10 rounded-full object-cover border-2 border-purple-500 hover:border-purple-600 transition cursor-pointer shadow-md">
+        </a>
+      </div>
+    </header>
+
+    <!-- Stats Overview Cards -->
+    <section class="stats-overview grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all border-l-4 border-purple-500 relative overflow-hidden animate-fadeIn">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold mb-3 tracking-wider">Total Users</h4>
+        <div class="stat-number text-4xl md:text-5xl font-bold text-purple-500 dark:text-purple-400 mb-2">{{ total_users|default:0 }}</div>
+        <div class="stat-label text-xs text-gray-400 dark:text-gray-500 font-medium">{{ admin_users|default:0 }} Admins, {{ regular_users|default:0 }} Regular</div>
+      </div>
+      
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all border-l-4 border-blue-500 relative overflow-hidden animate-fadeIn animate-delay-100">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold mb-3 tracking-wider">Total Tasks</h4>
+        <div class="stat-number text-4xl md:text-5xl font-bold text-blue-500 dark:text-blue-400 mb-2">{{ total_tasks|default:0 }}</div>
+        <div class="stat-label text-xs text-gray-400 dark:text-gray-500 font-medium">{{ completed_tasks|default:0 }} Completed</div>
+      </div>
+      
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all border-l-4 border-orange-500 relative overflow-hidden animate-fadeIn animate-delay-200">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-orange-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold mb-3 tracking-wider">Pending Tasks</h4>
+        <div class="stat-number text-4xl md:text-5xl font-bold text-orange-500 dark:text-orange-400 mb-2">{{ pending_tasks|default:0 }}</div>
+        <div class="stat-label text-xs text-gray-400 dark:text-gray-500 font-medium">{{ overdue_tasks|default:0 }} Overdue</div>
+      </div>
+      
+      <div class="stat-card bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700 p-6 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all border-l-4 border-emerald-500 relative overflow-hidden animate-fadeIn animate-delay-300">
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full"></div>
+        <h4 class="text-xs uppercase text-gray-500 dark:text-gray-400 font-semibold mb-3 tracking-wider">Total Notes</h4>
+        <div class="stat-number text-4xl md:text-5xl font-bold text-emerald-500 dark:text-emerald-400 mb-2">{{ total_notes|default:0 }}</div>
+        <div class="stat-label text-xs text-gray-400 dark:text-gray-500 font-medium">Across all users</div>
+      </div>
+    </section>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <!-- Activity Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Activity Overview (Last 7 Days)</h3>
+        <div class="chart-container">
+          <canvas id="activityChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Task Priority Distribution -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-4">Task Priority Distribution</h3>
+        <div class="chart-container">
+          <canvas id="priorityChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Recent Users -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <div class="flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Recent Users</h3>
+          <i data-lucide="users" class="w-5 h-5 text-purple-500 dark:text-purple-400"></i>
+        </div>
+        <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+          {% if recent_users %}
+            {% for user in recent_users %}
+            <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition">
+              <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                   alt="{{ user.full_name }}" 
+                   class="w-10 h-10 rounded-full object-cover">
+              <div class="flex-1 min-w-0">
+                <h4 class="text-sm font-semibold text-gray-800 dark:text-white truncate">{{ user.full_name }}</h4>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ user.email }}</p>
+              </div>
+              {% if user.is_staff or user.is_superuser %}
+              <span class="px-2 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 text-xs font-bold rounded whitespace-nowrap">Admin</span>
+              {% endif %}
+            </div>
+            {% endfor %}
+          {% else %}
+          <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No users yet</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Recent Tasks -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <div class="flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Recent Tasks</h3>
+          <i data-lucide="check-square" class="w-5 h-5 text-blue-500 dark:text-blue-400"></i>
+        </div>
+        <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+          {% if recent_tasks %}
+            {% for task in recent_tasks %}
+            <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition border-l-4 
+                        {% if task.priority == 'high' %}border-red-500
+                        {% elif task.priority == 'medium' %}border-orange-500
+                        {% else %}border-emerald-500{% endif %}">
+              <h4 class="text-sm font-semibold text-gray-800 dark:text-white mb-1 truncate">{{ task.title }}</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 truncate">By: {{ task.user.full_name }}</p>
+              <div class="flex gap-2 mt-2 flex-wrap">
+                <span class="px-2 py-1 rounded text-xs font-bold
+                             {% if task.status == 'completed' %}bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400
+                             {% elif task.status == 'in_progress' %}bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400
+                             {% else %}bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400{% endif %}">
+                  {{ task.get_status_display }}
+                </span>
+                <span class="px-2 py-1 rounded text-xs font-bold
+                             {% if task.priority == 'high' %}bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400
+                             {% elif task.priority == 'medium' %}bg-orange-100 dark:bg-orange-900/50 text-orange-600 dark:text-orange-400
+                             {% else %}bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400{% endif %}">
+                  {{ task.get_priority_display }}
+                </span>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+          <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No tasks yet</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Recent Notes -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+        <div class="flex justify-between items-center mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Recent Notes</h3>
+          <i data-lucide="file-text" class="w-5 h-5 text-emerald-500 dark:text-emerald-400"></i>
+        </div>
+        <div class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+          {% if recent_notes %}
+            {% for note in recent_notes %}
+            <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition border-l-4 border-emerald-500">
+              <h4 class="text-sm font-semibold text-gray-800 dark:text-white mb-1 truncate">{{ note.title }}</h4>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 truncate">By: {{ note.user.full_name }}</p>
+              <p class="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">{{ note.content|truncatewords:10 }}</p>
+            </div>
+            {% endfor %}
+          {% else %}
+          <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No notes yet</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Users Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-5">Most Active Users</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr class="text-left text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              <th class="px-4 py-3">User</th>
+              <th class="px-4 py-3">Email</th>
+              <th class="px-4 py-3 text-center">Tasks</th>
+              <th class="px-4 py-3 text-center">Notes</th>
+              <th class="px-4 py-3">Role</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            {% if user_stats %}
+              {% for user_stat in user_stats %}
+              <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-3">
+                    <img src="{% if user_stat.profile_pic %}{{ user_stat.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                         alt="{{ user_stat.full_name }}" 
+                         class="w-8 h-8 rounded-full object-cover">
+                    <span class="font-medium text-gray-800 dark:text-white">{{ user_stat.full_name }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">{{ user_stat.email }}</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-full text-sm font-semibold">{{ user_stat.task_count|default:0 }}</span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 rounded-full text-sm font-semibold">{{ user_stat.note_count|default:0 }}</span>
+                </td>
+                <td class="px-4 py-3">
+                  {% if user_stat.is_staff or user_stat.is_superuser %}
+                  <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 rounded-full text-xs font-bold">Admin</span>
+                  {% else %}
+                  <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full text-xs font-bold">User</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+            <tr>
+              <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No user data available</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Mobile menu functionality
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const closeSidebar = document.getElementById('closeSidebar');
+
+    function openSidebar() {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+    }
+
+    function closeSidebarFunc() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+    }
+
+    if (menuToggle) menuToggle.addEventListener('click', openSidebar);
+    if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarFunc);
+    if (overlay) overlay.addEventListener('click', closeSidebarFunc);
+
+    // Chart colors based on theme
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const textColor = isDarkMode ? '#e5e7eb' : '#374151';
+    const gridColor = isDarkMode ? '#374151' : '#e5e7eb';
+
+    // Activity Chart
+    const activityCtx = document.getElementById('activityChart');
+    if (activityCtx) {
+      new Chart(activityCtx, {
+        type: 'line',
+        data: {
+          labels: {{ date_labels|safe }},
+          datasets: [{
+            label: 'Tasks Created',
+            data: {{ daily_tasks|default:"[]" }},
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            tension: 0.4,
+            fill: true
+          }, {
+            label: 'Notes Created',
+            data: {{ daily_notes|default:"[]" }},
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: textColor,
+                padding: 15
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1,
+                color: textColor
+              },
+              grid: {
+                color: gridColor
+              }
+            },
+            x: {
+              ticks: {
+                color: textColor
+              },
+              grid: {
+                color: gridColor
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Priority Chart
+    const priorityCtx = document.getElementById('priorityChart');
+    if (priorityCtx) {
+      const totalPriorityTasks = {{ high_priority_tasks|default:0 }} + {{ medium_priority_tasks|default:0 }} + {{ low_priority_tasks|default:0 }};
+      
+      new Chart(priorityCtx, {
+        type: 'doughnut',
+        data: {
+          labels: ['High Priority', 'Medium Priority', 'Low Priority'],
+          datasets: [{
+            data: [{{ high_priority_tasks|default:0 }}, {{ medium_priority_tasks|default:0 }}, {{ low_priority_tasks|default:0 }}],
+            backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+            borderWidth: 2,
+            borderColor: isDarkMode ? '#1f2937' : '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: textColor,
+                padding: 15
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.parsed || 0;
+                  const percentage = totalPriorityTasks > 0 ? ((value / totalPriorityTasks) * 100).toFixed(1) : 0;
+                  return `${label}: ${value} (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

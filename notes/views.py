@@ -6,7 +6,9 @@ from django.utils import timezone
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from django.urls import reverse
-from .models import Task, Note
+from django.db.models import Count, Q
+from datetime import timedelta
+from .models import Task, Note, User
 from .forms import TaskForm, UserProfileForm, NoteForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -50,7 +52,7 @@ def register_view(request):
 
 def login_view(request):
     """
-    Handles user login.
+    Handles user login and redirects based on role.
     """
     if request.method == "POST":
         email = request.POST.get("email")
@@ -61,7 +63,12 @@ def login_view(request):
         if user:
             login(request, user)
             messages.success(request, "Login successful!")
-            return redirect("notes:home")
+            
+            # Redirect based on user role
+            if user.is_staff or user.is_superuser:
+                return redirect("notes:admin_dashboard")
+            else:
+                return redirect("notes:home")
         else:
             messages.error(request, "Invalid email or password.")
             return redirect("notes:login")
@@ -75,51 +82,55 @@ def home(request):
     Render the home page with tasks, notes, and statistics.
     Handles task creation and editing.
     """
+    # Redirect admin users to admin dashboard UNLESS they explicitly want user view
+    if (request.user.is_staff or request.user.is_superuser) and not request.session.get('view_as_user', False):
+        return redirect("notes:admin_dashboard")
+    
     user = request.user
     
     # Get all user tasks and notes
     tasks = Task.objects.filter(user=user).order_by('-created_at')
     notes = Note.objects.filter(user=user).order_by('-created_at')[:5]  # Latest 5 notes
     
-    # ✅ Calculate task statistics
+    # Calculate task statistics
     total_tasks = tasks.count()
     completed_tasks_count = tasks.filter(status='completed').count()
     pending_tasks_count = tasks.filter(status='pending').count()
     in_progress_tasks = tasks.filter(status='in_progress').count()
     
-    # ✅ Calculate overdue tasks
+    # Calculate overdue tasks
     now = timezone.now()
     overdue_tasks_count = tasks.filter(
         due_date__lt=now, 
         status__in=['pending', 'in_progress']
     ).count()
     
-    # ✅ Get today's active tasks (exclude completed)
+    # Get today's active tasks (exclude completed)
     today = now.date()
     today_tasks = tasks.filter(
         due_date__date=today,
         status__in=['pending', 'in_progress']
     ).order_by('due_date')
     
-    # ✅ Total notes count
+    # Total notes count
     total_notes = Note.objects.filter(user=user).count()
     
-    # ✅ Get completed tasks history
+    # Get completed tasks history
     completed_tasks_list = tasks.filter(status='completed').order_by('-updated_at')
     
-    # ✅ Get pending tasks list
+    # Get pending tasks list
     pending_tasks_list = tasks.filter(status='pending').order_by('due_date')
     
-    # ✅ Get overdue tasks list
+    # Get overdue tasks list
     overdue_tasks_list = tasks.filter(
         due_date__lt=now,
         status__in=['pending', 'in_progress']
     ).order_by('due_date')
     
-    # ✅ Get all notes list
+    # Get all notes list
     all_notes_list = Note.objects.filter(user=user).order_by('-created_at')
     
-    # ✅ NEW: Get unique subjects for filter dropdown
+    # Get unique subjects for filter dropdown
     unique_subjects = Note.objects.filter(
         user=user, 
         subject__isnull=False
@@ -127,8 +138,7 @@ def home(request):
         subject=''
     ).values_list('subject', flat=True).distinct().order_by('subject')
 
-    # ✅ Get upcoming tasks due within 24 hours
-    from datetime import timedelta
+    # Get upcoming tasks due within 24 hours
     next_24h = now + timedelta(hours=24)
     upcoming_tasks = tasks.filter(
         due_date__gte=now,
@@ -165,7 +175,7 @@ def home(request):
     else:
         form = TaskForm()
 
-    # ✅ Context with all stats data
+    # Context with all stats data
     context = {
         # Show only active tasks (not completed) in the main task list
         'tasks': tasks.exclude(status='completed')[:10],
@@ -192,7 +202,7 @@ def home(request):
         'all_notes_list': all_notes_list,
         'upcoming_tasks': upcoming_tasks,
         
-        # NEW: Unique subjects for filter
+        # Unique subjects for filter
         'unique_subjects': unique_subjects,
         
         # Dynamic sidebar counters
@@ -202,6 +212,122 @@ def home(request):
 
     return render(request, "home.html", context)
 
+
+@login_required
+def admin_dashboard(request):
+    """
+    Admin dashboard with system-wide statistics and management capabilities.
+    Only accessible to staff/superuser accounts.
+    """
+    # Clear the view_as_user flag when accessing admin dashboard
+    if 'view_as_user' in request.session:
+        del request.session['view_as_user']
+    
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to access the admin dashboard.")
+        return redirect("notes:home")
+    
+    # Get all users
+    all_users = User.objects.all()
+    total_users = all_users.count()
+    admin_users = all_users.filter(Q(is_staff=True) | Q(is_superuser=True)).count()
+    regular_users = total_users - admin_users
+    
+    # Get all tasks and notes
+    all_tasks = Task.objects.all()
+    all_notes = Note.objects.all()
+    
+    # Task statistics
+    total_tasks = all_tasks.count()
+    completed_tasks = all_tasks.filter(status='completed').count()
+    pending_tasks = all_tasks.filter(status='pending').count()
+    overdue_tasks = all_tasks.filter(
+        due_date__lt=timezone.now(),
+        status__in=['pending', 'in_progress']
+    ).count()
+    
+    # Note statistics
+    total_notes = all_notes.count()
+    
+    # Recent activity
+    recent_users = all_users.order_by('-created_at')[:5]
+    recent_tasks = all_tasks.order_by('-created_at')[:10]
+    recent_notes = all_notes.order_by('-created_at')[:10]
+    
+    # User activity statistics
+    user_stats = all_users.annotate(
+        task_count=Count('tasks'),
+        note_count=Count('notes')
+    ).order_by('-task_count')[:10]
+    
+    # Tasks by priority
+    high_priority_tasks = all_tasks.filter(priority='high').count()
+    medium_priority_tasks = all_tasks.filter(priority='medium').count()
+    low_priority_tasks = all_tasks.filter(priority='low').count()
+    
+    # Get date range for activity chart (last 7 days)
+    today = timezone.now().date()
+    days_ago_7 = today - timedelta(days=6)
+    
+    # Activity data for charts
+    daily_tasks = []
+    daily_notes = []
+    date_labels = []
+    
+    for i in range(7):
+        date = days_ago_7 + timedelta(days=i)
+        date_labels.append(date.strftime('%b %d'))
+        daily_tasks.append(all_tasks.filter(created_at__date=date).count())
+        daily_notes.append(all_notes.filter(created_at__date=date).count())
+    
+    context = {
+        # User statistics
+        'total_users': total_users,
+        'admin_users': admin_users,
+        'regular_users': regular_users,
+        
+        # Task statistics
+        'total_tasks': total_tasks,
+        'completed_tasks': completed_tasks,
+        'pending_tasks': pending_tasks,
+        'overdue_tasks': overdue_tasks,
+        'high_priority_tasks': high_priority_tasks,
+        'medium_priority_tasks': medium_priority_tasks,
+        'low_priority_tasks': low_priority_tasks,
+        
+        # Note statistics
+        'total_notes': total_notes,
+        
+        # Recent activity
+        'recent_users': recent_users,
+        'recent_tasks': recent_tasks,
+        'recent_notes': recent_notes,
+        'user_stats': user_stats,
+        
+        # Chart data
+        'date_labels': date_labels,
+        'daily_tasks': daily_tasks,
+        'daily_notes': daily_notes,
+    }
+    
+    return render(request, 'admin_dashboard.html', context)
+
+
+@login_required
+def switch_to_user_mode(request):
+    """
+    Allow admin to temporarily switch to user view.
+    """
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect("notes:home")
+    
+    # Set a session flag to indicate admin wants user view
+    request.session['view_as_user'] = True
+    
+    messages.info(request, "Switched to user view. You can return to admin dashboard from settings.")
+    return redirect("notes:home")
 
 
 def logout_view(request):
@@ -225,7 +351,7 @@ def toggle_task_status(request, task_id):
             messages.success(request, f"Task '{task.title}' marked as incomplete!")
         else:
             task.status = 'completed'
-            task.updated_at = timezone.now()  # Update the completion time
+            task.updated_at = timezone.now()
             messages.success(request, f"Task '{task.title}' marked as complete! 🎉")
         
         task.save()
@@ -295,20 +421,13 @@ def edit_profile(request):
     user = request.user
     
     if request.method == "POST":
-        # Accept first_name and last_name from the form even though the ModelForm
-        # still manages full_name. We'll compose full_name from the two fields
-        # and set first_name/last_name on the user instance before saving.
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
 
-        # Initialize the form with posted data
         form = UserProfileForm(request.POST, request.FILES, instance=user)
 
         if form.is_valid():
-            # Prepare instance without committing so we can set extras
             profile = form.save(commit=False)
-            # If a new profile picture was uploaded, remove the old file to save space
-            # but avoid deleting the project's default placeholder image.
             if 'profile_pic' in request.FILES:
                 try:
                     old = User.objects.get(pk=user.pk).profile_pic
@@ -318,12 +437,9 @@ def edit_profile(request):
                     try:
                         old.delete(save=False)
                     except Exception:
-                        # If deletion fails (e.g., storage not writable), continue silently
                         pass
-            # Set first_name/last_name and ensure full_name is consistent
             profile.first_name = first_name
             profile.last_name = last_name
-            # If full_name provided via hidden field, prefer it; otherwise compose
             full_from_post = request.POST.get('full_name', '').strip()
             if full_from_post:
                 profile.full_name = full_from_post
@@ -337,9 +453,6 @@ def edit_profile(request):
             messages.error(request, "Please correct the errors below.")
             
     else:
-        # If the user doesn't have first_name/last_name populated but has
-        # a `full_name`, split it for a better UX so the form shows the
-        # name split across the two fields instead of all in `first_name`.
         initial = {}
         if (not user.first_name or not user.last_name) and getattr(user, 'full_name', None):
             parts = user.full_name.strip().split()
@@ -383,7 +496,6 @@ def add_note(request):
             total_notes = Note.objects.filter(user=request.user).count()
             return JsonResponse({'status': 'ok', 'note': note_data, 'total_notes': total_notes})
     else:
-        # collect form errors to show in messages
         messages.error(request, "Failed to create note. Please check the form.")
         if is_ajax:
             return JsonResponse({'status': 'error', 'errors': form.errors}, status=400)
@@ -418,62 +530,45 @@ def delete_note(request, note_id):
         note.delete()
         messages.success(request, 'Note deleted successfully!')
         return redirect('notes:home')
-    # If not POST, redirect back
     return redirect('notes:home')
 
 @login_required
 def settings_page(request):
     user = request.user
     
-    # Initialize form and the flag for opening the modal
     password_form = PasswordChangeForm(user)
-    should_open_modal = False # Default to false for GET requests
+    should_open_modal = False
 
     if request.method == 'POST':
-        # 1. Handle the POST request (password change submission)
         password_form = PasswordChangeForm(user, request.POST)
         
         if password_form.is_valid():
             user = password_form.save()
-            
-            # Prevents the user from being logged out after password change
-            update_session_auth_hash(request, user)  
-            
+            update_session_auth_hash(request, user)
             messages.success(request, 'Your password was successfully updated!')
-            
-            # Redirect to the GET view to show messages and clear POST data
             return redirect('notes:settings_page')
         else:
-            # If the form is invalid, set error message and set flag to reopen modal
             messages.error(request, 'Please correct the error(s) below.')
-            should_open_modal = True # Set flag to reopen modal in template
+            should_open_modal = True
             
-    # 2. Calculate the required counts for the statistics blocks
-    # NOTE: Using 'status='completed'' based on your profile_view logic
     try:
         total_notes = Note.objects.filter(user=user).count()
         total_tasks = Task.objects.filter(user=user).count()
         completed_tasks_count = Task.objects.filter(user=user, status='completed').count()
     except Exception:
-        # Provide safe default values in case models or data access fails
         total_notes = 0
         total_tasks = 0
         completed_tasks_count = 0
     
-    # 3. Compile the final context for rendering
     context = {
         'password_form': password_form,
-        
-        # Pass the calculated stats using the variable names from your template (e.g., {{ total_notes_sidebar }})
         'total_notes_sidebar': total_notes,
         'total_tasks_count': total_tasks,
         'completed_tasks': completed_tasks_count,
-        
-        # Pass the flag to control modal visibility in JavaScript
         'should_open_modal': should_open_modal,
+        'is_admin': user.is_staff or user.is_superuser,
     }
     
-    # 4. Render the template
     return render(request, 'settings_page.html', context)
 
 @login_required
@@ -483,19 +578,9 @@ def delete_account(request):
     """
     if request.method == 'POST':
         user = request.user
-        
-        # 1. Log the user out immediately
         logout(request)
-        
-        # 2. Delete the user object (and cascade delete related data)
         user.delete()
-        
-        # 3. Add a success message (will be shown on the homepage/login page)
         messages.success(request, 'Your account was permanently deleted. We are sorry to see you go!')
-        
-        # 4. Redirect to a non-authenticated page (e.g., login or home)
-        # Assuming 'notes:home' is accessible without login, or use a general 'login' page name
         return redirect('notes:home') 
         
-    # If a GET request somehow reaches this, redirect them away
     return redirect('notes:settings_page')
