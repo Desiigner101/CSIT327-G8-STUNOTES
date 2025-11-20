@@ -29,4 +29,7 @@ urlpatterns = [
     #Profile URLs
     path('profile/', views.profile_view, name='profile_view'), 
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('switch-to-user/', views.switch_to_user_mode, name='switch_to_user_mode'), 
 ]
