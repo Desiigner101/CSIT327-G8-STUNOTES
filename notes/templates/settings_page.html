@@ -48,48 +48,48 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #388e3c; }
     </style>
 </head>
-<body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+<body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
   
   <!-- Sidebar -->
-  <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
-    <div class="logo p-6 border-b border-gray-200">
+  <aside class="sidebar w-64 bg-white dark:bg-gray-800 shadow-lg flex flex-col">
+    <div class="logo p-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-2">
-        <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
-        <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
+        <i data-lucide="book-open" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+        <span class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">StuNotes</span>
       </div>
     </div>
     
     <nav class="flex-1 p-4">
       <ul class="space-y-2">
-        {% if is_admin %}
+        {% if is_admin and not view_as_user %}
         <li>
-          <a href="{% url 'notes:admin_dashboard' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition">
+          <a href="{% url 'notes:admin_dashboard' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>Admin Dashboard</span>
           </a>
         </li>
         {% else %}
         <li>
-          <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+          <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
             <i data-lucide="home" class="w-5 h-5"></i>
             <span>Dashboard</span>
           </a>
         </li>
         {% endif %}
         <li>
-          <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+          <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
             <i data-lucide="user" class="w-5 h-5"></i>
             <span>Profile</span>
           </a>
         </li>
         <li>
-          <a href="{% url 'notes:settings_page' %}" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 text-emerald-600 rounded-lg font-semibold">
+          <a href="{% url 'notes:settings_page' %}" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg font-semibold">
             <i data-lucide="settings" class="w-5 h-5"></i>
             <span>Settings</span>
           </a>
         </li>
         <li>
-          <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+          <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/30 transition">
             <i data-lucide="log-out" class="w-5 h-5"></i>
             <span>Logout</span>
           </a>
@@ -97,15 +97,15 @@
       </ul>
     </nav>
     
-    <div class="stats p-6 border-t border-gray-200 bg-gray-50">
+    <div class="stats p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-600 font-medium">Tasks:</span>
-          <span class="text-lg font-bold text-emerald-600">{{ total_tasks_count }}</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Tasks:</span>
+          <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ total_tasks_count }}</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-600 font-medium">Notes:</span>
-          <span class="text-lg font-bold text-emerald-600">{{ total_notes_sidebar }}</span>
+          <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Notes:</span>
+          <span class="text-lg font-bold text-emerald-600 dark:text-emerald-400">{{ total_notes_sidebar }}</span>
         </div>
       </div>
     </div>
@@ -114,13 +114,13 @@
   <!-- Main Content -->
   <main class="main flex-1 p-8 overflow-y-auto custom-scrollbar">
     <!-- Topbar -->
-    <header class="topbar flex justify-between items-center p-6 bg-white rounded-2xl shadow-lg mb-8 animate-slideDown">
+    <header class="topbar flex justify-between items-center p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg mb-8 animate-slideDown">
       <div class="topbar-left">
-        <h2 class="text-3xl font-bold text-gray-800">Settings</h2>
-        <p class="text-gray-500 text-sm mt-1">Manage your account preferences</p>
+        <h2 class="text-3xl font-bold text-gray-800 dark:text-white">Settings</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage your account preferences</p>
       </div>
       <div class="topbar-right flex items-center gap-5">
-        {% if is_admin %}
+        {% if is_admin and not view_as_user %}
         <div class="flex items-center gap-3 px-4 py-2 bg-purple-50 rounded-lg">
           <i data-lucide="shield" class="w-5 h-5 text-purple-600"></i>
           <span class="text-sm font-semibold text-purple-600">Admin Mode</span>
@@ -137,10 +137,10 @@
     <!-- Settings Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fadeIn">
       <!-- Account Security -->
-      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
-          <i data-lucide="lock" class="w-6 h-6 text-emerald-600"></i>
-          <h3 class="text-xl font-bold text-gray-800">Account Security</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <i data-lucide="lock" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Account Security</h3>
         </div>
         <div class="space-y-4">
           <button onclick="openModal('changePasswordModal')" 
@@ -157,45 +157,70 @@
         </div>
       </div>
 
-      <!-- Role Management (Admin Only) -->
-      {% if is_admin %}
-      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
-          <i data-lucide="shield-check" class="w-6 h-6 text-purple-600"></i>
-          <h3 class="text-xl font-bold text-gray-800">Role Management</h3>
+      <!-- Admin Account Creation -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-l-4 border-purple-500">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <i data-lucide="user-plus" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Create Admin Account</h3>
         </div>
         <div class="space-y-4">
-          <a href="{% url 'notes:switch_to_user_mode' %}" 
-             class="w-full flex items-center justify-between p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition cursor-pointer group">
+          <button onclick="openModal('createAdminModal')" 
+                  class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
             <div class="flex items-center gap-3">
-              <i data-lucide="user-round" class="w-5 h-5 text-purple-600"></i>
+              <i data-lucide="shield-check" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
               <div>
-                <h4 class="font-semibold text-purple-800">Switch to User Mode</h4>
-                <p class="text-sm text-purple-600">View as regular user</p>
+                <h4 class="font-semibold text-purple-800 dark:text-purple-300">Create New Admin</h4>
+                <p class="text-sm text-purple-600 dark:text-purple-400">Create a new administrator account</p>
+              </div>
+            </div>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400"></i>
+          </button>
+        </div>
+      </div>
+
+
+      <!-- Role Management (Admin Only) -->
+      {% if is_admin %}
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <i data-lucide="shield-check" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Role Management</h3>
+        </div>
+        <div class="space-y-4">
+          {% if view_as_user %}
+          <a href="{% url 'notes:admin_dashboard' %}" 
+             class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <i data-lucide="shield" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+              <div>
+                <h4 class="font-semibold text-purple-800 dark:text-purple-300">Return to Admin Mode</h4>
+                <p class="text-sm text-purple-600 dark:text-purple-400">Switch back to admin view</p>
               </div>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400"></i>
           </a>
-          <a href="{% url 'notes:admin_dashboard' %}" 
-             class="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-purple-50 transition cursor-pointer group">
+          {% else %}
+          <a href="{% url 'notes:switch_to_user_mode' %}" 
+             class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
             <div class="flex items-center gap-3">
-              <i data-lucide="layout-dashboard" class="w-5 h-5 text-gray-600 group-hover:text-purple-600"></i>
+              <i data-lucide="user-round" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
               <div>
-                <h4 class="font-semibold text-gray-800">Go to Admin Dashboard</h4>
-                <p class="text-sm text-gray-500">Manage system settings</p>
+                <h4 class="font-semibold text-purple-800 dark:text-purple-300">Switch to User Mode</h4>
+                <p class="text-sm text-purple-600 dark:text-purple-400">View as regular user</p>
               </div>
             </div>
-            <i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+            <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400"></i>
           </a>
+          {% endif %}
         </div>
       </div>
       {% endif %}
 
       <!-- Theme Settings -->
-      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
-          <i data-lucide="palette" class="w-6 h-6 text-emerald-600"></i>
-          <h3 class="text-xl font-bold text-gray-800">Appearance</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
+          <i data-lucide="palette" class="w-6 h-6 text-emerald-600 dark:text-emerald-400"></i>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-white">Appearance</h3>
         </div>
         <div class="space-y-4">
           <button id="theme-toggle-settings" 
@@ -213,10 +238,10 @@
       </div>
 
       <!-- Danger Zone -->
-      <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-2 border-red-200">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-red-100">
-          <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
-          <h3 class="text-xl font-bold text-red-800">Danger Zone</h3>
+      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-2 border-red-200 dark:border-red-800">
+        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-red-100 dark:border-red-900">
+          <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+          <h3 class="text-xl font-bold text-red-800 dark:text-red-400">Danger Zone</h3>
         </div>
         <div class="space-y-4">
           <button onclick="openModal('deleteAccountModal')" 
@@ -305,6 +330,105 @@
     </div>
   </div>
 
+  <!-- Admin Created Success Modal -->
+  <div id="adminSuccessModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white dark:bg-gray-800 mx-auto my-12 p-0 w-11/12 max-w-lg rounded-3xl shadow-2xl animate-slideDown">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-green-500 to-green-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">✅ Admin Account Created!</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('adminSuccessModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        {% if admin_created_info %}
+        <div class="mb-6">
+          <p class="text-gray-700 dark:text-gray-300 mb-4">
+            Admin account has been successfully created. Use the credentials below to log in:
+          </p>
+          <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 p-4 rounded-lg mb-4">
+            <div class="space-y-3">
+              <div>
+                <p class="text-xs text-green-700 dark:text-green-400 font-semibold uppercase tracking-wide mb-1">Full Name</p>
+                <p class="text-lg font-bold text-green-900 dark:text-green-200">{{ admin_created_info.full_name }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-green-700 dark:text-green-400 font-semibold uppercase tracking-wide mb-1">Email</p>
+                <p class="text-lg font-bold text-green-900 dark:text-green-200" id="admin-email-display">{{ admin_created_info.email }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-4 rounded-lg">
+            <p class="text-yellow-800 dark:text-yellow-300 text-sm font-semibold mb-2">⚠️ Important:</p>
+            <ul class="list-disc list-inside text-yellow-700 dark:text-yellow-400 text-sm space-y-1">
+              <li>The password was set during account creation</li>
+              <li>Log out and log in with the admin credentials to access Admin Dashboard</li>
+              <li>Save these credentials in a secure place</li>
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+        <div class="flex gap-3">
+          <a href="{% url 'notes:logout' %}" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold text-center">Logout to Login as Admin</a>
+          <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('adminSuccessModal')">Stay Here</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Admin Account Modal -->
+  <div id="createAdminModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white dark:bg-gray-800 mx-auto my-12 p-0 w-11/12 max-w-md rounded-3xl shadow-2xl animate-slideDown">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-purple-500 to-purple-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">👑 Create Admin Account</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('createAdminModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        <form method="post" action="{% url 'notes:settings_page' %}">
+          {% csrf_token %}
+          <input type="hidden" name="create_admin" value="1">
+          <div class="space-y-4">
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Full Name</label>
+              {{ admin_form.full_name }}
+              {% if admin_form.full_name.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ admin_form.full_name.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Email Address</label>
+              {{ admin_form.email }}
+              {% if admin_form.email.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ admin_form.email.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Password</label>
+              {{ admin_form.password1 }}
+              {% if admin_form.password1.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ admin_form.password1.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Confirm Password</label>
+              {{ admin_form.password2 }}
+              {% if admin_form.password2.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ admin_form.password2.errors.0 }}</p>
+              {% endif %}
+            </div>
+            {% if admin_form.non_field_errors %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+              <p class="text-red-800 text-sm font-semibold">Please correct the errors:</p>
+              {{ admin_form.non_field_errors }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex gap-3 mt-6">
+            <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Create Admin</button>
+            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('createAdminModal')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <style>
     .form-group input {
       width: 100%;
@@ -313,12 +437,25 @@
       border-radius: 0.5rem;
       font-size: 0.875rem;
       transition: all 0.3s ease;
+      background-color: white;
+      color: #1f2937;
+    }
+    
+    .dark .form-group input {
+      background-color: #1f2937;
+      border-color: #4b5563;
+      color: #f3f4f6;
     }
     
     .form-group input:focus {
       outline: none;
       border-color: #4caf50;
       box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+    
+    .dark .form-group input:focus {
+      border-color: #4caf50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
     }
 
     .modal {
@@ -331,8 +468,13 @@
   </style>
 
   <script>
-    lucide.createIcons();
+    // Set flags from Django template (before DOMContentLoaded)
+    // These values are set by the Django view and will be rendered as proper JavaScript booleans
+    const shouldOpenPasswordModal = {% if should_open_modal %}true{% else %}false{% endif %};
+    const shouldOpenAdminModal = {% if should_open_admin_modal %}true{% else %}false{% endif %};
+    const shouldShowAdminSuccess = {% if should_show_admin_success %}true{% else %}false{% endif %};
 
+    // Modal functions (defined before DOMContentLoaded so they're available globally)
     function openModal(modalId) {
       const modal = document.getElementById(modalId);
       if (modal) {
@@ -349,45 +491,67 @@
       }
     }
 
-    // Auto-open password modal if there were errors
-    {% if should_open_modal %}
-    document.addEventListener('DOMContentLoaded', function() {
-      openModal('changePasswordModal');
-    });
-    {% endif %}
+    // Make functions globally accessible
+    window.openModal = openModal;
+    window.closeModal = closeModal;
 
-    // Theme toggle
-    document.addEventListener('DOMContentLoaded', () => {
+    // Initialize everything when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize Lucide icons
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
+      // Open modals if there are errors (set by Django view)
+      if (shouldOpenPasswordModal) {
+        openModal('changePasswordModal');
+      }
+      if (shouldOpenAdminModal) {
+        openModal('createAdminModal');
+      }
+      // Show admin creation success modal
+      if (shouldShowAdminSuccess) {
+        openModal('adminSuccessModal');
+      }
+
+      // Theme toggle functionality
       const htmlElement = document.documentElement;
       const toggle = document.getElementById('theme-toggle-settings');
       
-      if (!toggle) return;
-
-      const icon = document.getElementById('theme-icon-settings');
-      const text = document.getElementById('theme-text-settings');
-      
-      const isDarkInitially = htmlElement.classList.contains('dark');
-      if(icon) icon.setAttribute('data-lucide', isDarkInitially ? 'sun' : 'moon');
-      if(text) text.textContent = isDarkInitially ? 'Light Mode' : 'Dark Mode';
-      
-      lucide.createIcons();
-
-      toggle.addEventListener('click', () => {
-        const isCurrentlyDark = htmlElement.classList.contains('dark');
-        const newIsDark = !isCurrentlyDark;
-
-        htmlElement.classList.toggle('dark', newIsDark);
-        localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
-
-        const newIconName = newIsDark ? 'sun' : 'moon';
-        const newTextContent = newIsDark ? 'Light Mode' : 'Dark Mode';
+      if (toggle) {
+        const icon = document.getElementById('theme-icon-settings');
+        const text = document.getElementById('theme-text-settings');
         
-        if(icon) {
-          icon.setAttribute('data-lucide', newIconName);
+        // Set initial theme icon and text
+        const isDarkInitially = htmlElement.classList.contains('dark');
+        if (icon && typeof lucide !== 'undefined') {
+          icon.setAttribute('data-lucide', isDarkInitially ? 'sun' : 'moon');
           lucide.replace(icon);
         }
-        if(text) text.textContent = newTextContent;
-      });
+        if (text) {
+          text.textContent = isDarkInitially ? 'Light Mode' : 'Dark Mode';
+        }
+        
+        // Theme toggle click handler
+        toggle.addEventListener('click', function() {
+          const isCurrentlyDark = htmlElement.classList.contains('dark');
+          const newIsDark = !isCurrentlyDark;
+
+          htmlElement.classList.toggle('dark', newIsDark);
+          localStorage.setItem('theme', newIsDark ? 'dark' : 'light');
+
+          const newIconName = newIsDark ? 'sun' : 'moon';
+          const newTextContent = newIsDark ? 'Light Mode' : 'Dark Mode';
+          
+          if (icon && typeof lucide !== 'undefined') {
+            icon.setAttribute('data-lucide', newIconName);
+            lucide.replace(icon);
+          }
+          if (text) {
+            text.textContent = newTextContent;
+          }
+        });
+      }
     });
   </script>
 </body>
