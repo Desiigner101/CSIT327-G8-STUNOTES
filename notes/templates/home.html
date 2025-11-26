@@ -173,6 +173,9 @@
 
       <div class="topbar-right flex items-center gap-5">
         <p class="text-sm text-gray-600">Today is <strong>October 02, 2025</strong></p>
+        {% if view_as_user and user.is_staff or view_as_user and user.is_superuser %}
+        <a href="{% url 'notes:switch_to_admin_mode' %}" class="return-admin inline-flex items-center gap-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-800 dark:text-purple-300">Return to Admin Mode</a>
+        {% endif %}
 
         <!-- Notification Bell -->
         <div class="notification-wrapper relative">

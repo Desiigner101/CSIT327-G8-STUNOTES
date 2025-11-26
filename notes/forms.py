@@ -113,7 +113,7 @@ class UserProfileForm(forms.ModelForm):
 
 
 class AdminCreationForm(forms.Form):
-    """Form for creating a new admin account"""
+    """Form for creating a new admin account or upgrading existing account"""
     full_name = forms.CharField(
         max_length=255,
         required=True,
@@ -127,7 +127,8 @@ class AdminCreationForm(forms.Form):
         widget=forms.EmailInput(attrs={
             'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition',
             'placeholder': 'admin@example.com'
-        })
+        }),
+        help_text='Enter an existing email to upgrade that account to admin, or a new email to create a new admin account.'
     )
     password1 = forms.CharField(
         label='Password',
@@ -135,7 +136,14 @@ class AdminCreationForm(forms.Form):
         widget=forms.PasswordInput(attrs={
             'class': 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition',
             'placeholder': 'Password'
-        })
+        }),
+        help_text='For existing users, this will become their new password.'
+    )
+    is_admin_only = forms.BooleanField(
+        label='Admin-only account',
+        required=False,
+        initial=False,
+        help_text='If checked, this admin account will be admin-only and not have regular user features (Notes/Tasks).'
     )
     password2 = forms.CharField(
         label='Confirm Password',
@@ -145,12 +153,6 @@ class AdminCreationForm(forms.Form):
             'placeholder': 'Confirm Password'
         })
     )
-    
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("A user with this email already exists.")
-        return email
     
     def clean_password2(self):
         password1 = self.cleaned_data.get('password1')
