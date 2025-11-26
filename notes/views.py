@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db.models import Count, Q
 from datetime import timedelta
 from .models import Task, Note, User
-from .forms import TaskForm, UserProfileForm, NoteForm
+from .forms import TaskForm, UserProfileForm, NoteForm, AdminCreationForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 
@@ -537,19 +537,52 @@ def settings_page(request):
     user = request.user
     
     password_form = PasswordChangeForm(user)
+    admin_form = AdminCreationForm()
     should_open_modal = False
+    should_open_admin_modal = False
 
     if request.method == 'POST':
-        password_form = PasswordChangeForm(user, request.POST)
-        
-        if password_form.is_valid():
-            user = password_form.save()
-            update_session_auth_hash(request, user)
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('notes:settings_page')
-        else:
-            messages.error(request, 'Please correct the error(s) below.')
-            should_open_modal = True
+        # Check if this is a password change request
+        if 'old_password' in request.POST:
+            password_form = PasswordChangeForm(user, request.POST)
+            
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Your password was successfully updated!')
+                return redirect('notes:settings_page')
+            else:
+                messages.error(request, 'Please correct the error(s) below.')
+                should_open_modal = True
+        # Check if this is an admin creation request
+        elif 'create_admin' in request.POST:
+            admin_form = AdminCreationForm(request.POST)
+            
+            if admin_form.is_valid():
+                full_name = admin_form.cleaned_data['full_name']
+                email = admin_form.cleaned_data['email']
+                password = admin_form.cleaned_data['password1']
+                
+                # Create the admin user
+                admin_user = User.objects.create_user(
+                    email=email,
+                    username=email,
+                    full_name=full_name,
+                    password=password,
+                    is_staff=True,
+                    is_superuser=True
+                )
+                
+                messages.success(request, f'Admin account created successfully for {admin_user.full_name}!')
+                # Store admin creation info in session to show in success modal
+                request.session['admin_created'] = {
+                    'full_name': admin_user.full_name,
+                    'email': admin_user.email,
+                }
+                return redirect('notes:settings_page')
+            else:
+                messages.error(request, 'Please correct the errors below.')
+                should_open_admin_modal = True
             
     try:
         total_notes = Note.objects.filter(user=user).count()
@@ -560,13 +593,28 @@ def settings_page(request):
         total_tasks = 0
         completed_tasks_count = 0
     
+    # Check if admin was just created (to show success modal)
+    admin_created_info = None
+    should_show_admin_success = False
+    if 'admin_created' in request.session:
+        admin_created_info = request.session.pop('admin_created')
+        should_show_admin_success = True
+    
+    # Check if user is viewing as regular user (for sidebar navigation)
+    view_as_user = request.session.get('view_as_user', False)
+    
     context = {
         'password_form': password_form,
+        'admin_form': admin_form,
         'total_notes_sidebar': total_notes,
         'total_tasks_count': total_tasks,
         'completed_tasks': completed_tasks_count,
         'should_open_modal': should_open_modal,
+        'should_open_admin_modal': should_open_admin_modal,
         'is_admin': user.is_staff or user.is_superuser,
+        'view_as_user': view_as_user,
+        'admin_created_info': admin_created_info,
+        'should_show_admin_success': should_show_admin_success,
     }
     
     return render(request, 'settings_page.html', context)
