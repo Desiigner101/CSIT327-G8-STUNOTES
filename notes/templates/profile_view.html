@@ -102,6 +102,9 @@
                             <p class="text-sm text-gray-600 relative top-3">{{ user.email }}</p>
                         </div>
 
+                        {% if view_as_user and user.is_staff or view_as_user and user.is_superuser %}
+                        <a href="{% url 'notes:switch_to_admin_mode' %}" class="inline-flex items-center gap-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-800 dark:text-purple-300 mr-4">Return to Admin Mode</a>
+                        {% endif %}
                         <a href="{% url 'notes:edit_profile' %}" class="ml-6 inline-flex items-center gap-2 px-5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold text-sm transition transform hover:-translate-y-0.5 shadow-md">
                             <i data-lucide="edit-2" class="w-4 h-4"></i>
                             Edit

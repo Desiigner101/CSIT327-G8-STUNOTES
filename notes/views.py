@@ -65,7 +65,11 @@ def login_view(request):
             messages.success(request, "Login successful!")
             
             # Redirect based on user role
-            if user.is_staff or user.is_superuser:
+            # Check if user is admin-only (cannot access user features)
+            if hasattr(user, 'is_admin_only') and user.is_admin_only:
+                return redirect("notes:admin_dashboard")
+            # Check if user is staff/superuser but not admin-only (can switch between views)
+            elif user.is_staff or user.is_superuser:
                 return redirect("notes:admin_dashboard")
             else:
                 return redirect("notes:home")
@@ -82,15 +86,21 @@ def home(request):
     Render the home page with tasks, notes, and statistics.
     Handles task creation and editing.
     """
+    user = request.user
+    
+    # Check if user is admin-only (cannot access user dashboard)
+    if hasattr(user, 'is_admin_only') and user.is_admin_only:
+        messages.error(request, "Your account is admin-only and cannot access user features. Please use the Admin Dashboard.")
+        return redirect("notes:admin_dashboard")
+    
     # Redirect admin users to admin dashboard UNLESS they explicitly want user view
     if (request.user.is_staff or request.user.is_superuser) and not request.session.get('view_as_user', False):
         return redirect("notes:admin_dashboard")
     
-    user = request.user
-    
+    # Rest of the home view code remains the same...
     # Get all user tasks and notes
     tasks = Task.objects.filter(user=user).order_by('-created_at')
-    notes = Note.objects.filter(user=user).order_by('-created_at')[:5]  # Latest 5 notes
+    notes = Note.objects.filter(user=user).order_by('-created_at')[:5]
     
     # Calculate task statistics
     total_tasks = tasks.count()
@@ -105,7 +115,7 @@ def home(request):
         status__in=['pending', 'in_progress']
     ).count()
     
-    # Get today's active tasks (exclude completed)
+    # Get today's active tasks
     today = now.date()
     today_tasks = tasks.filter(
         due_date__date=today,
@@ -157,14 +167,14 @@ def home(request):
 
     # Handle POST requests (create or edit task)
     if request.method == "POST":
-        if "edit_task_id" in request.POST:  # Editing existing task
+        if "edit_task_id" in request.POST:
             task_to_edit = get_object_or_404(Task, id=request.POST["edit_task_id"], user=user)
             form = TaskForm(request.POST, instance=task_to_edit)
             if form.is_valid():
                 form.save()
                 messages.success(request, "Task updated successfully!")
                 return redirect("notes:home")
-        else:  # Creating new task
+        else:
             form = TaskForm(request.POST)
             if form.is_valid():
                 task = form.save(commit=False)
@@ -175,39 +185,28 @@ def home(request):
     else:
         form = TaskForm()
 
-    # Context with all stats data
     context = {
-        # Show only active tasks (not completed) in the main task list
         'tasks': tasks.exclude(status='completed')[:10],
         'notes': notes,
         'form': form,
         'edit_form': edit_form,
         'task_to_edit': task_to_edit,
-        
-        # Stats for overview cards
         'total_tasks': total_tasks,
         'completed_tasks': completed_tasks_count,
         'pending_tasks': pending_tasks_count,
         'in_progress_tasks': in_progress_tasks,
         'overdue_tasks': overdue_tasks_count,
         'total_notes': total_notes,
-        
-        # Today's tasks for calendar
         'today_tasks': today_tasks,
-        
-        # Lists for modals
         'completed_tasks_list': completed_tasks_list,
         'pending_tasks_list': pending_tasks_list,
         'overdue_tasks_list': overdue_tasks_list,
         'all_notes_list': all_notes_list,
         'upcoming_tasks': upcoming_tasks,
-        
-        # Unique subjects for filter
         'unique_subjects': unique_subjects,
-        
-        # Dynamic sidebar counters
         'total_tasks_count': total_tasks,
         'total_notes_sidebar': total_notes,
+        'view_as_user': request.session.get('view_as_user', False),
     }
 
     return render(request, "home.html", context)
@@ -281,6 +280,11 @@ def admin_dashboard(request):
         daily_tasks.append(all_tasks.filter(created_at__date=date).count())
         daily_notes.append(all_notes.filter(created_at__date=date).count())
     
+    # Determine whether the 'Switch to User View' should be shown in the admin UI
+    show_switch_to_user = (not getattr(request.user, 'is_admin_only', False)) and (request.user.is_staff or request.user.is_superuser)
+
+    view_as_user = request.session.get('view_as_user', False)
+
     context = {
         # User statistics
         'total_users': total_users,
@@ -309,6 +313,8 @@ def admin_dashboard(request):
         'date_labels': date_labels,
         'daily_tasks': daily_tasks,
         'daily_notes': daily_notes,
+        'show_switch_to_user': show_switch_to_user,
+        'view_as_user': view_as_user,
     }
     
     return render(request, 'admin_dashboard.html', context)
@@ -323,11 +329,36 @@ def switch_to_user_mode(request):
         messages.error(request, "You don't have permission to perform this action.")
         return redirect("notes:home")
     
+    # Prevent admin-only accounts (admin-only) from switching to user view
+    if getattr(request.user, 'is_admin_only', False):
+        messages.error(request, "Admin-only accounts cannot access user features.")
+        return redirect("notes:admin_dashboard")
+
     # Set a session flag to indicate admin wants user view
     request.session['view_as_user'] = True
     
     messages.info(request, "Switched to user view. You can return to admin dashboard from settings.")
     return redirect("notes:home")
+
+
+@login_required
+def switch_to_admin_mode(request):
+    """
+    Clears the 'view_as_user' session flag and takes the user back to the admin dashboard.
+    Only available to staff/superusers.
+    """
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect("notes:home")
+
+    if 'view_as_user' in request.session:
+        try:
+            del request.session['view_as_user']
+        except Exception:
+            pass
+
+    messages.info(request, "Returned to Admin mode.")
+    return redirect('notes:admin_dashboard')
 
 
 def logout_view(request):
@@ -409,6 +440,7 @@ def profile_view(request):
         'total_notes_created': total_notes,
         'total_tasks_created': total_tasks,
         'tasks_completed': completed_tasks,
+        'view_as_user': request.session.get('view_as_user', False),
     }
     return render(request, 'profile_view.html', context)
 
@@ -540,6 +572,8 @@ def settings_page(request):
     admin_form = AdminCreationForm()
     should_open_modal = False
     should_open_admin_modal = False
+    should_open_upgrade_modal = False
+    should_open_make_user_accessible_modal = False
 
     if request.method == 'POST':
         # Check if this is a password change request
@@ -554,7 +588,53 @@ def settings_page(request):
             else:
                 messages.error(request, 'Please correct the error(s) below.')
                 should_open_modal = True
-        # Check if this is an admin creation request
+        
+        # Check if this is an upgrade to admin request
+        elif 'upgrade_to_admin' in request.POST:
+            confirm_password = request.POST.get('confirm_password')
+            
+            # Verify password
+            if user.check_password(confirm_password):
+                # Check if user already has tasks/notes (warn them they'll lose access)
+                user_tasks = Task.objects.filter(user=user).count()
+                user_notes = Note.objects.filter(user=user).count()
+                
+                # Determine admin-only flag from the form checkbox
+                make_admin_only = request.POST.get('make_admin_only') in ['on', '1', 'true', 'True']
+
+                # Upgrade user to admin (optionally admin-only)
+                user.is_staff = True
+                user.is_superuser = True
+                # Mark that this is admin-only account (cannot access user features)
+                user.is_admin_only = make_admin_only
+                user.save()
+                
+                messages.success(request, f'Your account has been upgraded to admin! You now have admin-only access.')
+                request.session['admin_upgraded'] = {
+                    'full_name': user.full_name,
+                    'email': user.email,
+                    'was_upgrade': True,
+                }
+                
+                return redirect('notes:settings_page')
+            else:
+                messages.error(request, 'Incorrect password. Please try again.')
+                should_open_upgrade_modal = True
+
+        # Check if this is a request to make an admin account user-accessible again
+        elif 'make_user_accessible' in request.POST:
+            confirm_password = request.POST.get('confirm_password_user_access')
+            if user.check_password(confirm_password):
+                user.is_admin_only = False
+                user.save()
+                messages.success(request, 'Your account now has user access in addition to admin.')
+                return redirect('notes:settings_page')
+            else:
+                messages.error(request, 'Incorrect password. Please try again.')
+                # Open the 'make user accessible' modal back up with error
+                should_open_make_user_accessible_modal = True
+        
+        # Check if this is a create new admin request
         elif 'create_admin' in request.POST:
             admin_form = AdminCreationForm(request.POST)
             
@@ -562,24 +642,32 @@ def settings_page(request):
                 full_name = admin_form.cleaned_data['full_name']
                 email = admin_form.cleaned_data['email']
                 password = admin_form.cleaned_data['password1']
+                is_admin_only_flag = admin_form.cleaned_data.get('is_admin_only', False)
                 
-                # Create the admin user
-                admin_user = User.objects.create_user(
-                    email=email,
-                    username=email,
-                    full_name=full_name,
-                    password=password,
-                    is_staff=True,
-                    is_superuser=True
-                )
-                
-                messages.success(request, f'Admin account created successfully for {admin_user.full_name}!')
-                # Store admin creation info in session to show in success modal
-                request.session['admin_created'] = {
-                    'full_name': admin_user.full_name,
-                    'email': admin_user.email,
-                }
-                return redirect('notes:settings_page')
+                # Check if user with this email already exists
+                if User.objects.filter(email=email).exists():
+                    messages.error(request, 'An account with this email already exists. Use "Upgrade to Admin" to upgrade an existing account, or choose a different email.')
+                    should_open_admin_modal = True
+                else:
+                    # Create new admin-only user
+                    admin_user = User.objects.create_user(
+                        email=email,
+                        username=email,
+                        full_name=full_name,
+                        password=password,
+                        is_staff=True,
+                        is_superuser=True,
+                        is_admin_only=is_admin_only_flag  # Honor the admin-only flag
+                    )
+                    
+                    messages.success(request, f'Admin account created successfully for {admin_user.full_name}!')
+                    request.session['admin_upgraded'] = {
+                        'full_name': admin_user.full_name,
+                        'email': admin_user.email,
+                        'was_upgrade': False,
+                    }
+                    
+                    return redirect('notes:settings_page')
             else:
                 messages.error(request, 'Please correct the errors below.')
                 should_open_admin_modal = True
@@ -593,11 +681,11 @@ def settings_page(request):
         total_tasks = 0
         completed_tasks_count = 0
     
-    # Check if admin was just created (to show success modal)
-    admin_created_info = None
+    # Check if admin was just created/upgraded (to show success modal)
+    admin_upgraded_info = None
     should_show_admin_success = False
-    if 'admin_created' in request.session:
-        admin_created_info = request.session.pop('admin_created')
+    if 'admin_upgraded' in request.session:
+        admin_upgraded_info = request.session.pop('admin_upgraded')
         should_show_admin_success = True
     
     # Check if user is viewing as regular user (for sidebar navigation)
@@ -611,9 +699,11 @@ def settings_page(request):
         'completed_tasks': completed_tasks_count,
         'should_open_modal': should_open_modal,
         'should_open_admin_modal': should_open_admin_modal,
+        'should_open_upgrade_modal': should_open_upgrade_modal,
+        'should_open_make_user_accessible_modal': should_open_make_user_accessible_modal,
         'is_admin': user.is_staff or user.is_superuser,
         'view_as_user': view_as_user,
-        'admin_created_info': admin_created_info,
+        'admin_upgraded_info': admin_upgraded_info,
         'should_show_admin_success': should_show_admin_success,
     }
     

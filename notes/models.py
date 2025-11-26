@@ -12,7 +12,6 @@ class User(AbstractUser):
     # Optional profile fields
     bio = models.TextField(max_length=500, blank=True)  # Short biography
     profile_pic = models.ImageField(upload_to='profile_pics/', default='default.jpg')  # Profile image
-    is_admin = models.BooleanField(default=False)  # Admin status (mapped to is_superuser)
     
     # User interface preference
     THEME_CHOICES = [
@@ -22,6 +21,12 @@ class User(AbstractUser):
     theme = models.CharField(max_length=20, choices=THEME_CHOICES, default='light')  # Light or dark mode
     notifications_enabled = models.BooleanField(default=True)  # Whether notifications are enabled
     
+    # Admin configuration
+    is_admin_only = models.BooleanField(
+        default=False,
+        help_text="If True, this admin account cannot access user features"
+    )
+    
     # Timestamps
     created_at = models.DateTimeField(default=timezone.now)  # Date of user creation
     updated_at = models.DateTimeField(auto_now=True)  # Date of last profile update
@@ -29,6 +34,18 @@ class User(AbstractUser):
     # Authentication settings
     USERNAME_FIELD = 'email'  # Email is used for login
     REQUIRED_FIELDS = ['username', 'full_name']  # Fields required when creating a superuser
+    
+    def __str__(self):
+        # Display the user's full name or email in admin interface
+        return self.full_name or self.email
+    
+    @property
+    def is_admin(self):
+        # Admin check mapped to Django's built-in superuser field
+        return self.is_superuser
+
+    class Meta:
+        db_table = 'notes_user'  # Custom database table name
     
     def __str__(self):
         # Display the user's full name or email in admin interface
