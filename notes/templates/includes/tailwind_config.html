@@ -1,0 +1,9 @@
+<script>
+// Ensure Tailwind CDN uses class-based dark mode (so dark: utilities only apply when
+// the `dark` class is present on <html>). This must run before loading the CDN script.
+try{
+  window.tailwind = window.tailwind || {};
+  window.tailwind.config = window.tailwind.config || {};
+  window.tailwind.config.darkMode = 'class';
+}catch(e){/* noop if window not available */}
+</script>

@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.urls import reverse
 from django.db.models import Count, Q
 from datetime import timedelta
-from .models import Task, Note, User
+from .models import Task, Note, User, Reminder
 from .forms import TaskForm, UserProfileForm, NoteForm, AdminCreationForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -408,15 +408,22 @@ def edit_task(request, task_id):
     Handles editing a task.
     """
     task = get_object_or_404(Task, id=task_id, user=request.user)
+    # If request asked for panel rendering (AJAX or panel param), render partial
+    panel_mode = request.GET.get('panel') == '1' or request.POST.get('panel') == '1' or request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
             form.save()
             messages.success(request, "Task updated successfully!")
+            if panel_mode:
+                return redirect('notes:calendar')
             return redirect('notes:home')
     else:
         form = TaskForm(instance=task)
+
+    if panel_mode:
+        return render(request, "includes/edit_task_panel.html", {"form": form, "task": task})
 
     return render(request, "edit_task.html", {"form": form, "task": task})
 
@@ -427,6 +434,18 @@ def profile_view(request):
     Renders the user's profile page and calculates user statistics.
     """
     user = request.user
+    # If first/last name are not populated but a full_name exists,
+    # derive reasonable first and last name values for display.
+    try:
+        if (not getattr(user, 'first_name', None) or not getattr(user, 'last_name', None)) and getattr(user, 'full_name', None):
+            parts = user.full_name.strip().split()
+            if parts:
+                # assign non-persisted attributes for template rendering
+                user.first_name = parts[0]
+                user.last_name = ' '.join(parts[1:]) if len(parts) > 1 else ''
+    except Exception:
+        # be defensive; if anything goes wrong, fall back to existing attributes
+        pass
     
     # Calculate Task Statistics
     total_tasks = Task.objects.filter(user=user).count()
@@ -451,6 +470,17 @@ def edit_profile(request):
     Handles displaying and processing the User Profile edit form.
     """
     user = request.user
+    # If first/last name are not populated but a full_name exists,
+    # derive reasonable first and last name values for display while editing.
+    try:
+        if (not getattr(user, 'first_name', None) or not getattr(user, 'last_name', None)) and getattr(user, 'full_name', None):
+            parts = user.full_name.strip().split()
+            if parts:
+                # assign non-persisted attributes so templates can read them
+                user.first_name = parts[0]
+                user.last_name = ' '.join(parts[1:]) if len(parts) > 1 else ''
+    except Exception:
+        pass
     
     if request.method == "POST":
         first_name = request.POST.get('first_name', '').strip()
@@ -498,6 +528,22 @@ def edit_profile(request):
         "form": form,
         "user": user
     })
+
+
+@login_required
+def notes_list(request):
+    """Show all notes created by the logged-in user."""
+    user = request.user
+    notes = Note.objects.filter(user=user).order_by('-created_at')
+    total_notes = notes.count()
+    context = {
+        'notes': notes,
+        'total_notes': total_notes,
+        'total_tasks_count': Task.objects.filter(user=user).count(),
+        'total_notes_sidebar': total_notes,
+        'view_as_user': request.session.get('view_as_user', False),
+    }
+    return render(request, 'notes_list.html', context)
 
 
 @login_required
@@ -708,6 +754,82 @@ def settings_page(request):
     }
     
     return render(request, 'settings_page.html', context)
+
+
+@login_required
+def calendar_view(request):
+    """
+    Displays a month calendar with tasks' due dates and reminders.
+    """
+    user = request.user
+    # Gather tasks with due dates and reminders, but exclude tasks that are completed
+    tasks_with_due = Task.objects.filter(user=user, due_date__isnull=False).exclude(status='completed').order_by('due_date')
+    # Exclude reminders that belong to completed tasks
+    reminders = Reminder.objects.filter(task__user=user).exclude(task__status='completed').order_by('remind_time')
+
+    # Build combined upcoming events list
+    upcoming = []
+    for t in tasks_with_due:
+        upcoming.append({
+            'type': 'task',
+            'title': t.title,
+            'datetime': t.due_date,
+            'url': reverse('notes:edit_task', args=[t.id])
+        })
+    for r in reminders:
+        upcoming.append({
+            'type': 'reminder',
+            'title': f"Reminder: {r.task.title}",
+            'datetime': r.remind_time,
+            'url': reverse('notes:edit_task', args=[r.task.id])
+        })
+
+    # Sort by datetime
+    upcoming_sorted = sorted(upcoming, key=lambda e: e['datetime'] or timezone.now())
+
+    # Generate month grid for current month
+    import calendar as _pycal
+    now = timezone.localtime(timezone.now())
+    year = now.year
+    month = now.month
+    cal = _pycal.Calendar()
+    month_weeks = cal.monthdayscalendar(year, month)
+
+    # Map day -> events
+    events_by_day = {}
+    for ev in upcoming_sorted:
+        dt = timezone.localtime(ev['datetime']) if ev['datetime'] else None
+        if dt and dt.year == year and dt.month == month:
+            events_by_day.setdefault(dt.day, []).append(ev)
+
+    # Build a structure where each week is a list of day dicts {day: int, events: []}
+    month_cells = []
+    for week in month_weeks:
+        week_cells = []
+        for day in week:
+            if day == 0:
+                week_cells.append({'day': 0, 'events': []})
+            else:
+                week_cells.append({'day': day, 'events': events_by_day.get(day, [])})
+        month_cells.append(week_cells)
+
+    context = {
+        'month_cells': month_cells,
+        'year': year,
+        'month': now.strftime('%B'),
+        'upcoming': upcoming_sorted[:30],
+        # Prepare todos for today and tomorrow
+        'todos_today': [e for e in upcoming_sorted if (timezone.localtime(e['datetime']).date() == now.date())],
+        'todos_tomorrow': [e for e in upcoming_sorted if (timezone.localtime(e['datetime']).date() == (now + timedelta(days=1)).date())],
+        'total_tasks_count': Task.objects.filter(user=user).count(),
+        'total_notes_sidebar': Note.objects.filter(user=user).count(),
+        'view_as_user': request.session.get('view_as_user', False),
+    }
+
+    # expose 'now' for template use
+    context['now'] = now
+
+    return render(request, 'calendar.html', context)
 
 @login_required
 def delete_account(request):

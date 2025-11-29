@@ -83,6 +83,18 @@
           </a>
         </li>
         <li>
+          <a href="{% url 'notes:notes_list' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            <span>All Notes</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:calendar' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+            <span>Calendar</span>
+          </a>
+        </li>
+        <li>
           <a href="{% url 'notes:settings_page' %}" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg font-semibold">
             <i data-lucide="settings" class="w-5 h-5"></i>
             <span>Settings</span>
@@ -161,7 +173,7 @@
             <div class="flex items-center gap-3">
               <i data-lucide="key" class="w-5 h-5 text-gray-600 group-hover:text-emerald-600"></i>
               <div>
-                <h4 class="font-semibold text-gray-800">Change Password</h4>
+                <h4 class="font-semibold text-gray-800 text-left">Change Password</h4>
                 <p class="text-sm text-gray-500">Update your account password</p>
               </div>
             </div>
@@ -245,7 +257,7 @@
             <div class="flex items-center gap-3">
               <i id="theme-icon-settings" data-lucide="moon" class="w-5 h-5 text-gray-600 group-hover:text-emerald-600"></i>
               <div>
-                <h4 class="font-semibold text-gray-800">Theme</h4>
+                <h4 class="font-semibold text-gray-800 text-left">Theme</h4>
                 <p id="theme-text-settings" class="text-sm text-gray-500">Dark Mode</p>
               </div>
             </div>
@@ -266,7 +278,7 @@
             <div class="flex items-center gap-3">
               <i data-lucide="trash-2" class="w-5 h-5 text-red-600"></i>
               <div>
-                <h4 class="font-semibold text-red-800">Delete Account</h4>
+                <h4 class="font-semibold text-red-800 text-left">Delete Account</h4>
                 <p class="text-sm text-red-600">Permanently delete your account</p>
               </div>
             </div>

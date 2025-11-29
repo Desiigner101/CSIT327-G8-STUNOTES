@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>All Notes - StuNotes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  {% include 'includes/theme_init.html' %}
+  {% include 'includes/dark_overrides.html' %}
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  <aside class="sidebar w-64 bg-white flex flex-col">
+    <div class="logo p-6 border-b border-gray-200">
+      <div class="flex items-center gap-2">
+        <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
+        <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
+      </div>
+    </div>
+    <nav class="flex-1 p-4">
+      <ul class="space-y-2">
+        <li>
+          <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600  transition">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span>Profile</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:notes_list' %}" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 text-emerald-600 rounded-lg font-semibold">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            <span>All Notes</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:calendar' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50  hover:text-emerald-600 transition">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+            <span>Calendar</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            <span>Settings</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:logout' %}" class="flex items-center gap-3 px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+            <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="stats p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Tasks:</span>
+          <span class="text-lg font-bold text-emerald-600">{{ total_tasks_count }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-gray-600">Notes:</span>
+          <span class="text-lg font-bold text-emerald-600">{{ total_notes_sidebar }}</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main flex-1 p-8 overflow-y-auto custom-scrollbar">
+    <header class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-black">All Notes ({{ total_notes }})</h1>
+      <p class="text-sm text-gray-500 dark:text-black-400 mt-1">All notes you've created are shown here.</p>
+    </header>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for note in notes %}
+      <article class="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow hover:shadow-lg transition">
+        <header class="flex items-start justify-between">
+          <strong class="text-sm text-gray-700">Notes</strong>
+          <div class="text-xs text-gray-400">{{ note.created_at|date:"d M Y" }}</div>
+        </header>
+        <p class="mt-3 text-sm text-gray-600 h-24 overflow-hidden">{{ note.content }}</p>
+        <div class="mt-4 flex items-center justify-between">
+          <a href="{% url 'notes:edit_note' note.id %}" class="text-xs text-emerald-600">Edit</a>
+          <a href="#" class="text-xs text-gray-400">{{ note.subject }}</a>
+        </div>
+      </article>
+      {% empty %}
+      <div class="col-span-full text-gray-500">You have no notes yet.</div>
+      {% endfor %}
+    </section>
+  </main>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

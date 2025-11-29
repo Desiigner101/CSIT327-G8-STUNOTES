@@ -29,8 +29,12 @@ urlpatterns = [
     #Profile URLs
     path('profile/', views.profile_view, name='profile_view'), 
     path('profile/edit/', views.edit_profile, name='edit_profile'),
+    # Notes list
+    path('notes/', views.notes_list, name='notes_list'),
 
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('switch-to-user/', views.switch_to_user_mode, name='switch_to_user_mode'),
     path('switch-to-admin/', views.switch_to_admin_mode, name='switch_to_admin_mode'),
+    # Calendar
+    path('calendar/', views.calendar_view, name='calendar'),
 ]
