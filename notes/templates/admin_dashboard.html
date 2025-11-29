@@ -122,6 +122,18 @@
           </a>
         </li>
         <li>
+          <a href="{% url 'notes:notes_list' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            <span>All Notes</span>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'notes:calendar' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition">
+            <i data-lucide="calendar" class="w-5 h-5"></i>
+            <span>Calendar</span>
+          </a>
+        </li>
+        <li>
           <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition">
             <i data-lucide="settings" class="w-5 h-5"></i>
             <span>Settings</span>

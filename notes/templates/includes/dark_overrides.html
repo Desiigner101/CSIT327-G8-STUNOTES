@@ -211,3 +211,82 @@
   .dark #close-delete-button { background-color: var(--sn-surface-2) !important; color: var(--sn-text) !important; }
   .dark #close-delete-button:hover { background-color: #111827 !important; }
 </style>
+<style>
+  /* Dark-mode: make sidebar hover and active states consistent with emerald accent
+     Scoped to html.dark so light mode is not affected. */
+  html.dark .sidebar a,
+  html.dark .sidebar a * {
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+
+  /* Hover state: subtle emerald background and accent color for text/icon */
+  html.dark .sidebar a:hover{
+    background-color: rgba(52,211,153,0.06) !important; /* very subtle */
+    color: var(--sn-accent) !important;
+  }
+  html.dark .sidebar a:hover * {
+    background-color: rgba(52,211,153,0.06) !important; /* very subtle */
+    background-color: transparent !important; /* remove the inner box */
+  }
+
+/* ACTIVE: background only on the <a> element */
+html.dark .sidebar a.active {
+    background-color: rgba(34,197,94,0.12) !important;
+    color: var(--sn-accent) !important;
+}
+
+/* Color the text and icons, but do NOT set background */
+html.dark .sidebar a.active * {
+    color: var(--sn-accent) !important;
+    background-color: transparent !important; /* remove the inner box */
+}
+
+  /* Make sure icons (svgs) use accent color when active/hover */
+  html.dark .sidebar a.active [data-lucide],
+  html.dark .sidebar a:hover [data-lucide] {
+    color: var(--sn-accent) !important;
+  }
+</style>
+<!-- If the user explicitly selected 'light' (stored/persisted), prefer that
+     and make the sidebar stats + main content readable by targeting the
+     `data-user-theme` attribute. This is narrowly scoped and will not
+     interfere when the user explicitly uses dark mode. -->
+<style>
+  html[data-user-theme="light"] .sidebar .stats {
+    background-color: #f8fafc !important;
+    color: #0f1724 !important;
+    border-color: rgba(15,23,36,0.06) !important;
+  }
+  html[data-user-theme="light"] .sidebar .stats .text-lg,
+  html[data-user-theme="light"] .sidebar .stats strong {
+    color: #10b981 !important; /* emerald */
+  }
+  html[data-user-theme="light"] main, html[data-user-theme="light"] .main {
+    color: #0f1724 !important;
+  }
+</style>
+<!-- Force light-mode appearance when `html` does NOT have the `dark` class.
+     This neutralizes media-driven dark variants from the CDN and makes the
+     page appear light unless we explicitly add `html.dark`. Placed at the
+     end so it can override previously-loaded styles. -->
+<style>
+  html:not(.dark) body,
+  html:not(.dark) main,
+  html:not(.dark) .main {
+    background-image: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+    background-color: #f8fafc !important;
+    color: #0f1724 !important;
+  }
+
+  /* Ensure panels/cards that use bg-white stay white in light mode */
+  html:not(.dark) .bg-white,
+  html:not(.dark) .rounded-2xl.bg-white,
+  html:not(.dark) .rounded-xl.bg-white {
+    background-color: #ffffff !important;
+    color: #0f1724 !important;
+    border-color: rgba(15,23,36,0.06) !important;
+  }
+
+  /* Make sure small text and icons are readable in light mode */
+  html:not(.dark) .text-gray-500, html:not(.dark) .text-gray-400 { color: #6b7280 !important; }
+</style>
