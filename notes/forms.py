@@ -29,10 +29,21 @@ class TaskForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter task title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Add details'}),
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
-            'due_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'due_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local', 'min': ''}),
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
+    
+    def clean_due_date(self):
+        """Validate that due_date is not in the past"""
+        from django.utils import timezone
+        due_date = self.cleaned_data.get('due_date')
+        if due_date:
+            now = timezone.now()
+            # Compare dates (ignore microseconds for comparison)
+            if due_date < now:
+                raise forms.ValidationError("Due date cannot be in the past. Please select today or a future date.")
+        return due_date
 
 
 # ----------------------------
@@ -166,3 +177,57 @@ class AdminCreationForm(forms.Form):
         if password1 and len(password1) < 8:
             raise forms.ValidationError("Password must be at least 8 characters long.")
         return password1
+
+
+class UserCreationForm(forms.Form):
+    """Form for creating a new regular user account"""
+    full_name = forms.CharField(
+        max_length=255,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition',
+            'placeholder': 'Full Name'
+        })
+    )
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition',
+            'placeholder': 'user@example.com'
+        })
+    )
+    password1 = forms.CharField(
+        label='Password',
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition',
+            'placeholder': 'Password'
+        })
+    )
+    password2 = forms.CharField(
+        label='Confirm Password',
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition',
+            'placeholder': 'Confirm Password'
+        })
+    )
+    
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError("Passwords don't match.")
+        return password2
+    
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        if password1 and len(password1) < 8:
+            raise forms.ValidationError("Password must be at least 8 characters long.")
+        return password1
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email and User.objects.filter(email=email).exists():
+            raise forms.ValidationError("A user with this email already exists.")
+        return email

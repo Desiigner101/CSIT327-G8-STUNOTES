@@ -57,6 +57,42 @@
             height: 300px;
         }
 
+        .modal {
+            display: none;
+        }
+        
+        .modal.flex {
+            display: flex !important;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            background-color: white;
+            color: #1f2937;
+        }
+        
+        .dark .form-group input {
+            background-color: #1f2937;
+            border-color: #4b5563;
+            color: #f3f4f6;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+        }
+        
+        .dark .form-group input:focus {
+            border-color: #9333ea;
+            box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+        }
+
         /* Mobile menu toggle */
         @media (max-width: 768px) {
             .sidebar {
@@ -181,6 +217,16 @@
         <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">System Overview & Management</p>
       </div>
       <div class="topbar-right flex items-center gap-3 md:gap-5">
+        <div class="flex items-center gap-2">
+          <button onclick="openModal('addUserModal')" class="inline-flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition shadow-md">
+            <i data-lucide="user-plus" class="w-4 h-4"></i>
+            <span class="text-sm font-semibold">Add User</span>
+          </button>
+          <button onclick="openModal('deleteUserModal')" class="inline-flex items-center gap-2 px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition shadow-md">
+            <i data-lucide="user-minus" class="w-4 h-4"></i>
+            <span class="text-sm font-semibold">Delete User</span>
+          </button>
+        </div>
         <div class="flex items-center gap-3 px-4 py-2 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
           <i data-lucide="shield" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
           <span class="text-sm font-semibold text-purple-600 dark:text-purple-400">Administrator</span>
@@ -347,6 +393,7 @@
               <th class="px-4 py-3 text-center">Tasks</th>
               <th class="px-4 py-3 text-center">Notes</th>
               <th class="px-4 py-3">Role</th>
+              <th class="px-4 py-3 text-center">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -375,11 +422,21 @@
                   <span class="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-full text-xs font-bold">User</span>
                   {% endif %}
                 </td>
+                <td class="px-4 py-3 text-center">
+                  {% if user_stat.id != user.id %}
+                  <button onclick="confirmDeleteUser({{ user_stat.id }}, '{{ user_stat.full_name|default:user_stat.email|escapejs }}')" 
+                          class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition">
+                    <i data-lucide="trash-2" class="w-4 h-4 inline"></i> Delete
+                  </button>
+                  {% else %}
+                  <span class="text-xs text-gray-400">Current User</span>
+                  {% endif %}
+                </td>
               </tr>
               {% endfor %}
             {% else %}
             <tr>
-              <td colspan="5" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No user data available</td>
+              <td colspan="6" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">No user data available</td>
             </tr>
             {% endif %}
           </tbody>
@@ -388,7 +445,190 @@
     </div>
   </main>
 
+  <!-- Hidden CSRF token for JavaScript -->
+  <div id="csrf-token" style="display: none;">{% csrf_token %}</div>
+
+  <!-- Add User Modal -->
+  <div id="addUserModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white dark:bg-gray-800 mx-auto my-12 p-0 w-11/12 max-w-md rounded-3xl shadow-2xl animate-slideDown">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">➕ Add User</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('addUserModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        <form method="post" action="{% url 'notes:add_user' %}">
+          {% csrf_token %}
+          <div class="space-y-4">
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Full Name</label>
+              {{ user_form.full_name }}
+              {% if user_form.full_name.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.full_name.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Email Address</label>
+              {{ user_form.email }}
+              {% if user_form.email.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.email.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Password</label>
+              {{ user_form.password1 }}
+              {% if user_form.password1.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.password1.errors.0 }}</p>
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Confirm Password</label>
+              {{ user_form.password2 }}
+              {% if user_form.password2.errors %}
+              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.password2.errors.0 }}</p>
+              {% endif %}
+            </div>
+            {% if user_form.non_field_errors %}
+            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
+              <p class="text-red-800 dark:text-red-300 text-sm font-semibold">Please correct the errors:</p>
+              {{ user_form.non_field_errors }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex gap-3 mt-6">
+            <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Create User</button>
+            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('addUserModal')">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete User Modal -->
+  <div id="deleteUserModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+    <div class="modal-content bg-white dark:bg-gray-800 mx-auto my-12 p-0 w-11/12 max-w-md rounded-3xl shadow-2xl animate-slideDown">
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-red-500 to-red-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">🗑️ Delete User</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('deleteUserModal')">&times;</span>
+      </div>
+      <div class="modal-body p-8">
+        <div class="mb-6">
+          <p class="text-gray-700 dark:text-gray-300 mb-4">Select a user to delete from the list below:</p>
+          <div class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+            {% if all_users %}
+              {% for user_item in all_users %}
+                {% if user_item.id != user.id %}
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <img src="{% if user_item.profile_pic %}{{ user_item.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                         alt="{{ user_item.full_name }}" 
+                         class="w-8 h-8 rounded-full object-cover">
+                    <div>
+                      <p class="font-semibold text-gray-800 dark:text-white">{{ user_item.full_name }}</p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">{{ user_item.email }}</p>
+                    </div>
+                  </div>
+                  <button onclick="confirmDeleteUser({{ user_item.id }}, '{{ user_item.full_name|default:user_item.email|escapejs }}')" 
+                          class="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition">
+                    <i data-lucide="trash-2" class="w-4 h-4 inline"></i> Delete
+                  </button>
+                </div>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              <p class="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No users available to delete</p>
+            {% endif %}
+          </div>
+        </div>
+        <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
+          <p class="text-red-800 dark:text-red-300 text-sm font-semibold">⚠️ Warning:</p>
+          <ul class="list-disc list-inside text-red-700 dark:text-red-400 text-sm mt-2">
+            <li>This action is permanent and cannot be undone</li>
+            <li>All user data (tasks, notes, profile) will be deleted</li>
+            <li>You cannot delete your own account</li>
+          </ul>
+        </div>
+        <div class="flex gap-3 mt-6">
+          <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('deleteUserModal')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    // Modal functions
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        lucide.createIcons(); // Reinitialize icons in modal
+      }
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    }
+
+    // Get CSRF token function
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+
+    // Confirm and delete user
+    function confirmDeleteUser(userId, userName) {
+      if (confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `{% url 'notes:delete_user' 0 %}`.replace('0', userId);
+        
+        // Add CSRF token - try multiple methods
+        let csrfToken = getCookie('csrftoken');
+        if (!csrfToken) {
+          const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+          if (csrfInput) {
+            csrfToken = csrfInput.value;
+          }
+        }
+        
+        if (csrfToken) {
+          const csrfInput = document.createElement('input');
+          csrfInput.type = 'hidden';
+          csrfInput.name = 'csrfmiddlewaretoken';
+          csrfInput.value = csrfToken;
+          form.appendChild(csrfInput);
+        }
+        
+        document.body.appendChild(form);
+        form.submit();
+      }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modals = document.querySelectorAll('.modal');
+      modals.forEach(modal => {
+        if (event.target === modal) {
+          closeModal(modal.id);
+        }
+      });
+    }
+
     // Initialize Lucide icons
     lucide.createIcons();
 

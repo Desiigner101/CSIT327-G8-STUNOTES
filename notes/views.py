@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db.models import Count, Q
 from datetime import timedelta
 from .models import Task, Note, User, Reminder
-from .forms import TaskForm, UserProfileForm, NoteForm, AdminCreationForm
+from .forms import TaskForm, UserProfileForm, NoteForm, AdminCreationForm, UserCreationForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 
@@ -295,6 +295,9 @@ def admin_dashboard(request):
 
     view_as_user = request.session.get('view_as_user', False)
 
+    # Initialize user form for modal
+    user_form = UserCreationForm()
+    
     context = {
         # User statistics
         'total_users': total_users,
@@ -318,11 +321,15 @@ def admin_dashboard(request):
         'recent_tasks': recent_tasks,
         'recent_notes': recent_notes,
         'user_stats': user_stats,
+        'all_users': all_users,  # For delete modal
         
         # Chart data
         'date_labels': date_labels,
         'daily_tasks': daily_tasks,
         'daily_notes': daily_notes,
+        
+        # Forms
+        'user_form': user_form,
         'show_switch_to_user': show_switch_to_user,
         'view_as_user': view_as_user,
     }
@@ -854,3 +861,70 @@ def delete_account(request):
         return redirect('notes:home') 
         
     return redirect('notes:settings_page')
+
+
+@login_required
+@require_POST
+def add_user(request):
+    """
+    Allows admin to create a new regular user account.
+    """
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to add users.")
+        return redirect("notes:admin_dashboard")
+    
+    form = UserCreationForm(request.POST)
+    if form.is_valid():
+        email = form.cleaned_data['email']
+        full_name = form.cleaned_data['full_name']
+        password = form.cleaned_data['password1']
+        
+        # Create the user
+        user = User.objects.create_user(
+            email=email,
+            username=email,
+            full_name=full_name,
+            password=password
+        )
+        
+        messages.success(request, f'User "{full_name}" has been successfully created!')
+    else:
+        # If form is invalid, show errors
+        for field, errors in form.errors.items():
+            for error in errors:
+                messages.error(request, f'{field}: {error}')
+    
+    return redirect('notes:admin_dashboard')
+
+
+@login_required
+@require_POST
+def delete_user(request, user_id):
+    """
+    Allows admin to delete a user account.
+    """
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to delete users.")
+        return redirect("notes:admin_dashboard")
+    
+    try:
+        user_to_delete = get_object_or_404(User, id=user_id)
+        
+        # Prevent admin from deleting themselves
+        if user_to_delete.id == request.user.id:
+            messages.error(request, "You cannot delete your own account.")
+            return redirect('notes:admin_dashboard')
+        
+        # Prevent deleting superusers (optional safety check)
+        if user_to_delete.is_superuser and not request.user.is_superuser:
+            messages.error(request, "You don't have permission to delete superuser accounts.")
+            return redirect('notes:admin_dashboard')
+        
+        user_name = user_to_delete.full_name or user_to_delete.email
+        user_to_delete.delete()
+        messages.success(request, f'User "{user_name}" has been successfully deleted.')
+        
+    except Exception as e:
+        messages.error(request, f'Error deleting user: {str(e)}')
+    
+    return redirect('notes:admin_dashboard')
