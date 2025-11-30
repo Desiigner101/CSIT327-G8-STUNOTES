@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StuNotes - Study Smarter, Not Harder</title>
+  <link rel="icon" type="image/png" href="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+  <style>
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(1deg); }
+    }
+    @keyframes floatReverse {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(-1deg); }
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.5; }
+    }
+    .fade-in-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+      opacity: 0;
+    }
+    .slide-in-right {
+      animation: slideInRight 0.8s ease-out forwards;
+      opacity: 0;
+    }
+    .float-animation {
+      animation: float 6s ease-in-out infinite;
+    }
+    .float-reverse {
+      animation: floatReverse 7s ease-in-out infinite;
+    }
+    .gradient-border {
+      position: relative;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .glow-emerald {
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+    }
+    .glow-teal {
+      box-shadow: 0 0 30px rgba(20, 184, 166, 0.3);
+    }
+    .pulse-glow {
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    /* Smooth scroll */
+    html {
+      scroll-behavior: smooth;
+    }
+    /* Hero gradient mesh */
+    .gradient-mesh {
+      background: 
+        radial-gradient(at 27% 37%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+        radial-gradient(at 97% 21%, rgba(20, 184, 166, 0.15) 0px, transparent 50%),
+        radial-gradient(at 52% 99%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+        radial-gradient(at 10% 29%, rgba(5, 150, 105, 0.15) 0px, transparent 50%);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/30 overflow-x-hidden">
+  {% include 'includes/loader.html' %}
+  
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md bg-white/70 border-b border-gray-200/50">
+    <div class="container mx-auto px-6 py-4">
+      <div class="flex justify-between items-center">
+        <a href="{% url 'notes:landing' %}" class="flex items-center gap-2 group">
+          <img src="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/stunotes_logo.png" 
+               alt="StuNotes Logo" 
+               class="w-9 h-9 object-contain transition-transform group-hover:scale-110">
+          <span class="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">StuNotes</span>
+        </a>
+        
+        <nav class="flex items-center gap-2">
+           <a href="{% url 'notes:login' %}" 
+             class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors rounded-lg hover:bg-emerald-50">
+            Sign in
+          </a>
+          <a href="{% url 'notes:register' %}" 
+             class="px-5 py-2.5 text-sm font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:shadow-lg hover:shadow-emerald-500/30 hover:scale-105 transition-all duration-200">
+            Get Started
+          </a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="gradient-mesh">
+    <section class="container mx-auto px-6 pt-32 pb-20 md:pt-40 md:pb-28">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        
+        <!-- Left Content -->
+        <div class="fade-in-up space-y-8 max-w-2xl">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2 px-4 py-2 glass-card rounded-full text-emerald-700 text-sm font-medium shadow-sm">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>Trusted by 50,000+ students worldwide</span>
+          </div>
+          
+          <!-- Headline -->
+          <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 leading-[1.1] tracking-tight">
+            Study Smarter,<br>
+            <span class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+              Not Harder
+            </span>
+          </h1>
+          
+          <!-- Subheadline -->
+          <p class="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl">
+            Your all-in-one platform to organize notes, track tasks, and never miss a deadline. Built by students, for students.
+          </p>
+          
+          <!-- CTA Buttons -->
+          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <a href="{% url 'notes:register' %}" 
+               class="group px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2">
+              Get Started
+              <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+            </a>
+            <a href="#features" 
+               class="px-8 py-4 bg-white text-gray-700 text-base font-semibold rounded-xl border-2 border-gray-200 hover:border-emerald-500 hover:text-emerald-600 transition-all duration-200 flex items-center justify-center gap-2">
+              <i data-lucide="play-circle" class="w-5 h-5"></i>
+              See How It Works
+            </a>
+          </div>
+
+          <!-- Social Proof -->
+          <div class="flex items-center gap-6 pt-6">
+            <div class="flex -space-x-2">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-white"></div>
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 border-2 border-white"></div>
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-cyan-600 border-2 border-white"></div>
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                +5k
+              </div>
+            </div>
+            <div class="text-sm text-gray-600">
+              <div class="font-semibold text-gray-900">Join the community</div>
+              <div class="flex items-center gap-1">
+                <div class="flex">
+                  <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+                  <i data-lucide="star" class="w-4 h-4 fill-yellow-400 text-yellow-400"></i>
+                </div>
+                <span class="ml-1">4.9 rating</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Visual -->
+        <div class="slide-in-right relative hidden lg:flex justify-center items-center" style="animation-delay: 0.2s">
+          <div class="relative w-full max-w-lg">
+            <!-- Background Glow Elements -->
+            <div class="absolute -top-10 -left-10 w-72 h-72 bg-emerald-400/30 rounded-full blur-3xl pulse-glow"></div>
+            <div class="absolute -bottom-10 -right-10 w-72 h-72 bg-teal-400/30 rounded-full blur-3xl pulse-glow" style="animation-delay: 1.5s"></div>
+            
+            <!-- Floating Cards -->
+            <div class="relative space-y-4">
+              <!-- Note Card -->
+              <div class="gradient-border rounded-2xl p-5 shadow-xl float-animation">
+                <div class="flex items-start gap-3 mb-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="file-text" class="w-5 h-5 text-white"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="h-3 bg-gray-200 rounded-full w-32 mb-2"></div>
+                    <div class="h-2 bg-gray-100 rounded-full w-24"></div>
+                  </div>
+                  <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">Biology</span>
+                </div>
+                <div class="space-y-2">
+                  <div class="h-2 bg-gray-100 rounded-full w-full"></div>
+                  <div class="h-2 bg-gray-100 rounded-full w-11/12"></div>
+                  <div class="h-2 bg-gray-100 rounded-full w-4/5"></div>
+                </div>
+              </div>
+              
+              <!-- Task Card -->
+              <div class="gradient-border rounded-2xl p-5 shadow-xl float-reverse ml-8" style="animation-delay: 0.5s">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-6 h-6 rounded-lg border-2 border-emerald-500 flex items-center justify-center">
+                      <i data-lucide="check" class="w-4 h-4 text-emerald-500"></i>
+                    </div>
+                    <div class="h-3 bg-gray-200 rounded-full w-28"></div>
+                  </div>
+                  <span class="text-xs font-semibold text-emerald-600">Complete</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500">
+                  <i data-lucide="calendar" class="w-3 h-3"></i>
+                  <span>Due: Today</span>
+                </div>
+              </div>
+
+              <!-- Reminder Card -->
+              <div class="gradient-border rounded-2xl p-5 shadow-xl float-animation" style="animation-delay: 1s">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i data-lucide="bell" class="w-5 h-5 text-white"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="h-3 bg-gray-200 rounded-full w-36 mb-2"></div>
+                    <div class="flex items-center gap-2 text-xs text-gray-500">
+                      <i data-lucide="clock" class="w-3 h-3"></i>
+                      <span>In 30 minutes</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Stats Card -->
+              <div class="gradient-border rounded-2xl p-6 shadow-xl float-reverse ml-4" style="animation-delay: 1.5s">
+                <div class="grid grid-cols-3 gap-6 text-center">
+                  <div>
+                    <div class="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">24</div>
+                    <div class="text-xs text-gray-600 mt-1">Notes</div>
+                  </div>
+                  <div>
+                    <div class="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-700 bg-clip-text text-transparent">15</div>
+                    <div class="text-xs text-gray-600 mt-1">Tasks</div>
+                  </div>
+                  <div>
+                    <div class="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-cyan-700 bg-clip-text text-transparent">2</div>
+                    <div class="text-xs text-gray-600 mt-1">Notes</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="container mx-auto px-6 py-20">
+      <div class="text-center mb-16 fade-in-up">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          Everything you need to <span class="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">excel</span>
+        </h2>
+        <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          Powerful features designed to help you stay organized and focused on what matters most.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="fade-in-up glass-card rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group" style="animation-delay: 0.1s">
+          <div class="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <i data-lucide="file-text" class="w-7 h-7 text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Notes</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Create, organize, and format your notes with a clean, distraction-free editor. Add tags, search instantly, and never lose track of your ideas.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="fade-in-up glass-card rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group" style="animation-delay: 0.2s">
+          <div class="w-14 h-14 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <i data-lucide="check-circle" class="w-7 h-7 text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Task Management</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Break down projects into actionable tasks. Set priorities, track progress, and celebrate your wins as you complete each milestone.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="fade-in-up glass-card rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group" style="animation-delay: 0.3s">
+          <div class="w-14 h-14 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform">
+            <i data-lucide="bell" class="w-7 h-7 text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">Smart Reminders</h3>
+          <p class="text-gray-600 leading-relaxed">
+            Never miss a deadline again. Set custom reminders for assignments, exams, and study sessions. Get notified at the perfect time.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="container mx-auto px-6 py-20">
+      <div class="fade-in-up gradient-border rounded-3xl p-12 md:p-16 text-center glow-emerald">
+        <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+          Ready to transform your study routine?
+        </h2>
+        <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          Join thousands of students who are already achieving more with StuNotes. Start your free account today — no credit card required.
+        </p>
+        <a href="{% url 'notes:register' %}" 
+           class="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-lg font-semibold rounded-xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200">
+          Get Started
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-200 bg-white/50 backdrop-blur-sm">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="flex items-center gap-2">
+          <img src="https://dxiorsuarmdwswzyaxdy.supabase.co/storage/v1/object/public/public-assets/stunotes_logo.png" alt="StuNotes Logo" class="w-8 h-8">
+          <span class="text-lg font-bold text-gray-900">StuNotes</span>
+        </div>
+        <p class="text-sm text-gray-600">© 2025 StuNotes. Made with ❤️ for students.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="{% static 'notes/js/common.js' %}" defer></script>
+  <script>
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+      
+      // Stagger animations for fade-in elements
+      const fadeElements = document.querySelectorAll('.fade-in-up, .slide-in-right');
+      fadeElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+      });
+
+      // Header scroll effect
+      let lastScroll = 0;
+      const header = document.querySelector('header');
+      
+      window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        
+        if (currentScroll > 50) {
+          header.classList.add('shadow-sm');
+        } else {
+          header.classList.remove('shadow-sm');
+        }
+        
+        lastScroll = currentScroll;
+      });
+    });
+  </script>
+</body>
+</html>

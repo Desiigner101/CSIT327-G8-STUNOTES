@@ -15,9 +15,11 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   
   <!-- Custom JS -->
+  <script src="{% static 'notes/js/common.js' %}" defer></script>
   <script src="{% static 'notes/js/login.js' %}" defer></script>
 </head>
 <body class="h-screen flex overflow-hidden">
+  {% include 'includes/loader.html' %}
   
   <!-- Left Panel - Green Background -->
   <div class="left-panel hidden md:flex md:w-2/3 bg-gradient-to-br from-emerald-600 to-emerald-700 flex-col items-start justify-center px-16 text-white relative overflow-hidden">
