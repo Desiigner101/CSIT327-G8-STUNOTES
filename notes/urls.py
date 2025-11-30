@@ -5,7 +5,9 @@ app_name = 'notes'
 
 urlpatterns = [
     #Home
-    path('', views.home, name='home'),
+    path('', views.landing_view, name='landing'),
+    path('landing/', views.landing_view, name='landing_page'),
+    path('home/', views.home, name='home'),
     
     #Settings
     path('settings/', views.settings_page, name='settings_page'),

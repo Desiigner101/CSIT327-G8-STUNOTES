@@ -50,6 +50,16 @@ def register_view(request):
     return render(request, "register.html")
 
 
+def landing_view(request):
+    """
+    Landing page for unauthenticated users. Redirects to `home` if already logged in.
+    """
+    # If logged-in and not explicitly requesting to show the landing page, redirect to the home dashboard
+    if request.user.is_authenticated and not request.GET.get('show_landing'):
+        return redirect('notes:home')
+    return render(request, 'landing.html')
+
+
 def login_view(request):
     """
     Handles user login and redirects based on role.

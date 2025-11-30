@@ -23,6 +23,8 @@
     {% include 'includes/dark_overrides.html' %}
 </head>
 <body class="flex h-screen overflow-hidden bg-gray-50">
+    {% include 'includes/loader.html' %}
+    <script src="{% static 'notes/js/common.js' %}" defer></script>
     
     <!-- Sidebar -->
     <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">

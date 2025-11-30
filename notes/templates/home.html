@@ -80,6 +80,7 @@
     </script>
 
 </head>
+</head>
 
   <style>
     @keyframes slideDown {
@@ -106,6 +107,8 @@
   </style>
 </head>
 <body class="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+  {% include 'includes/loader.html' %}
+  <script src="{% static 'notes/js/common.js' %}" defer></script>
   
   <!-- Sidebar -->
   <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
@@ -188,6 +191,7 @@
         {% if view_as_user and user.is_staff or view_as_user and user.is_superuser %}
         <a href="{% url 'notes:switch_to_admin_mode' %}" class="return-admin inline-flex items-center gap-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-800 dark:text-purple-300">Return to Admin Mode</a>
         {% endif %}
+      
 
         <!-- Notification Bell -->
         <div class="notification-wrapper relative">
