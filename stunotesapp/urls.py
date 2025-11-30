@@ -6,9 +6,10 @@ from notes import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
+    # Use the notes app's root landing page as the project's default root.
+    # The logic for redirecting to login vs. landing (first-run) is handled in `notes.views.landing_view`.
     path('', include('notes.urls')),
-    #path('test/', include('stunotes.urls')),  
+    #path('test/', include('stunotes.urls')),
     
     
 ]
