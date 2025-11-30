@@ -35,6 +35,9 @@ urlpatterns = [
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('switch-to-user/', views.switch_to_user_mode, name='switch_to_user_mode'),
     path('switch-to-admin/', views.switch_to_admin_mode, name='switch_to_admin_mode'),
+    # User management (admin only)
+    path('admin/add-user/', views.add_user, name='add_user'),
+    path('admin/delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
     # Calendar
     path('calendar/', views.calendar_view, name='calendar'),
 ]
