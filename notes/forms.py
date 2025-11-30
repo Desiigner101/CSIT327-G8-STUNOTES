@@ -29,10 +29,21 @@ class TaskForm(forms.ModelForm):
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter task title'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Add details'}),
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
-            'due_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+            'due_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local', 'min': ''}),
             'priority': forms.Select(attrs={'class': 'form-select'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
+    
+    def clean_due_date(self):
+        """Validate that due_date is not in the past"""
+        from django.utils import timezone
+        due_date = self.cleaned_data.get('due_date')
+        if due_date:
+            now = timezone.now()
+            # Compare dates (ignore microseconds for comparison)
+            if due_date < now:
+                raise forms.ValidationError("Due date cannot be in the past. Please select today or a future date.")
+        return due_date
 
 
 # ----------------------------

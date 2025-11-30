@@ -1908,6 +1908,34 @@ document.addEventListener("DOMContentLoaded", function() {
     console.log('   - ESC: Close task form');
     console.log('🎯 All search and filter features loaded!');
 
+    // Set minimum date to today for all datetime-local inputs
+    function setMinDateForInputs() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const minDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+      
+      // Set min for all datetime-local inputs
+      const dateInputs = document.querySelectorAll('input[type="datetime-local"]');
+      dateInputs.forEach(input => {
+        input.setAttribute('min', minDateTime);
+      });
+    }
+    
+    // Set min date on page load
+    setMinDateForInputs();
+    
+    // Also set min date when task form is shown (in case it's dynamically added)
+    const taskFormToggle = document.getElementById('toggleTaskForm');
+    if (taskFormToggle) {
+      taskFormToggle.addEventListener('click', function() {
+        setTimeout(setMinDateForInputs, 100);
+      });
+    }
+
 });
   </script>
   
