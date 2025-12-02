@@ -122,7 +122,6 @@ class UserProfileForm(forms.ModelForm):
         if 'profile_pic' in self.fields:
              self.fields['profile_pic'].label = "Change Profile Picture"
 
-
 class AdminCreationForm(forms.Form):
     """Form for creating a new admin account or upgrading existing account"""
     full_name = forms.CharField(

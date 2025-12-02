@@ -144,7 +144,7 @@
         <a href="{% url 'notes:switch_to_admin_mode' %}" class="inline-flex items-center gap-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-800 dark:text-purple-300">Return to Admin Mode</a>
         {% endif %}
         <a href="{% url 'notes:profile_view' %}" class="profile-link">
-          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+          <img src="{{ user.profile_pic_url }}" 
                alt="Profile" 
                class="profile-icon w-10 h-10 rounded-full object-cover border-2 border-emerald-500 hover:border-emerald-600 transition cursor-pointer shadow-md">
         </a>

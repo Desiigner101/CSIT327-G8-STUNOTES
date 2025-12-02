@@ -106,7 +106,7 @@
                     <!-- Header with avatar, name, email and edit button -->
                     <div class="flex items-end px-8 pb-6 -mt-20 relative">
                         <img 
-                            src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}"
+                            src="{{ user.profile_pic_url }}"
                             alt="{{ user.username }}"
                             class="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg mr-6 bg-white z-10"
                         >

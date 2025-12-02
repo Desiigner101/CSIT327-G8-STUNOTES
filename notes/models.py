@@ -11,7 +11,7 @@ class User(AbstractUser):
     
     # Optional profile fields
     bio = models.TextField(max_length=500, blank=True)  # Short biography
-    profile_pic = models.ImageField(upload_to='profile_pics/', default='default.jpg')  # Profile image
+    profile_pic = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.jpg')  # Profile image
     
     # User interface preference
     THEME_CHOICES = [
@@ -36,28 +36,35 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username', 'full_name']  # Fields required when creating a superuser
     
     def __str__(self):
-        # Display the user's full name or email in admin interface
         return self.full_name or self.email
-    
+
     @property
     def is_admin(self):
-        # Admin check mapped to Django's built-in superuser field
         return self.is_superuser
 
     class Meta:
-        db_table = 'notes_user'  # Custom database table name
-    
-    def __str__(self):
-        # Display the user's full name or email in admin interface
-        return self.full_name or self.email
-    
-    @property
-    def is_admin(self):
-        # Admin check mapped to Django's built-in superuser field
-        return self.is_superuser
+        db_table = 'notes_user'
 
-    class Meta:
-        db_table = 'notes_user'  # Custom database table name
+    @property
+    def profile_pic_url(self):
+        """
+        Return a safe URL for the user's profile picture. If the stored file
+        is missing from storage, return the static default image path so
+        templates don't raise when accessing `.url` on a missing file.
+        """
+        try:
+            if self.profile_pic and getattr(self.profile_pic, 'name', None):
+                # Check whether the file actually exists in storage
+                storage = self.profile_pic.storage
+                name = self.profile_pic.name
+                if storage.exists(name):
+                    return self.profile_pic.url
+        except Exception:
+            pass
+
+        # Fallback to static default user icon (use existing asset)
+        from django.conf import settings
+        return f"{settings.STATIC_URL}notes/images/profile_pic.png"
 
 
 class Task(models.Model):
