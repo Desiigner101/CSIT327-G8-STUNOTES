@@ -235,7 +235,7 @@
         <a href="{% url 'notes:switch_to_user_mode' %}" class="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-700 dark:text-blue-300">Switch to User View</a>
         {% endif %}
         <a href="{% url 'notes:profile_view' %}" class="profile-link">
-          <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+          <img src="{{ user.profile_pic_url }}" 
                alt="Profile" 
                class="profile-icon w-10 h-10 rounded-full object-cover border-2 border-purple-500 hover:border-purple-600 transition cursor-pointer shadow-md">
         </a>
@@ -304,7 +304,7 @@
           {% if recent_users %}
             {% for user in recent_users %}
             <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition">
-              <img src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+              <img src="{{ user.profile_pic_url }}" 
                    alt="{{ user.full_name }}" 
                    class="w-10 h-10 rounded-full object-cover">
               <div class="flex-1 min-w-0">
@@ -402,7 +402,7 @@
               <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                 <td class="px-4 py-3">
                   <div class="flex items-center gap-3">
-                    <img src="{% if user_stat.profile_pic %}{{ user_stat.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                    <img src="{{ user_stat.profile_pic_url }}" 
                          alt="{{ user_stat.full_name }}" 
                          class="w-8 h-8 rounded-full object-cover">
                     <span class="font-medium text-gray-800 dark:text-white">{{ user_stat.full_name }}</span>
@@ -519,7 +519,7 @@
                 {% if user_item.id != user.id %}
                 <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <div class="flex items-center gap-3">
-                    <img src="{% if user_item.profile_pic %}{{ user_item.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                    <img src="{{ user_item.profile_pic_url }}" 
                          alt="{{ user_item.full_name }}" 
                          class="w-8 h-8 rounded-full object-cover">
                     <div>

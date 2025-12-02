@@ -117,7 +117,7 @@
                     <div class="flex items-end px-8 pb-6 -mt-16 relative">
                         <!-- Profile Picture -->
                         <img 
-                            src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'notes/images/default.jpg' %}{% endif %}" 
+                            src="{{ user.profile_pic_url }}" 
                             alt="{{ user.username }}" 
                             class="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg mr-6 bg-gray-100"
                         >
