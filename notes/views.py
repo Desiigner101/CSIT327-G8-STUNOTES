@@ -397,6 +397,7 @@ def admin_dashboard(request):
         'recent_tasks': recent_tasks,
         'recent_notes': recent_notes,
         'user_stats': user_stats,
+        'all_users': all_users,  # For delete-user modal
         
         # Chart data
         'date_labels': date_labels,

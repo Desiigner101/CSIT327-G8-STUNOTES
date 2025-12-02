@@ -460,39 +460,51 @@
           {% csrf_token %}
           <div class="space-y-4">
             <div class="form-group">
-              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Full Name</label>
-              {{ user_form.full_name }}
-              {% if user_form.full_name.errors %}
-              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.full_name.errors.0 }}</p>
-              {% endif %}
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2" for="add_full_name">Full Name</label>
+              <input
+                id="add_full_name"
+                type="text"
+                name="full_name"
+                required
+                class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900 transition"
+                placeholder="Full Name"
+              >
             </div>
             <div class="form-group">
-              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Email Address</label>
-              {{ user_form.email }}
-              {% if user_form.email.errors %}
-              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.email.errors.0 }}</p>
-              {% endif %}
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2" for="add_email">Email Address</label>
+              <input
+                id="add_email"
+                type="email"
+                name="email"
+                required
+                class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900 transition"
+                placeholder="user@example.com"
+              >
             </div>
             <div class="form-group">
-              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Password</label>
-              {{ user_form.password1 }}
-              {% if user_form.password1.errors %}
-              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.password1.errors.0 }}</p>
-              {% endif %}
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2" for="add_password">Password</label>
+              <input
+                id="add_password"
+                type="password"
+                name="password"
+                required
+                minlength="8"
+                class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900 transition"
+                placeholder="Password (min 8 characters)"
+              >
             </div>
             <div class="form-group">
-              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Confirm Password</label>
-              {{ user_form.password2 }}
-              {% if user_form.password2.errors %}
-              <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ user_form.password2.errors.0 }}</p>
-              {% endif %}
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2" for="add_confirm_password">Confirm Password</label>
+              <input
+                id="add_confirm_password"
+                type="password"
+                name="confirm_password"
+                required
+                minlength="8"
+                class="w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 dark:focus:ring-emerald-900 transition"
+                placeholder="Confirm Password"
+              >
             </div>
-            {% if user_form.non_field_errors %}
-            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded">
-              <p class="text-red-800 dark:text-red-300 text-sm font-semibold">Please correct the errors:</p>
-              {{ user_form.non_field_errors }}
-            </div>
-            {% endif %}
           </div>
           <div class="flex gap-3 mt-6">
             <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Create User</button>
