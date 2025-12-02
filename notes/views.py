@@ -61,7 +61,6 @@ def landing_view(request):
     # redirect them to the login page rather than showing the landing/registration page.
     # This ensures a fresh installation (no users yet) shows the landing/registration screen by default,
     # but after a user exists, the default root will go to login.
-    if not request.user.is_authenticated and User.objects.exists():
         # Unless explicitly requested to show the landing page via query param (show_landing), go to login
         if not request.GET.get('show_landing'):
             return redirect('notes:login')
@@ -229,6 +228,77 @@ def home(request):
     }
 
     return render(request, "home.html", context)
+
+@login_required
+def add_user(request):
+    """
+    Admin view to create a new regular user account.
+    """
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to add users.")
+        return redirect("notes:admin_dashboard")
+    
+    if request.method == "POST":
+        full_name = request.POST.get("full_name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+        
+        # Validate passwords match
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match!")
+            return redirect("notes:admin_dashboard")
+        
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "User with this email already exists!")
+            return redirect("notes:admin_dashboard")
+        
+        # Create the user
+        try:
+            user = User.objects.create_user(
+                email=email,
+                username=email,
+                full_name=full_name,
+                password=password
+            )
+            messages.success(request, f"User '{full_name}' created successfully!")
+        except Exception as e:
+            messages.error(request, f"Error creating user: {str(e)}")
+        
+        return redirect("notes:admin_dashboard")
+    
+    return redirect("notes:admin_dashboard")
+
+
+@login_required
+def delete_user(request, user_id):
+    """
+    Admin view to delete a user account.
+    """
+    # Check if user is admin
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to delete users.")
+        return redirect("notes:admin_dashboard")
+    
+    # Prevent admins from deleting themselves
+    if request.user.id == user_id:
+        messages.error(request, "You cannot delete your own account from here. Use account settings instead.")
+        return redirect("notes:admin_dashboard")
+    
+    if request.method == "POST":
+        try:
+            user_to_delete = get_object_or_404(User, id=user_id)
+            user_name = user_to_delete.full_name or user_to_delete.email
+            user_to_delete.delete()
+            messages.success(request, f"User '{user_name}' has been deleted successfully!")
+        except Exception as e:
+            messages.error(request, f"Error deleting user: {str(e)}")
+        
+        return redirect("notes:admin_dashboard")
+    
+    return redirect("notes:admin_dashboard")
 
 
 @login_required
