@@ -122,6 +122,31 @@ class UserProfileForm(forms.ModelForm):
         if 'profile_pic' in self.fields:
              self.fields['profile_pic'].label = "Change Profile Picture"
 
+    def clean_profile_pic(self):
+        """
+        Validate uploaded profile image: file size and content type.
+        Limits: <= 3 MB, image/* MIME types only.
+        """
+        pic = self.cleaned_data.get('profile_pic')
+        if not pic:
+            return pic
+
+        # Size check (3 MB)
+        max_bytes = 3 * 1024 * 1024
+        try:
+            size = getattr(pic, 'size', 0) or 0
+            if size > max_bytes:
+                raise forms.ValidationError("Profile image must be 3 MB or smaller.")
+        except Exception:
+            pass
+
+        # Content type check
+        content_type = getattr(getattr(pic, 'file', None), 'content_type', '') or getattr(pic, 'content_type', '')
+        if content_type and not content_type.startswith('image/'):
+            raise forms.ValidationError("Please upload a valid image file.")
+
+        return pic
+
 class AdminCreationForm(forms.Form):
     """Form for creating a new admin account or upgrading existing account"""
     full_name = forms.CharField(

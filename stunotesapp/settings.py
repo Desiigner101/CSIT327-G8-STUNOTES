@@ -33,6 +33,10 @@ if DEBUG:
     ALLOWED_HOSTS.append('127.0.0.1')
     ALLOWED_HOSTS.append('[::1]') # IPv6 local host
 
+# CSRF trusted origins for prod
+raw_csrf = config('CSRF_TRUSTED_ORIGINS', default='')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in raw_csrf.split(',')] if raw_csrf else []
+
 
 # ---------------------------------------------------
 # APPLICATIONS
@@ -165,15 +169,45 @@ WHITENOISE_AUTOREFRESH = True
 WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = '/media/'
-# Use an environment-configurable MEDIA_ROOT. In production (DEBUG=False)
-# the default is `/tmp/media` which is writable on many serverless hosts
-# (Vercel's `/var/task` is read-only), but can be overridden with the
-# `MEDIA_ROOT` environment variable (useful when configuring cloud storage
-# or a persistent file location).
+"""
+Media storage
+
+On Vercel, the filesystem is read-only (except for ephemeral `/tmp`).
+For production, prefer a cloud file storage (e.g., Cloudinary).
+Fallbacks:
+- DEBUG=True: local `media/` folder
+- DEBUG=False: ephemeral `/tmp/media` unless cloud storage configured
+"""
+
 if DEBUG:
     MEDIA_ROOT = BASE_DIR / 'media'
 else:
     MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', '/tmp/media'))
+
+# Optional Cloudinary setup — enable when env vars are present
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
+CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
+CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
+CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
+
+if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET):
+    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME or None,
+        'API_KEY': CLOUDINARY_API_KEY or None,
+        'API_SECRET': CLOUDINARY_API_SECRET or None,
+        'MEDIA_PREFIX': os.environ.get('CLOUDINARY_MEDIA_PREFIX', 'stunotes-media'),
+    }
+
+# Secure cookies for production
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = False  # CSRF must be readable by browser, keep default
+SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
+SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=0 if DEBUG else 31536000, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
 
 
 # ---------------------------------------------------

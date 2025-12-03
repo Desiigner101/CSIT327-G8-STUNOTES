@@ -110,7 +110,7 @@ def home(request):
     # Rest of the home view code remains the same...
     # Get all user tasks and notes
     tasks = Task.objects.filter(user=user).order_by('-created_at')
-    notes = Note.objects.filter(user=user).order_by('-created_at')[:5]
+    notes = Note.objects.filter(user=user).only('id', 'title', 'subject', 'created_at').order_by('-created_at')[:5]
     
     # Calculate task statistics
     total_tasks = tasks.count()
@@ -136,19 +136,19 @@ def home(request):
     total_notes = Note.objects.filter(user=user).count()
     
     # Get completed tasks history
-    completed_tasks_list = tasks.filter(status='completed').order_by('-updated_at')
+    completed_tasks_list = tasks.filter(status='completed').only('id','title','updated_at').order_by('-updated_at')
     
     # Get pending tasks list
-    pending_tasks_list = tasks.filter(status='pending').order_by('due_date')
+    pending_tasks_list = tasks.filter(status='pending').only('id','title','due_date').order_by('due_date')
     
     # Get overdue tasks list
     overdue_tasks_list = tasks.filter(
         due_date__lt=now,
         status__in=['pending', 'in_progress']
-    ).order_by('due_date')
+    ).only('id','title','due_date').order_by('due_date')
     
     # Get all notes list
-    all_notes_list = Note.objects.filter(user=user).order_by('-created_at')
+    all_notes_list = Note.objects.filter(user=user).only('id','title','subject','created_at').order_by('-created_at')
     
     # Get unique subjects for filter dropdown
     unique_subjects = Note.objects.filter(
@@ -164,7 +164,7 @@ def home(request):
         due_date__gte=now,
         due_date__lte=next_24h,
         status__in=['pending', 'in_progress']
-    ).order_by('due_date')
+    ).only('id','title','due_date').order_by('due_date')
     
     # Detect if editing
     edit_task_id = request.GET.get("edit")
@@ -500,6 +500,24 @@ def edit_profile(request):
         pass
     
     if request.method == "POST":
+        # Allow removing current profile picture without changing other fields
+        if request.POST.get('remove_profile_pic') == '1':
+            try:
+                # Delete old file from storage if it's not the default
+                old = User.objects.get(pk=user.pk).profile_pic
+                if old and getattr(old, 'name', None) and old.name != 'profile_pics/default.jpg':
+                    try:
+                        old.delete(save=False)
+                    except Exception:
+                        pass
+                # Reset to default image
+                user.profile_pic = 'profile_pics/default.jpg'
+                user.save(update_fields=['profile_pic'])
+                messages.success(request, "Profile picture removed. You can upload a new one.")
+            except Exception:
+                messages.error(request, "Failed to remove profile picture. Please try again.")
+            return redirect("notes:edit_profile")
+
         first_name = request.POST.get('first_name', '').strip()
         last_name = request.POST.get('last_name', '').strip()
 

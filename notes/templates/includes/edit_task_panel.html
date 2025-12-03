@@ -9,7 +9,7 @@
   </div>
 
   <div class="p-6 overflow-auto">
-    <form method="post" class="space-y-6" action="">
+    <form method="post" class="space-y-6" action="{% url 'notes:edit_task' task.id %}">
       {% csrf_token %}
       <input type="hidden" name="panel" value="1">
 
