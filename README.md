@@ -1,3 +1,39 @@
+## Deployment (Vercel) Quick Guide
+
+This app is optimized for serverless deploys on Vercel. Key points:
+
+- Filesystem is read-only in production; use cloud storage for uploads (Cloudinary).
+- Static files are built and served via WhiteNoise.
+- Configure settings via environment variables.
+
+### Required Environment Variables
+
+- `SECRET_KEY`: Django secret key
+- `DEBUG`: `false` in production
+- `ALLOWED_HOSTS`: e.g. `.vercel.app,localhost,127.0.0.1`
+- `CSRF_TRUSTED_ORIGINS`: e.g. `https://your-app.vercel.app`
+- `DATABASE_URL`: Supabase/Postgres URL (with SSL)
+- Cloudinary (optional, recommended for prod uploads):
+   - `CLOUDINARY_URL` (or set `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`)
+
+### Static/Media
+
+- Static: `STATIC_URL=/static/`, built to `staticfiles/` and served via WhiteNoise.
+- Media (uploads):
+   - Dev: stored under `media/` locally.
+   - Prod: if Cloudinary is configured, uploaded there; otherwise fallback to `/tmp/media` (ephemeral).
+
+### Build/Runtime
+
+- Python runtime defined in `runtime.txt`.
+- Use Vercel’s Django adapter or containerize if needed.
+- Add a simple health endpoint if you want uptime checks.
+
+### Notes
+
+- Session and CSRF cookies are secure in production.
+- HSTS enabled in production; override with `SECURE_...` envs if necessary.
+
 # StuNotes: A Student Task & Notes Management System
 
 ## Table of Contents

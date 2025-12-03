@@ -9,6 +9,11 @@
   
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    try { tailwind.config = tailwind.config || {}; tailwind.config.darkMode = 'class'; } catch(e){}
+  </script>
+  {% include 'includes/theme_init.html' %}
+  {% include 'includes/dark_overrides.html' %}
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -30,9 +35,9 @@
   
   <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-lg flex flex-col">
+    <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
       <!-- Logo -->
-      <div class="p-6 border-b border-gray-200">
+      <div class="logo p-6 border-b border-gray-200">
         <div class="flex items-center gap-2">
           <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
           <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
@@ -55,13 +60,19 @@
             </a>
           </li>
           <li>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <a href="{% url 'notes:notes_list' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+              <span>All Notes</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'notes:calendar' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
               <i data-lucide="calendar" class="w-5 h-5"></i>
               <span>Calendar</span>
             </a>
           </li>
           <li>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+            <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
               <i data-lucide="settings" class="w-5 h-5"></i>
               <span>Settings</span>
             </a>
@@ -206,7 +217,7 @@
         </div>
 
         <!-- Info Section -->
-        <div class="mt-8 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-xl">
+        <div class="tips-box mt-8 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-xl">
           <div class="flex gap-3">
             <i data-lucide="lightbulb" class="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"></i>
             <div>
@@ -226,6 +237,12 @@
 
   <!-- Initialize Lucide Icons -->
   <script>
+    // Apply server/user theme immediately for this page
+    (function(){
+      const serverTheme = {% if user.is_authenticated %}"{{ user.theme|default:'light'|escapejs }}"{% else %}null{% endif %};
+      if(serverTheme !== null){ try{ localStorage.setItem('theme', serverTheme); }catch(e){}; document.documentElement.classList.toggle('dark', serverTheme === 'dark'); }
+      else { const theme = localStorage.getItem('theme') || 'light'; document.documentElement.classList.toggle('dark', theme === 'dark'); }
+    })();
     lucide.createIcons();
   </script>
 </body>
