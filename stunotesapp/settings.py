@@ -8,6 +8,7 @@ from pathlib import Path
 import dj_database_url
 from dotenv import load_dotenv
 from decouple import config
+import cloudinary
 
 # Load environment variables
 load_dotenv()
@@ -47,7 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'cloudinary_storage',  # Must be BEFORE staticfiles
+    'cloudinary',
+    'django.contrib.staticfiles',  # Only once!
     'notes',
     'widget_tweaks',
 ]
@@ -152,7 +155,20 @@ LOGIN_URL = 'notes:login'
 
 
 # ---------------------------------------------------
-# STATIC & MEDIA FILES
+# CLOUDINARY CONFIGURATION (Media Files)
+# ---------------------------------------------------
+cloudinary.config(
+    cloud_name = config('CLOUDINARY_CLOUD_NAME', default=''),
+    api_key = config('CLOUDINARY_API_KEY', default=''),
+    api_secret = config('CLOUDINARY_API_SECRET', default='')
+)
+
+# Use Cloudinary for all media file storage
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
+# ---------------------------------------------------
+# STATIC FILES
 # ---------------------------------------------------
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
@@ -168,41 +184,8 @@ WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = True
 WHITENOISE_MANIFEST_STRICT = False
 
+# Media URL (served by Cloudinary)
 MEDIA_URL = '/media/'
-"""
-Media storage
-
-On Vercel, the filesystem is read-only (except for ephemeral `/tmp`).
-For production, prefer a cloud file storage (e.g., Cloudinary).
-Fallbacks:
-- DEBUG=True: local `media/` folder
-- DEBUG=False: ephemeral `/tmp/media` unless cloud storage configured
-"""
-
-if DEBUG:
-    MEDIA_ROOT = BASE_DIR / 'media'
-else:
-    MEDIA_ROOT = Path(os.environ.get('MEDIA_ROOT', '/tmp/media'))
-
-# Optional Cloudinary setup — enable when env vars are present
-CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
-CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
-
-if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET):
-    INSTALLED_APPS += ['cloudinary', 'cloudinary_storage']
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': CLOUDINARY_CLOUD_NAME or None,
-        'API_KEY': CLOUDINARY_API_KEY or None,
-        'API_SECRET': CLOUDINARY_API_SECRET or None,
-        'MEDIA_PREFIX': os.environ.get('CLOUDINARY_MEDIA_PREFIX', 'stunotes-media'),
-    }
-elif not DEBUG:
-    # Explicitly force filesystem storage to writable /tmp in production when Cloudinary is not configured
-    from django.core.files.storage import FileSystemStorage  # noqa: F401
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Secure cookies for production
 CSRF_COOKIE_SECURE = not DEBUG
