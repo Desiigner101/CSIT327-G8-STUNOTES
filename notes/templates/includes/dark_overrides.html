@@ -229,6 +229,17 @@
     background-color: transparent !important; /* remove the inner box */
   }
 
+  /* Exception: Logout link should hover red in dark mode */
+  html.dark .sidebar a.text-red-600:hover {
+    background-color: rgba(239,68,68,0.12) !important; /* red-500 tint */
+    color: #ef4444 !important; /* red-500 */
+  }
+  html.dark .sidebar a.text-red-600:hover [data-lucide],
+  html.dark .sidebar a.text-red-600:hover span {
+    color: #ef4444 !important;
+    background-color: transparent !important;
+  }
+
 /* ACTIVE: background only on the <a> element */
 html.dark .sidebar a.active {
     background-color: rgba(34,197,94,0.12) !important;
@@ -246,6 +257,50 @@ html.dark .sidebar a.active * {
   html.dark .sidebar a:hover [data-lucide] {
     color: var(--sn-accent) !important;
   }
+
+  /* Dark-mode: make the "Return to Admin Mode" button readable */
+  html.dark .return-admin-btn {
+    background-color: rgba(99,102,241,0.18) !important; /* indigo-500 tint */
+    color: #e0e7ff !important; /* indigo-100 text */
+    border: 1px solid rgba(99,102,241,0.30) !important;
+  }
+  html.dark .return-admin-btn:hover {
+    background-color: rgba(99,102,241,0.30) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.6) !important;
+  }
+
+  /* Dark-mode: keep emerald color but increase Edit button clarity */
+  html.dark .edit-btn {
+    box-shadow: 0 6px 16px rgba(16,185,129,0.35) !important; /* emerald glow */
+    border: 1px solid rgba(16,185,129,0.35) !important; /* subtle outline */
+  }
+  html.dark .edit-btn:hover {
+    box-shadow: 0 8px 20px rgba(16,185,129,0.5) !important;
+    filter: brightness(1.04) !important; /* tiny lift without changing color */
+  }
+
+  /* Dark-mode: soften and clarify "Switch to User View" without being too bright */
+  html.dark .switch-user-btn {
+    background-color: rgba(59,130,246,0.14) !important; /* blue-500 tint, softer */
+    color: #dbeafe !important; /* blue-100 text for readability */
+    border: 1px solid rgba(59,130,246,0.28) !important;
+  }
+  html.dark .switch-user-btn:hover {
+    background-color: rgba(59,130,246,0.22) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(2,6,23,0.6) !important;
+  }
+
+  /* Dark-mode: tips/info boxes on edit_note become readable */
+  html.dark .tips-box {
+    background-color: rgba(30,41,59,0.6) !important; /* slate-800/60 */
+    border-color: rgba(59,130,246,0.45) !important; /* blue-500 border */
+    color: var(--sn-text) !important;
+  }
+  html.dark .tips-box h3 { color: #c7d2fe !important; } /* indigo-200 */
+  html.dark .tips-box ul { color: rgba(230,238,246,0.82) !important; }
+  html.dark .tips-box [data-lucide] { color: #93c5fd !important; } /* blue-300 icon */
 </style>
 <!-- If the user explicitly selected 'light' (stored/persisted), prefer that
      and make the sidebar stats + main content readable by targeting the

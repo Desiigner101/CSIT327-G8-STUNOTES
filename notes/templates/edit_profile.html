@@ -32,9 +32,9 @@
     <div class="flex h-screen overflow-hidden">
         
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg flex flex-col">
+        <aside class="sidebar w-64 bg-white shadow-lg flex flex-col">
             <!-- Logo -->
-            <div class="p-6 border-b border-gray-200">
+            <div class="logo p-6 border-b border-gray-200">
                 <div class="flex items-center gap-2">
                     <i data-lucide="book-open" class="w-6 h-6 text-emerald-600"></i>
                     <span class="text-2xl font-bold text-emerald-600">StuNotes</span>
@@ -51,19 +51,25 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'notes:profile_view' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                        <a href="{% url 'notes:profile_view' %}" class="active flex items-center gap-3 px-4 py-3 bg-emerald-50 text-emerald-600 rounded-lg font-semibold">
                             <i data-lucide="user" class="w-5 h-5"></i>
                             <span>Profile</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                        <a href="{% url 'notes:notes_list' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
                             <i data-lucide="calendar" class="w-5 h-5"></i>
+                            <span>All Notes</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'notes:calendar' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
                             <span>Calendar</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
+                        <a href="{% url 'notes:settings_page' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-emerald-50 hover:text-emerald-600 transition">
                             <i data-lucide="settings" class="w-5 h-5"></i>
                             <span>Settings</span>
                         </a>
@@ -222,13 +228,19 @@
                                 <label for="{{ form.profile_pic.id_for_label }}" class="block text-sm font-bold text-gray-800 mb-3">
                                     <i data-lucide="image" class="w-4 h-4 inline mr-2"></i>Profile Picture
                                 </label>
-                                <input 
-                                    type="file" 
-                                    name="profile_pic" 
-                                    id="{{ form.profile_pic.id_for_label }}"
-                                    accept="image/*"
-                                    class="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100"
-                                >
+                                <div class="flex items-center w-full justify-between gap-3">
+                                    <input 
+                                        type="file" 
+                                        name="profile_pic" 
+                                        id="{{ form.profile_pic.id_for_label }}"
+                                        accept="image/*"
+                                        class="flex-none px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100 transition file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100"
+                                    >
+                                    <button type="submit" name="remove_profile_pic" value="1" class="px-4 py-2 rounded-lg bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition whitespace-nowrap">
+                                        Remove Current Picture
+                                    </button>
+                                    
+                                </div>
                                 {% if form.profile_pic.errors %}
                                     <p class="text-red-500 text-sm mt-2 flex items-center gap-1">
                                         <i data-lucide="alert-circle" class="w-4 h-4"></i>{{ form.profile_pic.errors.0 }}
