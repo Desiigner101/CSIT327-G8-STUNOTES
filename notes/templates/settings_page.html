@@ -183,6 +183,7 @@
           </button>
         </div>
       </div>
+      
 <!-- Admin Account Creation -->
 <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-l-4 border-purple-500">
   <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
@@ -259,39 +260,26 @@
 
 
       <!-- Danger Zone -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-2 border-red-200 dark:border-red-800">
-        <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-red-100 dark:border-red-900">
-          <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
-          <h3 class="text-xl font-bold text-red-800 dark:text-red-400">Danger Zone</h3>
-        </div>
-        <div class="space-y-4">
-          <button onclick="openModal('deleteAccountModal')" 
-                  class="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition cursor-pointer group">
-            <div class="flex items-center gap-3">
-              <i data-lucide="trash-2" class="w-5 h-5 text-red-600 dark:text-red-400"></i>
-              <div>
-                <h4 class="font-semibold text-red-800 dark:text-red-300 text-left">Delete Account</h4>
-                <p class="text-sm text-red-600 dark:text-red-400">Permanently delete your account</p>
-              </div>
-            </div>
-            <i data-lucide="chevron-right" class="w-5 h-5 text-red-400 dark:text-red-300"></i>
-            </button>
-            {% if not is_admin %}
-            <button onclick="openModal('upgradeAdminModal')" 
-                    class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
-              <div class="flex items-center gap-3">
-                <i data-lucide="user-check" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
-                <div>
-                  <h4 class="font-semibold text-purple-800 dark:text-purple-300">Upgrade My Account</h4>
-                  <p class="text-sm text-purple-600 dark:text-purple-400">Make your account an Admin (admin-only)</p>
-                </div>
-              </div>
-              <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400"></i>
-            </button>
-            {% endif %}
+<div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-2 border-red-200 dark:border-red-800">
+  <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-red-100 dark:border-red-900">
+    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+    <h3 class="text-xl font-bold text-red-800 dark:text-red-400">Danger Zone</h3>
+  </div>
+  <div class="space-y-4">
+    <button onclick="openModal('deleteAccountModal')" 
+            class="w-full flex items-center justify-between p-4 bg-red-50 dark:bg-red-900/30 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition cursor-pointer group">
+      <div class="flex items-center gap-3">
+        <i data-lucide="trash-2" class="w-5 h-5 text-red-600 dark:text-red-400"></i>
+        <div>
+          <h4 class="font-semibold text-red-800 dark:text-red-300 text-left">Delete Account</h4>
+          <p class="text-sm text-red-600 dark:text-red-400">Permanently delete your account</p>
         </div>
       </div>
+      <i data-lucide="chevron-right" class="w-5 h-5 text-red-400 dark:text-red-300"></i>
+    </button>
   </div>
+</div>
+</div>
 </div>
 </main>
 
