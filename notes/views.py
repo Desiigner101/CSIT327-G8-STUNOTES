@@ -85,11 +85,16 @@ def login_view(request):
             # Redirect based on user role
             # Check if user is admin-only (cannot access user features)
             if hasattr(user, 'is_admin_only') and user.is_admin_only:
+                # Admin-only accounts always go to admin dashboard
                 return redirect("notes:admin_dashboard")
-            # Check if user is staff/superuser but not admin-only (can switch between views)
+            # Check if user is staff/superuser but NOT admin-only (has both admin and user access)
             elif user.is_staff or user.is_superuser:
-                return redirect("notes:admin_dashboard")
+                # These users have both privileges, default to user dashboard
+                # Set session flag so home view doesn't redirect them back
+                request.session['view_as_user'] = True
+                return redirect("notes:home")
             else:
+                # Regular users go to home
                 return redirect("notes:home")
         else:
             messages.error(request, "Invalid email or password.")
@@ -111,9 +116,8 @@ def home(request):
         messages.error(request, "Your account is admin-only and cannot access user features. Please use the Admin Dashboard.")
         return redirect("notes:admin_dashboard")
     
-    # Redirect admin users to admin dashboard UNLESS they explicitly want user view
-    if (request.user.is_staff or request.user.is_superuser) and not request.session.get('view_as_user', False):
-        return redirect("notes:admin_dashboard")
+    # REMOVED: The automatic redirect to admin dashboard for staff/superuser
+    # Now they can access home view by default unless they're admin-only
     
     # Rest of the home view code remains the same...
     # Get all user tasks and notes
