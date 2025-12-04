@@ -64,7 +64,7 @@ class User(AbstractUser):
 
         # Fallback to static default user icon
         from django.conf import settings
-        return f"{settings.STATIC_URL}notes/images/default-profile.png"
+        return "https://res.cloudinary.com/dgpuex4bh/image/upload/v1764851245/default-profile_kmmw8n.png"
 
 
 class Task(models.Model):
