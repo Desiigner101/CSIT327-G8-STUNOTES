@@ -11,7 +11,7 @@ class User(AbstractUser):
     
     # Optional profile fields
     bio = models.TextField(max_length=500, blank=True)  # Short biography
-    profile_pic = models.ImageField(upload_to='profile_pics/', default='profile_pics/default.jpg')  # Profile image
+    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, null=True)  # Profile image - blank/null means use default
     
     # User interface preference
     THEME_CHOICES = [
@@ -62,9 +62,9 @@ class User(AbstractUser):
         except Exception:
             pass
 
-        # Fallback to static default user icon (use existing asset)
+        # Fallback to static default user icon
         from django.conf import settings
-        return f"{settings.STATIC_URL}notes/images/profile_pic.png"
+        return f"{settings.STATIC_URL}notes/images/default-profile.png"
 
 
 class Task(models.Model):

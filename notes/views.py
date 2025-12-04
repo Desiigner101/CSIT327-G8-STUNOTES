@@ -580,15 +580,15 @@ def edit_profile(request):
         # Allow removing current profile picture without changing other fields
         if request.POST.get('remove_profile_pic') == '1':
             try:
-                # Delete old file from storage if it's not the default
+                # Delete old file from storage if it exists
                 old = User.objects.get(pk=user.pk).profile_pic
-                if old and getattr(old, 'name', None) and old.name != 'profile_pics/default.jpg':
+                if old and getattr(old, 'name', None):
                     try:
                         old.delete(save=False)
                     except Exception:
                         pass
-                # Reset to default image
-                user.profile_pic = 'profile_pics/default.jpg'
+                # Set to None/blank - the profile_pic_url property will handle showing default
+                user.profile_pic = None
                 user.save(update_fields=['profile_pic'])
                 messages.success(request, "Profile picture removed. You can upload a new one.")
             except Exception:
@@ -607,7 +607,8 @@ def edit_profile(request):
                     old = User.objects.get(pk=user.pk).profile_pic
                 except User.DoesNotExist:
                     old = None
-                if old and getattr(old, 'name', None) and old.name != 'default.jpg':
+                # Delete old file if it exists and is not empty
+                if old and getattr(old, 'name', None):
                     try:
                         old.delete(save=False)
                     except Exception:
