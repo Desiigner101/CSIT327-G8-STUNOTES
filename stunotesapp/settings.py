@@ -199,6 +199,10 @@ if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINAR
         'API_SECRET': CLOUDINARY_API_SECRET or None,
         'MEDIA_PREFIX': os.environ.get('CLOUDINARY_MEDIA_PREFIX', 'stunotes-media'),
     }
+elif not DEBUG:
+    # Explicitly force filesystem storage to writable /tmp in production when Cloudinary is not configured
+    from django.core.files.storage import FileSystemStorage  # noqa: F401
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Secure cookies for production
 CSRF_COOKIE_SECURE = not DEBUG
