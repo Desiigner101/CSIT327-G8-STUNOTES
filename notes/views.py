@@ -358,20 +358,24 @@ def admin_dashboard(request):
     medium_priority_tasks = all_tasks.filter(priority='medium').count()
     low_priority_tasks = all_tasks.filter(priority='low').count()
     
-    # Get date range for activity chart (last 7 days)
-    today = timezone.now().date()
-    days_ago_7 = today - timedelta(days=6)
-    
+    # Get date range for activity chart (last 7 days) using local timezone
+    # Use explicit start/end boundaries per day to avoid UTC vs local off-by-one issues
+    local_today = timezone.localdate()
+    start_day = local_today - timedelta(days=6)
+
     # Activity data for charts
     daily_tasks = []
     daily_notes = []
     date_labels = []
-    
+
     for i in range(7):
-        date = days_ago_7 + timedelta(days=i)
-        date_labels.append(date.strftime('%b %d'))
-        daily_tasks.append(all_tasks.filter(created_at__date=date).count())
-        daily_notes.append(all_notes.filter(created_at__date=date).count())
+        day = start_day + timedelta(days=i)
+        # Day boundaries in local tz
+        day_start = timezone.make_aware(timezone.datetime.combine(day, timezone.datetime.min.time()))
+        day_end = timezone.make_aware(timezone.datetime.combine(day + timedelta(days=1), timezone.datetime.min.time()))
+        date_labels.append(day.strftime('%b %d'))
+        daily_tasks.append(all_tasks.filter(created_at__gte=day_start, created_at__lt=day_end).count())
+        daily_notes.append(all_notes.filter(created_at__gte=day_start, created_at__lt=day_end).count())
     
     # Determine whether the 'Switch to User View' should be shown in the admin UI
     show_switch_to_user = (not getattr(request.user, 'is_admin_only', False)) and (request.user.is_staff or request.user.is_superuser)
