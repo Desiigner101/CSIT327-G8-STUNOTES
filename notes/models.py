@@ -153,3 +153,26 @@ class Reminder(models.Model):
     def is_due(self):
         # Returns True if the reminder time has passed and it hasn't been sent
         return timezone.now() >= self.remind_time and not self.is_sent
+
+
+class AdminRequest(models.Model):
+    """A request from a regular user asking to become an admin."""
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
+    requester = models.ForeignKey(User, on_delete=models.CASCADE, related_name="admin_requests")
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_admin_requests")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-created_at"]
+        db_table = "notes_admin_request"
+
+    def __str__(self):
+        return f"AdminRequest({self.requester.email}, {self.status})"

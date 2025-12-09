@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import User, Task, Note, Reminder
+from .models import AdminRequest
 from django.contrib.auth.forms import PasswordChangeForm
 # ----------------------------
 # User Forms
@@ -74,6 +75,14 @@ class ReminderForm(forms.ModelForm):
     class Meta:
         model = Reminder
         fields = ['task', 'remind_time', 'is_sent']
+
+class AdminRequestForm(forms.ModelForm):
+    class Meta:
+        model = AdminRequest
+        fields = ['reason']
+        widgets = {
+            'reason': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Describe why you should be an admin'})
+        }
 
 class UserProfileForm(forms.ModelForm):
     """
@@ -173,12 +182,6 @@ class AdminCreationForm(forms.Form):
             'placeholder': 'Password'
         }),
         help_text='For existing users, this will become their new password.'
-    )
-    is_admin_only = forms.BooleanField(
-        label='Admin-only account',
-        required=False,
-        initial=False,
-        help_text='If checked, this admin account will be admin-only and not have regular user features (Notes/Tasks).'
     )
     password2 = forms.CharField(
         label='Confirm Password',
