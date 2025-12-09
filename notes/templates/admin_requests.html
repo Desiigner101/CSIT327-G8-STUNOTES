@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Admin Requests - StuNotes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+  <div class="max-w-5xl mx-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <i data-lucide="inbox" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Pending Admin Requests</h1>
+      </div>
+      <a href="{% url 'notes:settings_page' %}"
+         class="inline-flex items-center gap-2 px-3 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg transition">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Back to Settings
+      </a>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
+      {% if pending_requests %}
+        <div class="grid grid-cols-1 gap-4">
+          {% for req in pending_requests %}
+            <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:shadow-md transition bg-white/70 dark:bg-gray-800/70">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ req.requester.full_name }} <span class="text-gray-500 dark:text-gray-400">({{ req.requester.email }})</span></p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Submitted: {{ req.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                <span class="px-2.5 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">{{ req.status|title }}</span>
+              </div>
+
+              <div class="mt-4">
+                <p class="text-gray-800 dark:text-gray-200 whitespace-pre-line">{{ req.reason }}</p>
+              </div>
+
+              <div class="mt-5 flex items-center gap-3">
+                <form method="post" action="{% url 'notes:approve_admin_request' req.id %}">
+                  {% csrf_token %}
+                  <button class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg shadow-sm transition">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    Approve
+                  </button>
+                </form>
+                <form method="post" action="{% url 'notes:reject_admin_request' req.id %}">
+                  {% csrf_token %}
+                  <button class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg shadow-sm transition">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                    Reject
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 rounded-xl">
+          <i data-lucide="mail" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+          <p class="text-purple-800 dark:text-purple-300">No pending requests.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => { try { lucide.createIcons(); } catch(e){} });
+  </script>
+</body>
+</html>

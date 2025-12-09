@@ -73,7 +73,7 @@
         {% else %}
         <li>
           <a href="{% url 'notes:home' %}" class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-900/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition">
-            <i data-lucide="home" class="w-5 h-5"></i>
+<!-- Admin Account Creation / Requests -->
             <span>Dashboard</span>
           </a>
         </li>
@@ -151,13 +151,10 @@
       </div>
     </header>
 
-    {% if user.is_admin_only %}
+    {% if is_admin and not view_as_user %}
     <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-lg text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-300">
-      <p class="font-semibold">Admin-only account</p>
-      <p class="text-sm">Your account has admin-only privileges and cannot access regular user features like Notes and Tasks. Use the Admin Dashboard to manage users and system data.</p>
-      <div class="mt-3">
-        <button onclick="openModal('makeUserAccessibleModal')" class="px-3 py-2 bg-emerald-500 text-white rounded-md">Make Account User-Accessible</button>
-      </div>
+      <p class="font-semibold">Admin account</p>
+      <p class="text-sm">Admins use the Admin Dashboard and do not access regular user features. Use a separate user account for personal notes and tasks.</p>
     </div>
     {% endif %}
 
@@ -184,32 +181,34 @@
         </div>
       </div>
       
-<!-- Admin Account Creation -->
+<!-- Admin Requests Inbox -->
 <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition border-l-4 border-purple-500">
   <div class="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100 dark:border-gray-700">
-    <i data-lucide="user-plus" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
-    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Admin Account Options</h3>
+    <i data-lucide="inbox" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Admin Requests Inbox</h3>
   </div>
   <div class="space-y-4">
-    <button onclick="openModal('createAdminModal')" 
-            class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
+    {% if is_admin %}
+    <a href="{% url 'notes:admin_requests_list' %}"
+       class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
       <div class="flex items-center gap-3">
-        <i data-lucide="shield-check" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+        <i data-lucide="mail" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
         <div class="flex-1">
-          <h4 class="font-semibold text-purple-800 dark:text-purple-300">Create New Admin</h4>
-          <p class="text-sm text-purple-600 dark:text-purple-400">Create a new administrator account</p>
+          <h4 class="font-semibold text-purple-800 dark:text-purple-300">Review Admin Permission Requests</h4>
+          <p class="text-sm text-purple-600 dark:text-purple-400">See and act on user requests to become admin</p>
         </div>
       </div>
       <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400 flex-shrink-0"></i>
-    </button>
+    </a>
+    {% endif %}
     {% if not is_admin %}
-    <button onclick="openModal('upgradeAdminModal')" 
+    <button onclick="openModal('requestAdminModal')" 
             class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
       <div class="flex items-center gap-3">
-        <i data-lucide="user-check" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+        <i data-lucide="mail" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
         <div class="flex-1">
-          <h4 class="font-semibold text-purple-800 dark:text-purple-300 text-left">Upgrade My Account</h4>
-          <p class="text-sm text-purple-600 dark:text-purple-400">Make your account an Admin (admin-only)</p>
+          <h4 class="font-semibold text-purple-800 dark:text-purple-300 text-left">Request Admin Permission</h4>
+          <p class="text-sm text-purple-600 dark:text-purple-400">Send a request with your reason</p>
         </div>
       </div>
       <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400 flex-shrink-0"></i>
@@ -227,33 +226,12 @@
     <h3 class="text-xl font-bold text-gray-800 dark:text-white">Role Management</h3>
   </div>
   <div class="space-y-4">
-    {% if view_as_user %}
-    <a href="{% url 'notes:switch_to_admin_mode' %}" 
-       class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
+    <div class="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4">
       <div class="flex items-center gap-3">
-        <i data-lucide="shield" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
-        <div>
-          <h4 class="font-semibold text-purple-800 dark:text-purple-300">Return to Admin Mode</h4>
-          <p class="text-sm text-purple-600 dark:text-purple-400">Switch back to admin view</p>
-        </div>
+        <i data-lucide="info" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+        <p class="text-sm text-purple-700 dark:text-purple-300">Admins cannot switch to user mode. Use a dedicated user account if needed.</p>
       </div>
-      <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400 flex-shrink-0"></i>
-    </a>
-    {% else %}
-      {% if not user.is_admin_only %}
-      <a href="{% url 'notes:switch_to_user_mode' %}" 
-         class="w-full flex items-center justify-between p-4 bg-purple-50 dark:bg-purple-900/30 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition cursor-pointer group">
-        <div class="flex items-center gap-3">
-          <i data-lucide="user-round" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
-          <div>
-            <h4 class="font-semibold text-purple-800 dark:text-purple-300">Switch to User Mode</h4>
-            <p class="text-sm text-purple-600 dark:text-purple-400">View as regular user</p>
-          </div>
-        </div>
-        <i data-lucide="chevron-right" class="w-5 h-5 text-purple-400 flex-shrink-0"></i>
-      </a>
-      {% endif %}
-    {% endif %}
+    </div>
   </div>
 </div>
 {% endif %}
@@ -516,11 +494,7 @@
               <p class="text-red-600 dark:text-red-400 text-sm mt-1">{{ admin_form.password2.errors.0 }}</p>
               {% endif %}
             </div>
-            <div class="form-group flex items-center gap-3">
-              {{ admin_form.is_admin_only }}
-              <label class="text-sm text-gray-700 dark:text-gray-300">Admin-only account</label>
-              <p class="text-xs text-gray-400 dark:text-gray-500 ml-2">Check to prevent this admin from using regular user features (Notes/Tasks).</p>
-            </div>
+            
             {% if admin_form.non_field_errors %}
             <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
               <p class="text-red-800 text-sm font-semibold">Please correct the errors:</p>
@@ -549,16 +523,12 @@
           {% csrf_token %}
           <input type="hidden" name="upgrade_to_admin" value="1">
           <div class="space-y-4">
-            <p class="text-gray-700 mb-2">Upgrading your account to admin will give you administrative privileges. You can choose to keep regular user access (Notes/Tasks), or mark the account as <strong>admin-only</strong> to prevent access to user features.</p>
+            <p class="text-gray-700 mb-2">Upgrading your account to admin will give you administrative privileges. Admins do not access regular user features. Alternatively, send a request below for an admin to approve.</p>
             <div class="form-group">
               <label class="block font-semibold text-gray-800 dark:text-white mb-2">Confirm Password</label>
               <input name="confirm_password" type="password" class="form-input" placeholder="Enter your current password" required>
             </div>
-            <div class="form-group flex items-center gap-3">
-              <input name="make_admin_only" type="checkbox" id="make_admin_only" class="form-checkbox h-5 w-5 text-purple-600">
-              <label for="make_admin_only" class="text-sm text-gray-700 dark:text-gray-300">Admin-only account</label>
-              <p class="text-xs text-gray-400 dark:text-gray-500 ml-2">Check to prevent this account from accessing regular user features (Notes/Tasks).</p>
-            </div>
+            
           </div>
           <div class="flex gap-3 mt-6">
             <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Upgrade Account</button>
@@ -569,30 +539,33 @@
     </div>
   </div>
 
-  <!-- Make Account User-Accessible Modal (downgrade admin-only) -->
-  <div id="makeUserAccessibleModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
+  <!-- Request Admin Permission Modal -->
+  <div id="requestAdminModal" class="modal hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] items-center justify-center">
     <div class="modal-content bg-white dark:bg-gray-800 mx-auto my-12 p-0 w-11/12 max-w-md rounded-3xl shadow-2xl animate-slideDown">
-      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-t-3xl text-white">
-        <h2 class="text-2xl font-bold">🔁 Make Account User-Accessible</h2>
-        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('makeUserAccessibleModal')">&times;</span>
+      <div class="modal-header px-8 py-6 flex justify-between items-center bg-gradient-to-r from-purple-500 to-purple-600 rounded-t-3xl text-white">
+        <h2 class="text-2xl font-bold">📨 Request Admin Permission</h2>
+        <span class="close-modal text-4xl font-bold cursor-pointer w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 hover:rotate-90 transition-all" onclick="closeModal('requestAdminModal')">&times;</span>
       </div>
       <div class="modal-body p-8">
-        <p class="text-gray-700 mb-4">This will allow your admin account to use regular user features (Notes and Tasks). Enter your password to confirm.</p>
         <form method="post" action="{% url 'notes:settings_page' %}">
           {% csrf_token %}
-          <input type="hidden" name="make_user_accessible" value="1">
-          <div class="form-group">
-            <label class="block font-semibold text-gray-800 dark:text-white mb-2">Confirm Password</label>
-            <input name="confirm_password_user_access" type="password" class="form-input" placeholder="Enter your current password" required>
+          <input type="hidden" name="submit_admin_request" value="1">
+          <div class="space-y-4">
+            <div class="form-group">
+              <label class="block font-semibold text-gray-800 dark:text-white mb-2">Reason</label>
+              {{ admin_request_form.reason }}
+            </div>
           </div>
           <div class="flex gap-3 mt-6">
-            <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Yes, Allow User Access</button>
-            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('makeUserAccessibleModal')">Cancel</button>
+            <button type="submit" class="btn btn-primary flex-1 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold">Send Request</button>
+            <button type="button" class="btn btn-secondary flex-1 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-xl hover:-translate-y-0.5 transition-all shadow-md font-semibold" onclick="closeModal('requestAdminModal')">Cancel</button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+  
 
   <style>
     .form-group input {
