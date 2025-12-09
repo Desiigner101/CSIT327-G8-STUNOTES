@@ -11,6 +11,7 @@ urlpatterns = [
     
     #Settings
     path('settings/', views.settings_page, name='settings_page'),
+    path('request-admin/', views.request_admin, name='request_admin'),
     path('delete-account/', views.delete_account, name='delete_account'),
     
     # Note creation
@@ -37,6 +38,10 @@ urlpatterns = [
 
     # Admin URLs
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    # Use non-conflicting prefix to avoid clashing with Django Admin at /admin/
+    path('admin-requests/', views.admin_requests_list, name='admin_requests_list'),
+    path('admin-requests/<int:request_id>/approve/', views.approve_admin_request, name='approve_admin_request'),
+    path('admin-requests/<int:request_id>/reject/', views.reject_admin_request, name='reject_admin_request'),
     path('add-user/', views.add_user, name='add_user'),  # ✅ Added earlier
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),  # ✅ ADD THIS LINE
     path('switch-to-user/', views.switch_to_user_mode, name='switch_to_user_mode'),

@@ -9,7 +9,8 @@ from django.urls import reverse
 from django.db.models import Count, Q
 from datetime import timedelta
 from .models import Task, Note, User, Reminder
-from .forms import TaskForm, UserProfileForm, NoteForm, AdminCreationForm
+from .models import AdminRequest
+from .forms import TaskForm, UserProfileForm, NoteForm, AdminCreationForm, AdminRequestForm
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 
@@ -82,20 +83,10 @@ def login_view(request):
             login(request, user)
             messages.success(request, "Login successful!")
             
-            # Redirect based on user role
-            # Check if user is admin-only (cannot access user features)
-            if hasattr(user, 'is_admin_only') and user.is_admin_only:
-                # Admin-only accounts always go to admin dashboard
+            # Redirect based on role: admins -> admin dashboard, users -> home
+            if user.is_staff or user.is_superuser:
                 return redirect("notes:admin_dashboard")
-            # Check if user is staff/superuser but NOT admin-only (has both admin and user access)
-            elif user.is_staff or user.is_superuser:
-                # These users have both privileges, default to user dashboard
-                # Set session flag so home view doesn't redirect them back
-                request.session['view_as_user'] = True
-                return redirect("notes:home")
-            else:
-                # Regular users go to home
-                return redirect("notes:home")
+            return redirect("notes:home")
         else:
             messages.error(request, "Invalid email or password.")
             return redirect("notes:login")
@@ -111,13 +102,10 @@ def home(request):
     """
     user = request.user
     
-    # Check if user is admin-only (cannot access user dashboard)
-    if hasattr(user, 'is_admin_only') and user.is_admin_only:
-        messages.error(request, "Your account is admin-only and cannot access user features. Please use the Admin Dashboard.")
+    # Admins cannot access user features; redirect them to admin dashboard
+    if user.is_staff or user.is_superuser:
+        messages.info(request, "Admins have a separate dashboard.")
         return redirect("notes:admin_dashboard")
-    
-    # REMOVED: The automatic redirect to admin dashboard for staff/superuser
-    # Now they can access home view by default unless they're admin-only
     
     # Rest of the home view code remains the same...
     # Get all user tasks and notes
@@ -378,7 +366,7 @@ def admin_dashboard(request):
         daily_notes.append(all_notes.filter(created_at__gte=day_start, created_at__lt=day_end).count())
     
     # Determine whether the 'Switch to User View' should be shown in the admin UI
-    show_switch_to_user = (not getattr(request.user, 'is_admin_only', False)) and (request.user.is_staff or request.user.is_superuser)
+    show_switch_to_user = False
 
     view_as_user = request.session.get('view_as_user', False)
 
@@ -427,16 +415,9 @@ def switch_to_user_mode(request):
         messages.error(request, "You don't have permission to perform this action.")
         return redirect("notes:home")
     
-    # Prevent admin-only accounts (admin-only) from switching to user view
-    if getattr(request.user, 'is_admin_only', False):
-        messages.error(request, "Admin-only accounts cannot access user features.")
-        return redirect("notes:admin_dashboard")
-
-    # Set a session flag to indicate admin wants user view
-    request.session['view_as_user'] = True
-    
-    messages.info(request, "Switched to user view. You can return to admin dashboard from settings.")
-    return redirect("notes:home")
+    # Disallow switching to user view entirely
+    messages.error(request, "Admins cannot switch to user view.")
+    return redirect("notes:admin_dashboard")
 
 
 @login_required
@@ -733,6 +714,7 @@ def settings_page(request):
     
     password_form = PasswordChangeForm(user)
     admin_form = AdminCreationForm()
+    admin_request_form = AdminRequestForm()
     should_open_modal = False
     should_open_admin_modal = False
     should_open_upgrade_modal = False
@@ -762,14 +744,9 @@ def settings_page(request):
                 user_tasks = Task.objects.filter(user=user).count()
                 user_notes = Note.objects.filter(user=user).count()
                 
-                # Determine admin-only flag from the form checkbox
-                make_admin_only = request.POST.get('make_admin_only') in ['on', '1', 'true', 'True']
-
-                # Upgrade user to admin (optionally admin-only)
+                # Upgrade user to admin; admins do not have user features
                 user.is_staff = True
                 user.is_superuser = True
-                # Mark that this is admin-only account (cannot access user features)
-                user.is_admin_only = make_admin_only
                 user.save()
                 
                 messages.success(request, f'Your account has been upgraded to admin! You now have admin-only access.')
@@ -784,18 +761,10 @@ def settings_page(request):
                 messages.error(request, 'Incorrect password. Please try again.')
                 should_open_upgrade_modal = True
 
-        # Check if this is a request to make an admin account user-accessible again
+        # Remove ability to make admin accounts user-accessible
         elif 'make_user_accessible' in request.POST:
-            confirm_password = request.POST.get('confirm_password_user_access')
-            if user.check_password(confirm_password):
-                user.is_admin_only = False
-                user.save()
-                messages.success(request, 'Your account now has user access in addition to admin.')
-                return redirect('notes:settings_page')
-            else:
-                messages.error(request, 'Incorrect password. Please try again.')
-                # Open the 'make user accessible' modal back up with error
-                should_open_make_user_accessible_modal = True
+            messages.error(request, 'Admins cannot have regular user access. Use a separate user account.')
+            should_open_make_user_accessible_modal = True
         
         # Check if this is a create new admin request
         elif 'create_admin' in request.POST:
@@ -805,14 +774,13 @@ def settings_page(request):
                 full_name = admin_form.cleaned_data['full_name']
                 email = admin_form.cleaned_data['email']
                 password = admin_form.cleaned_data['password1']
-                is_admin_only_flag = admin_form.cleaned_data.get('is_admin_only', False)
                 
                 # Check if user with this email already exists
                 if User.objects.filter(email=email).exists():
                     messages.error(request, 'An account with this email already exists. Use "Upgrade to Admin" to upgrade an existing account, or choose a different email.')
                     should_open_admin_modal = True
                 else:
-                    # Create new admin-only user
+                    # Create new admin user (separate role)
                     admin_user = User.objects.create_user(
                         email=email,
                         username=email,
@@ -820,7 +788,6 @@ def settings_page(request):
                         password=password,
                         is_staff=True,
                         is_superuser=True,
-                        is_admin_only=is_admin_only_flag  # Honor the admin-only flag
                     )
                     
                     messages.success(request, f'Admin account created successfully for {admin_user.full_name}!')
@@ -834,6 +801,22 @@ def settings_page(request):
             else:
                 messages.error(request, 'Please correct the errors below.')
                 should_open_admin_modal = True
+
+        # User submits an admin request
+        elif 'submit_admin_request' in request.POST:
+            if request.user.is_staff or request.user.is_superuser:
+                messages.error(request, 'Admins cannot request admin access.')
+            else:
+                admin_request_form = AdminRequestForm(request.POST)
+                if admin_request_form.is_valid():
+                    AdminRequest.objects.create(
+                        requester=request.user,
+                        reason=admin_request_form.cleaned_data['reason'],
+                        status='pending'
+                    )
+                    messages.success(request, 'Your admin request has been submitted for review.')
+                else:
+                    messages.error(request, 'Please provide a valid reason.')
             
     try:
         total_notes = Note.objects.filter(user=user).count()
@@ -868,9 +851,76 @@ def settings_page(request):
         'view_as_user': view_as_user,
         'admin_upgraded_info': admin_upgraded_info,
         'should_show_admin_success': should_show_admin_success,
+        'admin_request_form': admin_request_form,
     }
     
     return render(request, 'settings_page.html', context)
+
+
+@login_required
+def request_admin(request):
+    """Simple page for users to submit admin request."""
+    if request.user.is_staff or request.user.is_superuser:
+        messages.error(request, 'Admins do not need to request access.')
+        return redirect('notes:admin_dashboard')
+    if request.method == 'POST':
+        form = AdminRequestForm(request.POST)
+        if form.is_valid():
+            AdminRequest.objects.create(requester=request.user, reason=form.cleaned_data['reason'])
+            messages.success(request, 'Request submitted. An admin will review it.')
+            return redirect('notes:settings_page')
+    else:
+        form = AdminRequestForm()
+    return render(request, 'request_admin.html', {'form': form})
+
+
+@login_required
+def admin_requests_list(request):
+    """List pending admin requests for admins to review."""
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to access this page.")
+        return redirect('notes:home')
+    pending = AdminRequest.objects.filter(status='pending')
+    return render(request, 'admin_requests.html', {'pending_requests': pending})
+
+
+@login_required
+def approve_admin_request(request, request_id):
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('notes:home')
+    req = get_object_or_404(AdminRequest, id=request_id)
+    if req.status != 'pending':
+        messages.info(request, 'This request has already been processed.')
+        return redirect('notes:admin_requests_list')
+    # Approve: promote the requester to admin
+    user = req.requester
+    user.is_staff = True
+    user.is_superuser = True
+    user.save()
+    req.status = 'approved'
+    req.reviewed_by = request.user
+    req.reviewed_at = timezone.now()
+    req.save()
+    messages.success(request, f'{user.full_name or user.email} is now an admin.')
+    return redirect('notes:admin_requests_list')
+
+
+@login_required
+def reject_admin_request(request, request_id):
+    if not (request.user.is_staff or request.user.is_superuser):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('notes:home')
+    req = get_object_or_404(AdminRequest, id=request_id)
+    if req.status != 'pending':
+        messages.info(request, 'This request has already been processed.')
+        return redirect('notes:admin_requests_list')
+    req.status = 'rejected'
+    req.reviewed_by = request.user
+    req.reviewed_at = timezone.now()
+    req.save()
+    messages.info(request, 'Request rejected.')
+    return redirect('notes:admin_requests_list')
 
 
 @login_required
