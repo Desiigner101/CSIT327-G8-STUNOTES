@@ -8,7 +8,7 @@ This app is optimized for serverless deploys on Vercel. Key points:
 
 ### Required Environment Variables
 
-- `SECRET_KEY`: Django secret key
+- `SECRET_KEY`: Django secret ke
 - `DEBUG`: `false` in production
 - `ALLOWED_HOSTS`: e.g. `.vercel.app,localhost,127.0.0.1`
 - `CSRF_TRUSTED_ORIGINS`: e.g. `https://your-app.vercel.app`
