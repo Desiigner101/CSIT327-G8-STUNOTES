@@ -2,7 +2,7 @@
 
 This app is optimized for serverless deploys on Vercel. Key points:
 
-ds
+d
 - Filesystem is read-only in production; use cloud storage for uploads (Cloudinary).
 - Static files are built and served via WhiteNoise.
 - Configure settings via environment variables.
