@@ -4,7 +4,7 @@ This app is optimized for serverless deploys on Vercel. Key points:
 - Filesystem is read-only in production; use cloud storage for uploads (Cloudinary).
 - Static files are built and served via WhiteNoise.
 - Configure settings via environment variables.
-  12235433gg
+  12235433g
 ### Required Environment Variables
 
 - `SECRET_KEY`: Django secret key
